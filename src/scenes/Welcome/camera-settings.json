@@ -1,0 +1,39 @@
+{
+  "waypoints": [
+    {
+      "name": "Start: High & Far",
+      "position": [0.0, 6.0, 20.0],
+      "target": [0.0, 0.0, 0.0],
+      "enabled": true
+    },
+    {
+      "name": "Stop 1: Python (AI & Deep Learning)",
+      "position": [0.38, 4.5, -3.2],
+      "target": [0.2, 2.2, -1.8],
+      "enabled": true
+    },
+    {
+      "name": "Stop 2: React (Full-Stack Web)",
+      "position": [-5.4, 2.7, 0.85],
+      "target": [-3.2, 1.4, 0.5],
+      "enabled": true
+    },
+    {
+      "name": "Stop 3: Flutter (Mobile Apps)",
+      "position": [5.6, 1.7, 1.35],
+      "target": [3.4, 0.8, 0.8],
+      "enabled": true
+    }
+  ],
+  "end": {
+    "position": [0.0, 1.4, 14.5],
+    "target": [0.0, 0.2, 0.0]
+  },
+  "introDuration": 9.0,
+  "easing": "easeInOut",
+  "pathMode": "spline",
+  "zoomMin": 2.5,
+  "zoomMax": 22.0,
+  "cursorIntensity": 0.21,
+  "cursorSmoothing": 3.2
+}
