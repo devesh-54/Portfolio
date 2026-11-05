@@ -1,0 +1,225 @@
+:root {
+  --ink: #101a91;
+  --header-height: 56px;
+  --font-block: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+/* Header: name on the left, profile links on the right, floating over the scene */
+.header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 10;
+  height: var(--header-height);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ink);
+  pointer-events: none;   /* let drags reach the canvas; links opt back in */
+}
+.header-name {
+  font: 500 18px/1.2 var(--font-block);
+  letter-spacing: 0.01em;
+}
+.header-author {
+  opacity: 0.7;
+}
+@media (max-width: 520px) {
+  .header-author {
+    display: none;   /* not enough room next to the icons on phones */
+  }
+}
+.header-links {
+  display: flex;
+  gap: 16px;
+}
+.header-links a {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: inherit;
+  font-size: 20px;
+  border-radius: 4px;
+  pointer-events: auto;
+}
+.header-links a:hover {
+  opacity: 0.65;
+}
+.header-links a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.bottom-bar {
+  display: none !important;
+}
+
+/* Asset credits, bottom-left */
+.credits {
+  position: fixed;
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 2;
+  max-width: calc(50% - 270px);   /* stays clear of the centred bottom bar on wide screens */
+  margin: 0;
+  font: 400 11px/1.4 var(--font-block);
+  color: var(--ink);
+  opacity: 0.75;
+}
+.credits a {
+  color: inherit;
+}
+/* narrower screens: credits stay clear of nav */
+@media (max-width: 1000px) and (min-width: 641px) {
+  .credits {
+    left: 16px;
+    right: 16px;
+    bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    max-width: none;
+    text-align: center;
+  }
+}
+@media (max-width: 640px) {
+  .credits {
+    left: 12px;
+    right: 12px;
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    max-width: none;
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.3;
+  }
+}
+
+/* Leva panel sits below the header instead of over it */
+.leva-wrap {
+  position: fixed;
+  top: calc(var(--header-height) + 8px);
+  right: 16px;
+  z-index: 3;
+  width: min(300px, calc(100vw - 32px));
+  max-height: calc(100vh - var(--header-height) - 24px);
+  overflow-y: auto;
+}
+
+/* Loader: dark screen with cyan progress line for Welcome scene */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: #03050a;
+  transition: opacity 0.6s ease;
+}
+.loader--done {
+  opacity: 0;
+  pointer-events: none;
+}
+.loader-track {
+  width: min(240px, 60vw);
+  height: 2px;
+  background: #0e1526;
+  overflow: hidden;
+}
+.loader-line {
+  height: 100%;
+  background: #2fd0ff;
+  box-shadow: 0 0 10px #2fd0ff;
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+/* =========================================================
+   Scoped Dark Theme (.theme-dark) for Welcome scene ONLY
+   ========================================================= */
+.theme-dark {
+  --ink: #cfe3ff;
+  --bg-dark: #03050a;
+  --surface-fill: #090d18;
+  --hatch-blue: #4d73d9;
+  --outline-blue: #8fc4ff;
+  --cyan-glow: #2fd0ff;
+  background: #03050a;
+}
+
+.theme-dark .header {
+  color: #cfe3ff;
+}
+
+.theme-dark .header-name {
+  color: #cfe3ff;
+}
+
+.theme-dark .header-author {
+  color: #7fa6e8;
+  opacity: 1;
+}
+
+.theme-dark .top-action-icon {
+  color: #cfe3ff;
+}
+
+.theme-dark .top-action-icon:hover {
+  color: #2fd0ff;
+  opacity: 1;
+}
+
+.theme-dark .resume-btn {
+  color: #cfe3ff;
+  background: rgba(9, 13, 24, 0.85);
+  border: 1.5px solid rgba(47, 208, 255, 0.4);
+}
+
+.theme-dark .resume-btn:hover {
+  border-color: #2fd0ff;
+  color: #2fd0ff;
+  background: rgba(47, 208, 255, 0.1);
+}
+
+/* Nav pill styling in dark theme */
+.theme-dark .site-nav-pill {
+  background: rgba(9, 13, 24, 0.85);
+  border: 1.5px solid rgba(47, 208, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(47, 208, 255, 0.12);
+}
+
+.theme-dark .site-nav-item {
+  color: #cfe3ff;
+}
+
+.theme-dark .site-nav-item:hover {
+  background-color: rgba(47, 208, 255, 0.15);
+  color: #2fd0ff;
+}
+
+.theme-dark .site-nav-item--filled {
+  background-color: #2fd0ff;
+  color: #03050a;
+  font-weight: 800;
+}
+
+.theme-dark .site-nav-item--filled:hover {
+  background-color: #5ce0ff;
+  color: #03050a;
+}
+
+/* Credits in dark theme */
+.theme-dark .credits {
+  color: #7fa6e8;
+  opacity: 0.85;
+}
+
+.theme-dark .credits a {
+  color: #cfe3ff;
+}
+
