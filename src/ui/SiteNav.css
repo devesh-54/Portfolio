@@ -1,0 +1,244 @@
+/* SiteNav and TopActions Styles */
+.site-nav-pill-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.06s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.06s;
+}
+
+.site-nav-compact-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.site-nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(242, 241, 237, 0.9);
+  border: 1.5px solid #101a91;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(16, 26, 145, 0.08);
+}
+
+.site-nav-compact {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: rgba(242, 241, 237, 0.95);
+  border: 1.5px solid #101a91;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(16, 26, 145, 0.1);
+}
+
+.site-nav-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #101a91;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.site-nav-item:hover {
+  transform: translateY(-2px);
+  background-color: rgba(16, 26, 145, 0.08);
+}
+
+.site-nav-item:focus-visible {
+  outline: 2px solid #101a91;
+  outline-offset: 2px;
+}
+
+/* Primary filled item (e.g. PROJECTS on Welcome, or current active page) */
+.site-nav-item--filled {
+  background-color: #101a91;
+  color: #f2f1ed;
+}
+
+.site-nav-item--filled:hover {
+  background-color: #0c1475;
+  color: #f2f1ed;
+  transform: translateY(-2px);
+}
+
+/* Compact item adjustments */
+.site-nav-compact .site-nav-item {
+  padding: 6px 13px;
+  font-size: 11px;
+}
+
+/* Top-right action group */
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.resume-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  color: #101a91;
+  background: rgba(242, 241, 237, 0.85);
+  border: 1.5px solid #101a91;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.resume-btn-short {
+  display: none;
+}
+
+.resume-btn:hover {
+  transform: translateY(-1px);
+  background-color: rgba(16, 26, 145, 0.08);
+}
+
+.resume-btn:focus-visible {
+  outline: 2px solid #101a91;
+  outline-offset: 2px;
+}
+
+.social-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: #cfe3ff;
+  font-size: 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.social-icon-btn:hover {
+  color: #ffffff;
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.social-icon-btn:focus-visible {
+  outline: 2px solid #cfe3ff;
+  outline-offset: 2px;
+}
+
+/* Hidden during intro / entrance animation */
+.site-nav--hidden {
+  opacity: 0 !important;
+  transform: translateX(-50%) translateY(12px) !important;
+  pointer-events: none !important;
+}
+
+.top-actions--hidden {
+  opacity: 0 !important;
+  transform: translateY(12px) !important;
+  pointer-events: none !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav-pill-wrap,
+  .top-actions {
+    transition: opacity 0.4s ease !important;
+  }
+  .site-nav--hidden {
+    transform: translateX(-50%) !important;
+  }
+  .top-actions--hidden {
+    transform: none !important;
+  }
+  .site-nav-item:hover,
+  .site-nav-item--filled:hover,
+  .resume-btn:hover,
+  .social-icon-btn:hover {
+    transform: none !important;
+  }
+}
+
+/* Mobile responsive styles (640px and below) */
+@media (max-width: 640px) {
+  .site-nav-pill-wrap,
+  .site-nav-compact-wrap {
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    transform: none;
+    width: auto;
+  }
+
+  .site-nav--hidden {
+    transform: translateY(12px) !important;
+  }
+
+  .site-nav-pill,
+  .site-nav-compact {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .site-nav-item,
+  .site-nav-compact .site-nav-item {
+    padding: 9px 4px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .resume-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .resume-btn-text {
+    display: none;
+  }
+
+  .resume-btn-short {
+    display: inline;
+  }
+
+  .top-actions {
+    gap: 8px;
+  }
+}

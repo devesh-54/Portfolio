@@ -6,7 +6,7 @@ import { LogoTile } from './LogoTile'
 import { Space } from './Space'
 import { CameraRig } from './CameraRig'
 
-interface WelcomeSceneProps {
+interface ProjectsSceneProps {
   startIntro: boolean
   isSkipped: boolean
   reducedMotion: boolean
@@ -17,7 +17,7 @@ interface WelcomeSceneProps {
 }
 
 /**
- * Modern 3D Welcome Scene (Page 1)
+ * 3D Projects Logo Scene
  *
  * Implements:
  * - Empty, bright, airy paper void (#f2f1ed) with soft depth fog (18..48)
@@ -27,7 +27,7 @@ interface WelcomeSceneProps {
  * - Cinematic flythrough stopping at Python, React, and Flutter
  * - Seamless handoff to 360-degree free orbit controls + reset view
  */
-export function WelcomeScene({
+export function ProjectsScene({
   startIntro,
   isSkipped,
   reducedMotion,
@@ -35,7 +35,7 @@ export function WelcomeScene({
   onSceneReady,
   onIntroComplete,
   onWaypointChange,
-}: WelcomeSceneProps) {
+}: ProjectsSceneProps) {
   const [isMobile, setIsMobile] = useState(false)
   const { textures, ready: texturesReady } = useLogoTextures()
 

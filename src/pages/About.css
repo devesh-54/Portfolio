@@ -1,0 +1,66 @@
+/* About page styles */
+.about-bio-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.about-bio-p {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #101a91;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.about-card {
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(16, 26, 145, 0.16);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.about-card-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(16, 26, 145, 0.65);
+  margin-bottom: 8px;
+}
+
+.about-card-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #101a91;
+  font-weight: 500;
+  margin: 0;
+}
+
+.about-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.about-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(16, 26, 145, 0.08);
+  color: #101a91;
+  border: 1px solid rgba(16, 26, 145, 0.2);
+}
+
+.about-chip--primary {
+  background: #101a91;
+  color: #f2f1ed;
+  border-color: #101a91;
+}
