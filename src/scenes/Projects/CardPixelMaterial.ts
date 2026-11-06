@@ -12,7 +12,7 @@ const vertexShader = /* glsl */ `
 const fragmentShader = /* glsl */ `
   uniform sampler2D map;
   uniform float uWaveProgress; // 0.0 (veiled) -> 1.0 (complete project)
-  uniform float uResolution;   // pixel block density (~18.0 rows to match video)
+  uniform float uResolution;   // pixel block density (~36.0 rows for half pixel size)
   uniform float uBrightness;   // depth brightness
   uniform float uOpacity;      // total card opacity
   uniform float uHover;        // hover pop
@@ -31,7 +31,7 @@ const fragmentShader = /* glsl */ `
   void main() {
     vec2 uv = vUv;
 
-    // Grid size: exactly matching the chunky square pixel size from the video (18 rows)
+    // Grid size: refined square pixel size (36 rows = half original pixel size)
     vec2 gridSize = vec2(round(uResolution * uAspect), uResolution);
     vec2 blockId = floor(uv * gridSize);
     vec2 blockUv = (blockId + 0.5) / gridSize;
@@ -40,12 +40,12 @@ const fragmentShader = /* glsl */ `
     float d = blockUv.x;
 
     // Wave travels from before left edge to past right edge
-    float edge = mix(-0.15, 1.15, uWaveProgress);
+    float edge = mix(-0.12, 1.12, uWaveProgress);
 
     // Row jitter and cell scatter noise matching Graham Mast After Effects pixel wipe
     float flicker = uFlickerStep;
-    float rowJitter = (hash2(vec2(blockId.y, flicker * 0.04)) - 0.5) * 0.12;
-    float cellNoise = (hash2(blockId + vec2(flicker * 0.04, 3.14)) - 0.5) * 0.16;
+    float rowJitter = (hash2(vec2(blockId.y, flicker * 0.04)) - 0.5) * 0.10;
+    float cellNoise = (hash2(blockId + vec2(flicker * 0.04, 3.14)) - 0.5) * 0.12;
     float val = (d - (edge + rowJitter)) + cellNoise;
 
     if (uWaveProgress >= 0.999 || val <= 0.0) {
@@ -53,13 +53,13 @@ const fragmentShader = /* glsl */ `
       // 1. BEHIND THE WAVE: Revealed project picture
       // -------------------------------------------------------------
       vec4 texColor;
-      if (uWaveProgress < 0.96 && d > edge - 0.16) {
-        // Chunky square pixel block right at the wave transition front
+      if (uWaveProgress < 0.98 && d > edge - 0.10) {
+        // Square pixel block right at the wave transition front
         texColor = texture2D(map, blockUv);
         vec2 cellUv = fract(uv * gridSize);
-        float border = step(0.06, cellUv.x) * step(cellUv.x, 0.94) *
-                       step(0.06, cellUv.y) * step(cellUv.y, 0.94);
-        texColor.rgb *= (0.85 + 0.15 * border);
+        float border = step(0.04, cellUv.x) * step(cellUv.x, 0.96) *
+                       step(0.04, cellUv.y) * step(cellUv.y, 0.96);
+        texColor.rgb *= (0.88 + 0.12 * border);
       } else {
         // 100% crisp high-resolution project image
         texColor = texture2D(map, uv);
@@ -105,7 +105,7 @@ export function createCardPixelMaterial(texture: THREE.Texture): THREE.ShaderMat
     uniforms: {
       map: { value: texture },
       uWaveProgress: { value: 0.0 },
-      uResolution: { value: 18.0 },
+      uResolution: { value: 36.0 },
       uBrightness: { value: 1.0 },
       uOpacity: { value: 0.0 },
       uHover: { value: 0.0 },

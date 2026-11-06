@@ -554,9 +554,9 @@ export function DepthFlythrough({
       obj.position.set(card.x, card.y, card.z)
       obj.rotation.set(card.rotX, card.rotY, 0)
 
-      // Smooth lens dissolve only when passing right past camera lens
-      // Stays 100% solid and opaque throughout the entire focus view zone (d in [2.5, 55.0])
-      const lensDissolve = smoothstep(0.4, 2.5, d)
+      // Smooth lens dissolve as card approaches and passes camera
+      // Eliminates near-lens hyperbolic speed burst while keeping cards 100% solid in focus zone
+      const lensDissolve = smoothstep(0.8, 4.5, d)
 
       // Distant fog fade to white
       let distFade = 1.0
@@ -575,13 +575,13 @@ export function DepthFlythrough({
 
           // Distance-based Left-to-Right Graham Mast pixel wipe:
           // d >= 24.0: veiled blueprint state
-          // d in [7.0, 24.0]: pixel wave sweeps across card face
-          // d <= 7.0: 100% complete crisp high-resolution project screenshot
+          // d in [6.5, 24.0]: pixel wave sweeps across card face
+          // d <= 6.5: 100% complete crisp high-resolution project screenshot
           let waveProg = 0.0
-          if (d <= 7.0) {
+          if (d <= 6.5) {
             waveProg = 1.0
           } else if (d < 24.0) {
-            waveProg = 1.0 - (d - 7.0) / 17.0
+            waveProg = 1.0 - (d - 6.5) / 17.5
           } else {
             waveProg = 0.0
           }
