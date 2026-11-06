@@ -51,10 +51,6 @@ export function PixelateTransitionOverlay() {
 
     // Colors in ABGR (0xAABBGGRR) format for direct 32-bit write
     const COLOR_WHITE = 0xFFFFFFFF       // #ffffff (revealed project background)
-    const COLOR_DARK_VOID = 0xFF0A0503   // #03050a (Welcome void background)
-    const COLOR_DARK_NAVY = 0xFF50120F   // #0f1250 (Dark navy from Welcome palette)
-    const COLOR_INK_BLUE  = 0xFF911A10   // #101a91 (Ink blue)
-    const COLOR_CYAN_GLOW = 0xFFFFD02F   // #2fd0ff (Cyber cyan accent at wave crest)
     const COLOR_TRANSPARENT = 0x00000000 // Shows underlying dark Welcome 3D scene
 
     const render = () => {
@@ -84,8 +80,8 @@ export function PixelateTransitionOverlay() {
       const t = Math.max(0, Math.min(1, (p - P_START) / (P_END - P_START)))
       const easedT = easeInOutCubic(t)
 
-      // Cell size: ~28px square retro pixels
-      const cell = Math.max(20, Math.min(38, Math.round(H / 28)))
+      // Cell size: ~18 rows vertically, exactly matching the Graham Mast video block scale
+      const cell = Math.max(32, Math.round(H / 18))
       const cols = Math.ceil(W / cell)
       const rows = Math.ceil(H / cell)
 
@@ -97,57 +93,30 @@ export function PixelateTransitionOverlay() {
       const imgData = offCtx.createImageData(cols, rows)
       const buf32 = new Uint32Array(imgData.data.buffer)
 
-      // Wave band geometry (width ~6 cells)
-      const bandCols = 6
-      const edgeBase = easedT * (cols + bandCols + 4) - 2
-      const flicker = Math.floor(t * 120)
+      // Total travel distance in cells: from -4 to cols + 4
+      const edgeBase = easedT * (cols + 8) - 4
+      const flicker = Math.floor(t * 60)
 
       for (let r = 0; r < rows; r++) {
-        // Deterministic edge jitter per row
-        const jitter = (hash3(r, 11, flicker) - 0.5) * 2.2
-        const edgeR = edgeBase + jitter
-
+        // Row-by-row jitter for the wavy stair-step edge
+        const rowJitter = (hash3(r, 7, flicker) - 0.5) * 3.0
         const rowOffset = r * cols
 
         for (let c = 0; c < cols; c++) {
           const idx = rowOffset + c
 
-          if (c < edgeR - bandCols) {
-            // 1. BEHIND THE WAVE (left side):
-            // Swept clean to pure WHITE (#ffffff) project background
+          // Distance from the jagged edge in cell units
+          const dist = c - (edgeBase + rowJitter)
+
+          // Cell-level scatter noise matching Graham Mast After Effects wipe
+          const noise = (hash3(c, r, flicker + 13) - 0.5) * 2.2
+          const val = dist + noise
+
+          if (val <= 0) {
+            // BEHIND THE WAVE: Revealed pure clean solid WHITE (#ffffff)
             buf32[idx] = COLOR_WHITE
-
-          } else if (c <= edgeR) {
-            // 2. INSIDE THE PIXEL WAVE BAND:
-            // Moving wave made of dark Welcome-colored pixels with glowing leading edge
-            const bandT = (c - (edgeR - bandCols)) / bandCols // 0 at rear, 1 at front
-            const h = hash3(c, r, flicker)
-            const hColor = hash3(r, c, flicker + 37)
-
-            if (bandT > 0.82 && h < 0.40) {
-              // Leading edge glowing cyan / white hot crest
-              buf32[idx] = hColor < 0.5 ? COLOR_CYAN_GLOW : COLOR_WHITE
-            } else if (h < 0.90) {
-              // Dark Welcome page colors
-              if (hColor < 0.45) buf32[idx] = COLOR_DARK_VOID
-              else if (hColor < 0.75) buf32[idx] = COLOR_DARK_NAVY
-              else buf32[idx] = COLOR_INK_BLUE
-            } else {
-              buf32[idx] = COLOR_WHITE
-            }
-
-          } else if (c < edgeR + 2) {
-            // 3. SPARKS JUST AHEAD OF THE WAVE:
-            const h = hash3(c, r, flicker)
-            if (h < 0.18) {
-              buf32[idx] = COLOR_DARK_VOID
-            } else {
-              buf32[idx] = COLOR_TRANSPARENT
-            }
-
           } else {
-            // 4. AHEAD OF THE WAVE (right side):
-            // Transparent (shows dark Welcome 3D scene underneath)
+            // AHEAD OF THE WAVE: Transparent, showing dark Welcome scene underneath
             buf32[idx] = COLOR_TRANSPARENT
           }
         }
@@ -160,13 +129,7 @@ export function PixelateTransitionOverlay() {
       ctx.clearRect(0, 0, W, H)
       ctx.drawImage(offscreen, 0, 0, cols, rows, 0, 0, W, H)
 
-      // Draw glow canvas (blurred)
-      glowCtx.imageSmoothingEnabled = false
-      glowCtx.clearRect(0, 0, W, H)
-      glowCtx.drawImage(offscreen, 0, 0, cols, rows, 0, 0, W, H)
-
       canvas.style.opacity = '1'
-      glow.style.opacity = '0.6'
     }
 
     gsap.ticker.add(render)
