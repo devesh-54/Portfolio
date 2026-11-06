@@ -22,6 +22,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { projects, type ProjectItem } from '../../config/projects'
 import { heroProgress } from '../Welcome/heroProgress'
 import { FLIGHT_CONFIG } from './flightConfig'
+import { createCardPixelMaterial } from './CardPixelMaterial'
 
 // ─── Deterministic Seeded PRNG (Mulberry32) ──────────────────────────────────
 
@@ -544,8 +545,11 @@ export function DepthFlythrough({
   const cardMaterials = useMemo(() => {
     return cards.map((card) => {
       if (card.isReal && card.project) {
+        const tex = projectTextures.get(card.project.id)
+        if (tex) {
+          return createCardPixelMaterial(tex)
+        }
         return new THREE.MeshBasicMaterial({
-          map: projectTextures.get(card.project.id),
           transparent: true,
           opacity: 0,
           depthWrite: true,
@@ -718,18 +722,61 @@ export function DepthFlythrough({
         obj.position.set(t.x, t.y, t.z)
         obj.rotation.set(t.rotXRad, 0, t.rotZRad)
 
-        mat.opacity = t.totalOpacity
-
-        // Front cards are normal brightness (1.0), back ones are darker (down to 0.20)
-        const b = t.brightness
-        mat.color.setRGB(b, b, b)
-
         if (card.isReal && card.project) {
+          const pMat = mat as THREE.ShaderMaterial
+          if (pMat.uniforms) {
+            pMat.uniforms.uOpacity.value = t.totalOpacity
+            pMat.uniforms.uBrightness.value = t.brightness
+            pMat.uniforms.uFlickerStep.value = Math.floor(flightP * 120)
+
+            const d = t.d
+            // Distance-based pixel decode / materialization
+            if (d > 24.0) {
+              pMat.uniforms.uResolution.value = 14.0
+              pMat.uniforms.uProgress.value = 0.0
+            } else if (d > 6.5) {
+              const tApproach = 1.0 - (d - 6.5) / 17.5 // 0.0 at d=24, 1.0 at d=6.5
+              pMat.uniforms.uProgress.value = tApproach
+              if (tApproach < 0.20) {
+                pMat.uniforms.uResolution.value = 16.0
+              } else if (tApproach < 0.40) {
+                pMat.uniforms.uResolution.value = 24.0
+              } else if (tApproach < 0.60) {
+                pMat.uniforms.uResolution.value = 40.0
+              } else if (tApproach < 0.80) {
+                pMat.uniforms.uResolution.value = 72.0
+              } else if (tApproach < 0.95) {
+                pMat.uniforms.uResolution.value = 128.0
+              } else {
+                pMat.uniforms.uResolution.value = 512.0
+              }
+            } else if (d >= 4.5) {
+              // Focus crest / hero moment: 100% crisp, sharp high-res!
+              pMat.uniforms.uResolution.value = 512.0
+              pMat.uniforms.uProgress.value = 1.0
+            } else {
+              // Near-lens exit: pixelates out as it descends
+              const tExit = Math.max(0.0, (d - 1.0) / 3.5)
+              pMat.uniforms.uProgress.value = tExit
+              if (tExit < 0.3) {
+                pMat.uniforms.uResolution.value = 20.0
+              } else if (tExit < 0.7) {
+                pMat.uniforms.uResolution.value = 48.0
+              } else {
+                pMat.uniforms.uResolution.value = 96.0
+              }
+            }
+          }
+
           const isHovered = hoveredId === card.project.id
           const targetHover = isHovered ? 1.0 : 0.0
           const curHover = hoverProgressRef.current[i] || 0
           const nextHover = THREE.MathUtils.damp(curHover, targetHover, 14, safeDelta)
           hoverProgressRef.current[i] = nextHover
+
+          if (pMat.uniforms) {
+            pMat.uniforms.uHover.value = nextHover
+          }
 
           // Button scale pop on hover (1.0 -> 1.05)
           const s = 1.0 + 0.05 * nextHover
@@ -757,6 +804,11 @@ export function DepthFlythrough({
               activeLabelOpacity = 1.0 - smoothstep(0.015, 0.05, distToFocus)
             }
           }
+        } else {
+          // Placeholder card material
+          mat.opacity = t.totalOpacity
+          const b = t.brightness
+          ;(mat as THREE.MeshBasicMaterial).color.setRGB(b, b, b)
         }
       }
     }
