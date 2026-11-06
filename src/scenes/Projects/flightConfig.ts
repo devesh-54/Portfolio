@@ -7,12 +7,12 @@
 
 export const FLIGHT_CONFIG = {
   // Pinned scroll distances (in vh)
-  DIVE_SCROLL_VH: 150,     // Phase A: dive into monitor (150vh)
+  DIVE_SCROLL_VH: 80,      // Phase A: pixelate transition from Welcome to Projects (80vh)
   FLIGHT_SCROLL_VH: 500,   // Phase B: card flight (500vh)
 
-  // Derived handover point: fraction of total hero scroll where dive ends and flight begins
-  // 150 / (150 + 500) = 0.230769...
-  HANDOVER_P: 150 / (150 + 500),
+  // Derived handover point: fraction of total hero scroll where transition ends and flight begins
+  // 80 / (80 + 500) = 0.137931...
+  HANDOVER_P: 80 / (80 + 500),
 
   // Camera & Perspective: 100px = 1.0 Three.js unit
   PERSPECTIVE_DISTANCE: 15.0, // 1500px -> 15.0 units
