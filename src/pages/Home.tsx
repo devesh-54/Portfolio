@@ -8,6 +8,7 @@ import { invalidate } from '@react-three/fiber'
 import WelcomeApp from '../scenes/Welcome/App.jsx'
 import { Header } from '../scenes/Welcome/Header'
 import { Credits } from '../scenes/Welcome/Credits'
+import { PixelateTransitionOverlay } from '../scenes/Welcome/PixelateTransitionOverlay'
 import { About } from './About'
 import { Skills } from './Skills'
 import { Contact } from './Contact'
@@ -541,6 +542,9 @@ export function Home() {
           isDetailOpen={isDetailOpen}
         />
       </div>
+
+      {/* CapCut-style Pixelate Mosaic Transition Overlay across Handover */}
+      <PixelateTransitionOverlay />
 
       {/* Pinned Hero Section (Camera Dive Track) */}
       <section
