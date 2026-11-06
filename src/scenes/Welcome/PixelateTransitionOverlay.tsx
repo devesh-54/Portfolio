@@ -78,8 +78,8 @@ export function PixelateTransitionOverlay() {
       // Constant linear velocity: ensures 1:1 smooth movement matching scroll without acceleration surge at 50%
       const easedT = t
 
-      // Cell size: reduced by half (from H / 18 to H / 36) for fine, crisp square blocks
-      const cell = Math.max(16, Math.round(H / 36))
+      // Cell size: chunky & crisp square blocks (~26 rows across monitor height, matching projects)
+      const cell = Math.max(20, Math.round(H / 26))
       const cols = Math.ceil(W / cell)
       const rows = Math.ceil(H / cell)
 

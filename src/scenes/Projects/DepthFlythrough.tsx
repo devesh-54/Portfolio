@@ -13,6 +13,7 @@ import { FLIGHT_CONFIG } from './flightConfig'
 import { projects, type ProjectItem } from '../../config/projects'
 import { heroProgress } from '../Welcome/heroProgress'
 import { createCardPixelMaterial } from './CardPixelMaterial'
+import { createPlaceholderPixelMaterial } from './PlaceholderPixelMaterial'
 
 // ─── Deterministic PRNG ───────────────────────────────────────────────────────
 
@@ -122,12 +123,12 @@ function createButtonShadowTexture(): THREE.CanvasTexture {
   return tex
 }
 
-// ─── Placeholder: Black Box with Blue Lines (Matching Curved Monitor) ─────────
+// ─── Placeholder: Deep OLED Black Cyber Block with High-Contrast Blue/Cyan Details ──
 
 function createBlackBoxPlaceholderTextures(): THREE.CanvasTexture[] {
   const width = 384
   const height = 256
-  const r = 14
+  const r = 16
 
   return [0, 1, 2, 3, 4, 5, 6, 7].map((idx) => {
     const canvas = document.createElement('canvas')
@@ -135,13 +136,13 @@ function createBlackBoxPlaceholderTextures(): THREE.CanvasTexture[] {
     canvas.height = height
     const ctx = canvas.getContext('2d')!
 
-    // 1. Solid Dark Background
-    ctx.fillStyle = '#03050a'
+    // 1. Deep Solid Jet Black Background (#000000)
+    ctx.fillStyle = '#000000'
     drawRoundedRectPath(ctx, 0, 0, width, height, r)
     ctx.fill()
 
-    // 2. Blueprint Grid Lines
-    ctx.strokeStyle = 'rgba(77, 115, 217, 0.18)'
+    // 2. Technical Blueprint Grid Lines (crisp cyan-tinted cyber lines)
+    ctx.strokeStyle = 'rgba(47, 208, 255, 0.16)'
     ctx.lineWidth = 1.0
     const step = 32
     for (let x = step; x < width; x += step) {
@@ -157,10 +158,10 @@ function createBlackBoxPlaceholderTextures(): THREE.CanvasTexture[] {
       ctx.stroke()
     }
 
-    // 3. Technical Corner Tick Marks
-    ctx.strokeStyle = '#8fc4ff'
-    ctx.lineWidth = 2.0
-    const tick = 18
+    // 3. Technical Corner Tick Marks (Electric Cyan #2fd0ff + Pure White Accents)
+    ctx.strokeStyle = '#2fd0ff'
+    ctx.lineWidth = 2.5
+    const tick = 20
     const inset = 12
     ctx.beginPath()
     ctx.moveTo(inset, inset + tick)
@@ -180,18 +181,36 @@ function createBlackBoxPlaceholderTextures(): THREE.CanvasTexture[] {
     ctx.lineTo(width - inset, height - inset - tick)
     ctx.stroke()
 
-    // 4. Blue Outer Border Line
-    ctx.strokeStyle = 'rgba(143, 196, 255, 0.85)'
-    ctx.lineWidth = 2.5
+    // White corner dots for high-contrast technical precision
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(inset - 1, inset - 1, 3, 3)
+    ctx.fillRect(width - inset - 2, inset - 1, 3, 3)
+    ctx.fillRect(inset - 1, height - inset - 2, 3, 3)
+    ctx.fillRect(width - inset - 2, height - inset - 2, 3, 3)
+
+    // 4. Subtle Outer Border Line (Dark Blue-Cyan)
+    ctx.strokeStyle = 'rgba(77, 115, 217, 0.65)'
+    ctx.lineWidth = 1.8
     drawRoundedRectPath(ctx, 0, 0, width, height, r)
     ctx.stroke()
 
-    // 5. Monospace ID stamp
+    // 5. Monospace ID Stamp (Crisp Cyan #2fd0ff)
     const num = String(idx + 1).padStart(2, '0')
-    ctx.fillStyle = 'rgba(143, 196, 255, 0.45)'
-    ctx.font = '600 24px ui-monospace, monospace'
+    ctx.fillStyle = '#2fd0ff'
+    ctx.font = '700 24px ui-monospace, monospace'
     ctx.textBaseline = 'top'
     ctx.fillText(`SYS//${num}`, 24, 22)
+
+    // 6. Technical Status Label
+    ctx.fillStyle = 'rgba(143, 210, 255, 0.60)'
+    ctx.font = '600 12px ui-monospace, monospace'
+    ctx.fillText('NODE // ONLINE', 24, 52)
+
+    // 7. Micro Data Hash on Bottom Right
+    const hex = (idx * 0x3d + 0x4a).toString(16).toUpperCase().padStart(4, '0')
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.40)'
+    ctx.font = '500 11px ui-monospace, monospace'
+    ctx.fillText(`0x${hex} · V2.4`, width - 110, height - 28)
 
     const tex = new THREE.CanvasTexture(canvas)
     tex.generateMipmaps = true
@@ -380,14 +399,12 @@ export function DepthFlythrough({
         })
       } else {
         const tex = placeholderTextures[card.index % placeholderTextures.length]
-        return new THREE.MeshBasicMaterial({
-          map: tex,
-          transparent: true,
-          opacity: 0,
-          depthWrite: false,
-          depthTest: true,
-          side: THREE.DoubleSide,
-        })
+        return createPlaceholderPixelMaterial(
+          tex,
+          card.index * 0.17,
+          card.cardW / card.cardH,
+          20.0
+        )
       }
     })
   }, [cards, projectTextures, placeholderTextures])
@@ -616,8 +633,32 @@ export function DepthFlythrough({
           nearProject = card.project
         }
       } else {
-        // Placeholder card material
-        mat.opacity = totalOpacity * 0.85
+        // Placeholder card material: dynamic Left-to-Right Graham Mast pixel wipe on dark black
+        const phMat = mat as THREE.ShaderMaterial
+        if (phMat.uniforms) {
+          // Keep placeholders solid OLED black (opacity 1.0) while in view
+          const phLensDissolve = smoothstep(0.6, 3.5, d)
+          const phDistFade = d > 60.0 ? Math.max(0, 1.0 - (d - 60.0) / 25.0) : 1.0
+          const phOpacity = phLensDissolve * phDistFade
+
+          phMat.uniforms.uOpacity.value = phOpacity
+          phMat.uniforms.uBrightness.value = 1.0
+          phMat.uniforms.uFlickerStep.value = Math.floor(flightP * 120)
+
+          // Distance-based Left-to-Right Graham Mast pixel wipe on placeholders:
+          // d >= 28.0: dormant deep OLED black
+          // d in [6.0, 28.0]: pixel wave sweeps across placeholder face
+          // d <= 6.0: 100% illuminated technical cyber matrix
+          let phWave = 0.0
+          if (d <= 6.0) {
+            phWave = 1.0
+          } else if (d < 28.0) {
+            phWave = 1.0 - (d - 6.0) / 22.0
+          } else {
+            phWave = 0.0
+          }
+          phMat.uniforms.uWaveProgress.value = phWave
+        }
       }
     }
 
