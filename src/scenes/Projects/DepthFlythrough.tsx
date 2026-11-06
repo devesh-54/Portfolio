@@ -387,7 +387,12 @@ export function DepthFlythrough({
       if (card.isReal && card.project) {
         const tex = projectTextures.get(card.project.id)
         if (tex) {
-          return createCardPixelMaterial(tex)
+          return createCardPixelMaterial(
+            tex,
+            card.index * 0.17,
+            card.cardW / card.cardH,
+            20.0
+          )
         }
         return new THREE.MeshBasicMaterial({
           transparent: true,
@@ -571,9 +576,9 @@ export function DepthFlythrough({
       obj.position.set(card.x, card.y, card.z)
       obj.rotation.set(card.rotX, card.rotY, 0)
 
-      // Smooth lens dissolve as card approaches and passes camera
-      // Eliminates near-lens hyperbolic speed burst while keeping cards 100% solid in focus zone
-      const lensDissolve = smoothstep(0.8, 4.5, d)
+      // Smooth lens dissolve right as card passes camera lens
+      // Keeps cards 100% solid, fully opaque in reading zone [1.8, 55.0]
+      const lensDissolve = smoothstep(0.4, 1.8, d)
 
       // Distant fog fade to white
       let distFade = 1.0
@@ -637,7 +642,7 @@ export function DepthFlythrough({
         const phMat = mat as THREE.ShaderMaterial
         if (phMat.uniforms) {
           // Keep placeholders solid OLED black (opacity 1.0) while in view
-          const phLensDissolve = smoothstep(0.6, 3.5, d)
+          const phLensDissolve = smoothstep(0.4, 1.8, d)
           const phDistFade = d > 60.0 ? Math.max(0, 1.0 - (d - 60.0) / 25.0) : 1.0
           const phOpacity = phLensDissolve * phDistFade
 
