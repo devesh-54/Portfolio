@@ -13,7 +13,6 @@ import { FLIGHT_CONFIG } from './flightConfig'
 import { projects, type ProjectItem } from '../../config/projects'
 import { heroProgress } from '../Welcome/heroProgress'
 import { createCardPixelMaterial } from './CardPixelMaterial'
-import { createPlaceholderPixelMaterial } from './PlaceholderPixelMaterial'
 
 // ─── Deterministic PRNG ───────────────────────────────────────────────────────
 
@@ -237,6 +236,7 @@ export interface CardData {
   rotY: number
   rotZ?: number
   scale?: number
+  waveWindow?: [number, number]
   pFocus?: number
 }
 
@@ -251,50 +251,49 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
   const realList = realProjects.slice(0, 7)
   let cardIndex = 0
 
-  // 1. Reduced Placeholders around the sofa cluster (26 total, capped at z >= -28)
-  // Zero placeholders deep in the background after the projects!
-  // Center corridor (|x| < 7.6 && |y| < 5.2 && z > -28) is kept 100% CLEAR for real projects!
-  const PLACEHOLDERS = 26
+  // 1. Reduced Static Placeholders (14 total, strictly along outer perimeter)
+  // ZERO pixel animation, ZERO interference with center sofa cluster!
+  const PLACEHOLDERS = 14
   for (let i = 0; i < PLACEHOLDERS; i++) {
-    const w = rnd(2.2, 4.0)
-    const h = w * rnd(0.6, 0.75)
+    const w = rnd(2.2, 3.6)
+    const h = w * rnd(0.6, 0.72)
 
-    // Side selection: 0 = Left Wing, 1 = Right Wing, 2 = Top Flank, 3 = Bottom Flank
+    // Side selection: 0 = Far Left Wing, 1 = Far Right Wing, 2 = Top Perimeter, 3 = Bottom Perimeter
     const sideChoice = i % 4
     let x = 0
     let y = 0
     let z = 0
 
     if (sideChoice === 0) {
-      // Left Wing
-      x = rnd(-19.0, -8.5)
-      y = rnd(-5.0, 5.0)
-      z = -rnd(8.0, 26.0)
+      // Far Left Wing
+      x = rnd(-24.0, -12.5)
+      y = rnd(-6.0, 6.0)
+      z = -rnd(10.0, 26.0)
     } else if (sideChoice === 1) {
-      // Right Wing
-      x = rnd(8.5, 19.0)
-      y = rnd(-5.0, 5.0)
-      z = -rnd(8.0, 26.0)
+      // Far Right Wing
+      x = rnd(12.5, 24.0)
+      y = rnd(-6.0, 6.0)
+      z = -rnd(10.0, 26.0)
     } else if (sideChoice === 2) {
-      // Top Flank
-      x = rnd(-14.0, 14.0)
-      y = rnd(5.4, 9.8)
-      z = -rnd(10.0, 26.0)
+      // Top Perimeter
+      x = rnd(-16.0, 16.0)
+      y = rnd(7.8, 12.0)
+      z = -rnd(12.0, 26.0)
     } else {
-      // Bottom Flank
-      x = rnd(-14.0, 14.0)
-      y = rnd(-9.8, -5.4)
-      z = -rnd(10.0, 26.0)
+      // Bottom Perimeter
+      x = rnd(-16.0, 16.0)
+      y = rnd(-12.0, -7.8)
+      z = -rnd(12.0, 26.0)
     }
 
-    // Safety: ensure no placeholder ever encroaches on the center sofa cluster
-    if (Math.abs(x) < 7.6 && Math.abs(y) < 5.2 && z > -28.0) {
-      x += x >= 0 ? 8.0 : -8.0
+    // Safety: ensure no placeholder ever enters the generous project corridor
+    if (Math.abs(x) < 11.5 && Math.abs(y) < 7.0 && z > -28.0) {
+      x += x >= 0 ? 12.0 : -12.0
     }
 
-    const rotY = rnd(-0.35, 0.35)
-    const rotX = rnd(-0.15, 0.15)
-    const rotZ = rnd(-0.08, 0.08)
+    const rotY = rnd(-0.25, 0.25)
+    const rotX = rnd(-0.10, 0.10)
+    const rotZ = rnd(-0.06, 0.06)
 
     cards.push({
       id: `ph_${i}`,
@@ -313,77 +312,84 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
   }
 
   // 2. Real Project Cards in Floating 3D "Invisible Sofa" Layout with GENEROUS NON-OVERLAPPING SPACING
-  // Each card has its own clean breathing room with ZERO visual overlap
+  // Each card has its own dedicated waveWindow so EXACTLY ONE project animates pixels at a time!
   const sofaSlots = [
     {
-      // Slot 0: Center / Middle (Project 01 - JeevaLink)
+      // Slot 0: Center / Anchor (realList[0] - JeevaLink)
       x: 0.0,
       y: 0.0,
       z: -14.0,
       rotX: 0.06,
       rotY: -0.05,
       rotZ: -0.03,
-      scale: 0.95,
+      scale: 0.92,
+      waveWindow: [0.00, 0.12] as [number, number],
     },
     {
-      // Slot 1: Top / Headrest (Project 02 - ChitGuard)
-      x: -1.8,
-      y: 4.6,
-      z: -18.0,
-      rotX: -0.16,
+      // Slot 1: Top / Headrest (realList[1] - ChitGuard)
+      x: -2.8,
+      y: 5.8,
+      z: -17.5,
+      rotX: -0.18,
       rotY: 0.08,
       rotZ: 0.04,
-      scale: 0.82,
+      scale: 0.80,
+      waveWindow: [0.13, 0.25] as [number, number],
     },
     {
-      // Slot 2: Mid-Left Armrest (Project 03 - DR Detection)
-      x: -7.0,
-      y: 0.8,
+      // Slot 2: Mid-Left Armrest (realList[2] - DR Detection)
+      x: -10.2,
+      y: 1.0,
       z: -16.5,
       rotX: 0.05,
       rotY: 0.22,
       rotZ: 0.05,
-      scale: 0.82,
+      scale: 0.80,
+      waveWindow: [0.26, 0.38] as [number, number],
     },
     {
-      // Slot 3: Mid-Right Backrest (Project 04 - CashPilot)
-      x: 7.0,
-      y: 1.2,
-      z: -18.5,
+      // Slot 3: Mid-Right Backrest (realList[3] - CashPilot)
+      x: 10.2,
+      y: 1.4,
+      z: -17.5,
       rotX: -0.06,
       rotY: -0.22,
       rotZ: -0.04,
-      scale: 0.82,
+      scale: 0.80,
+      waveWindow: [0.39, 0.51] as [number, number],
     },
     {
-      // Slot 4: Bottom-Right Cushion (Project 05 - MediGuard AI)
-      x: 6.4,
-      y: -3.8,
+      // Slot 4: Bottom-Right Cushion (realList[4] - MediGuard AI)
+      x: 9.2,
+      y: -5.0,
       z: -16.0,
-      rotX: 0.12,
+      rotX: 0.15,
       rotY: -0.18,
       rotZ: 0.04,
-      scale: 0.82,
+      scale: 0.80,
+      waveWindow: [0.52, 0.64] as [number, number],
     },
     {
-      // Slot 5: Bottom-Left Cushion (Project 06 - HireConnect)
-      x: -6.4,
-      y: -3.8,
-      z: -15.0,
-      rotX: 0.14,
+      // Slot 5: Bottom-Left Cushion (realList[5] - HireConnect)
+      x: -9.2,
+      y: -5.0,
+      z: -15.5,
+      rotX: 0.15,
       rotY: 0.18,
-      rotZ: -0.05,
-      scale: 0.82,
+      rotZ: -0.04,
+      scale: 0.80,
+      waveWindow: [0.65, 0.77] as [number, number],
     },
     {
-      // Slot 6: Top-Right Accent (Project 07 - Campus IMS)
-      x: 6.0,
-      y: 4.6,
-      z: -20.5,
-      rotX: -0.08,
-      rotY: -0.15,
+      // Slot 6: Top-Right Accent (realList[6] - Campus IMS)
+      x: 8.6,
+      y: 6.0,
+      z: -19.5,
+      rotX: -0.15,
+      rotY: -0.16,
       rotZ: 0.03,
-      scale: 0.78,
+      scale: 0.75,
+      waveWindow: [0.78, 0.90] as [number, number],
     },
   ]
 
@@ -394,10 +400,10 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
     const slot = sofaSlots[i % sofaSlots.length]
 
     // Subtle deterministic organic jitter so each card feels naturally hand-placed
-    const jitterX = rnd(-0.04, 0.04)
-    const jitterY = rnd(-0.04, 0.04)
-    const jitterZ = rnd(-0.15, 0.15)
-    const jitterRot = rnd(-0.015, 0.015)
+    const jitterX = rnd(-0.03, 0.03)
+    const jitterY = rnd(-0.03, 0.03)
+    const jitterZ = rnd(-0.10, 0.10)
+    const jitterRot = rnd(-0.01, 0.01)
 
     const x = slot.x + jitterX
     const y = slot.y + jitterY
@@ -406,6 +412,7 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
     const rotY = slot.rotY + jitterRot
     const rotZ = slot.rotZ + jitterRot
     const scale = slot.scale
+    const waveWindow = slot.waveWindow
 
     // Focus moment progress: where camZ reaches z + 6.0
     // camZ = 8.0 - flightP * 36.0
@@ -426,6 +433,7 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
       rotY,
       rotZ,
       scale,
+      waveWindow,
       pFocus,
     })
   })
@@ -524,12 +532,14 @@ export function DepthFlythrough({
         })
       } else {
         const tex = placeholderTextures[card.index % placeholderTextures.length]
-        return createPlaceholderPixelMaterial(
-          tex,
-          card.index * 0.17,
-          card.cardW / card.cardH,
-          20.0
-        )
+        return new THREE.MeshBasicMaterial({
+          map: tex,
+          transparent: true,
+          opacity: 0,
+          depthWrite: true,
+          depthTest: true,
+          side: THREE.DoubleSide,
+        })
       }
     })
   }, [cards, projectTextures, placeholderTextures])
@@ -670,7 +680,8 @@ export function DepthFlythrough({
     const camZ = 8.0 - flightP * (DEPTH + 10.0)
 
     let activeCount = 0
-    let nearProject: ProjectItem | null = null
+    let activeWaveProject: ProjectItem | null = null
+    let nearestDistProject: ProjectItem | null = null
     let minProjectDist = 1e9
 
     for (let i = 0; i < cards.length; i++) {
@@ -716,16 +727,18 @@ export function DepthFlythrough({
           pMat.uniforms.uBrightness.value = 1.0
           pMat.uniforms.uFlickerStep.value = Math.floor(flightP * 120)
 
-          // Distance-based Left-to-Right Graham Mast pixel wipe:
-          // In sofa view (d in [12, 28]), cards have their pixel wave smoothly sweeping across,
-          // revealing the project photos just like in the reference image!
+          // Sequential Left-to-Right Graham Mast pixel wipe:
+          // Exactly ONE project card animates its pixel wave at any given moment!
           let waveProg = 0.0
-          if (d <= 12.0) {
-            waveProg = 1.0
-          } else if (d < 28.0) {
-            waveProg = 1.0 - (d - 12.0) / 16.0
-          } else {
-            waveProg = 0.0
+          if (card.waveWindow) {
+            const [wStart, wEnd] = card.waveWindow
+            if (flightP >= wEnd) {
+              waveProg = 1.0
+            } else if (flightP > wStart) {
+              waveProg = (flightP - wStart) / (wEnd - wStart)
+            } else {
+              waveProg = 0.0
+            }
           }
           pMat.uniforms.uWaveProgress.value = waveProg
         }
@@ -753,44 +766,33 @@ export function DepthFlythrough({
           sMat.opacity = totalOpacity * (0.85 + 0.15 * nextHover)
         }
 
-        // Nearest project detection for active title label (matches reference code)
+        // Synchronize active project title with the currently waving card, or nearest passing card
+        if (card.waveWindow) {
+          const [wStart, wEnd] = card.waveWindow
+          if (flightP >= wStart - 0.01 && flightP <= wEnd + 0.02) {
+            activeWaveProject = card.project
+          }
+        }
         if (d > 1.5 && d < 28.0 && d < minProjectDist) {
           minProjectDist = d
-          nearProject = card.project
+          nearestDistProject = card.project
         }
       } else {
-        // Placeholder card material: dynamic Left-to-Right Graham Mast pixel wipe on dark black
-        const phMat = mat as THREE.ShaderMaterial
-        if (phMat.uniforms) {
-          // Keep placeholders solid OLED black (opacity 1.0) while in view
+        // Static Placeholder: clean dark blueprint tile (ZERO pixel animation)
+        const bMat = mat as THREE.MeshBasicMaterial
+        if (bMat.isMeshBasicMaterial) {
           const phLensDissolve = smoothstep(0.4, 1.8, d)
-          const phDistFade = d > 60.0 ? Math.max(0, 1.0 - (d - 60.0) / 25.0) : 1.0
-          const phOpacity = phLensDissolve * phDistFade
-
-          phMat.uniforms.uOpacity.value = phOpacity
-          phMat.uniforms.uBrightness.value = 1.0
-          phMat.uniforms.uFlickerStep.value = Math.floor(flightP * 120)
-
-          // Distance-based Left-to-Right Graham Mast pixel wipe on placeholders:
-          // d >= 28.0: dormant deep OLED black
-          // d in [6.0, 28.0]: pixel wave sweeps across placeholder face
-          // d <= 6.0: 100% illuminated technical cyber matrix
-          let phWave = 0.0
-          if (d <= 6.0) {
-            phWave = 1.0
-          } else if (d < 28.0) {
-            phWave = 1.0 - (d - 6.0) / 22.0
-          } else {
-            phWave = 0.0
-          }
-          phMat.uniforms.uWaveProgress.value = phWave
+          const phDistFade = d > 55.0 ? Math.max(0, 1.0 - (d - 55.0) / 25.0) : 1.0
+          bMat.opacity = phLensDissolve * phDistFade
         }
       }
     }
 
     heroProgress.debug.activeCards = activeCount
-    heroProgress.activeProjectTitle = nearProject ? nearProject.title : ''
-    heroProgress.activeProjectOpacity = nearProject ? 1.0 : 0.0
+    const nearProject = activeWaveProject || nearestDistProject
+    const showTitle = flightP < 0.94 && nearProject !== null
+    heroProgress.activeProjectTitle = showTitle && nearProject ? nearProject.title : ''
+    heroProgress.activeProjectOpacity = showTitle ? 1.0 : 0.0
   })
 
   return (
