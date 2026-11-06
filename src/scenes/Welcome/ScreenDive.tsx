@@ -98,7 +98,7 @@ export function ScreenDive({
         }
 
         // Camera Pose ownership
-        if (introEnded) {
+        if (introEnded || p > 0.001) {
           externalPose.current.active = true
         }
         externalPose.current.position.copy(tempPos)
@@ -117,9 +117,7 @@ export function ScreenDive({
           FLIGHT_CONFIG.CAMERA_TARGET[2]
         )
 
-        if (introEnded) {
-          externalPose.current.active = true
-        }
+        externalPose.current.active = true
         externalPose.current.position.copy(tempPos)
         externalPose.current.target.copy(tempTarget)
         externalPose.current.e = 1.0

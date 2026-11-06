@@ -322,6 +322,16 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
 
       if (isRealSlot && proj) {
         const sched = realSchedules[projIdx]
+        // Target framed position at focus moment (comfortable reading position)
+        const targetX =
+          sched.side === 'L'
+            ? -1.35
+            : sched.side === 'R'
+            ? 1.35
+            : sched.side === 'C-L'
+            ? -0.85
+            : 0.85
+        const targetY = sched.row % 2 === 0 ? 0.25 : -0.15
         // Back-solve z_start so hero reaches peak distance 5.5 at pTarget
         const z_start = 9.5 - 65.0 * sched.pTarget
 
@@ -332,10 +342,10 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
           project: proj,
           cardW,
           cardH,
-          localX,
-          localY,
+          localX: targetX,
+          localY: targetY,
           z_start,
-          xPercent: (c < 4 ? -1 : 1) * 15,
+          xPercent: 0,
           yPercent: 0,
           pFocus: sched.pTarget,
         })
@@ -730,42 +740,20 @@ export function DepthFlythrough({
             pMat.uniforms.uFlickerStep.value = Math.floor(flightP * 120)
 
             const d = t.d
-            // Distance-based pixel decode / materialization
-            if (d > 24.0) {
-              pMat.uniforms.uResolution.value = 14.0
-              pMat.uniforms.uProgress.value = 0.0
-            } else if (d > 6.5) {
-              const tApproach = 1.0 - (d - 6.5) / 17.5 // 0.0 at d=24, 1.0 at d=6.5
-              pMat.uniforms.uProgress.value = tApproach
-              if (tApproach < 0.20) {
-                pMat.uniforms.uResolution.value = 16.0
-              } else if (tApproach < 0.40) {
-                pMat.uniforms.uResolution.value = 24.0
-              } else if (tApproach < 0.60) {
-                pMat.uniforms.uResolution.value = 40.0
-              } else if (tApproach < 0.80) {
-                pMat.uniforms.uResolution.value = 72.0
-              } else if (tApproach < 0.95) {
-                pMat.uniforms.uResolution.value = 128.0
-              } else {
-                pMat.uniforms.uResolution.value = 512.0
-              }
-            } else if (d >= 4.5) {
-              // Focus crest / hero moment: 100% crisp, sharp high-res!
-              pMat.uniforms.uResolution.value = 512.0
-              pMat.uniforms.uProgress.value = 1.0
+            // Distance-based pixel wave progression across card surface:
+            // When distant (d >= 22.0): wave hasn't started yet (waveProg = 0.0)
+            // As card approaches (d in [6.0, 22.0]): pixel wave sweeps diagonally from 0.0 to 1.0
+            // At focus crest (d <= 6.0): wave completes (waveProg = 1.0, 100% crisp complete project!)
+            let waveProg = 0.0
+            if (d <= 6.0) {
+              waveProg = 1.0
+            } else if (d < 22.0) {
+              waveProg = 1.0 - (d - 6.0) / 16.0
             } else {
-              // Near-lens exit: pixelates out as it descends
-              const tExit = Math.max(0.0, (d - 1.0) / 3.5)
-              pMat.uniforms.uProgress.value = tExit
-              if (tExit < 0.3) {
-                pMat.uniforms.uResolution.value = 20.0
-              } else if (tExit < 0.7) {
-                pMat.uniforms.uResolution.value = 48.0
-              } else {
-                pMat.uniforms.uResolution.value = 96.0
-              }
+              waveProg = 0.0
             }
+
+            pMat.uniforms.uWaveProgress.value = waveProg
           }
 
           const isHovered = hoveredId === card.project.id

@@ -176,6 +176,16 @@ export function CameraRig({ start = true, onReady, onIntroEnd, skipIntro = false
 
   useFrame(({ pointer }, delta) => {
     const ctl = controls.current
+
+    // When externalPose is active (scrolling or corridor), copy pose directly
+    if (externalPose?.current?.active) {
+      if (intro.current) intro.current = null
+      camera.position.copy(externalPose.current.position)
+      ctl.target.copy(externalPose.current.target)
+      camera.lookAt(ctl.target)
+      return
+    }
+
     const playing = intro.current
     if (playing) {
       // clamp so a slow first frame (shaders compiling) doesn't skip the start of the move
@@ -188,14 +198,6 @@ export function CameraRig({ start = true, onReady, onIntroEnd, skipIntro = false
         ctl.enabled = !externalPose
         onIntroEnd?.()
       }
-      return
-    }
-
-    // After intro finishes: when externalPose is active, copy pose directly
-    if (externalPose?.current?.active) {
-      camera.position.copy(externalPose.current.position)
-      ctl.target.copy(externalPose.current.target)
-      camera.lookAt(ctl.target)
       return
     }
 
