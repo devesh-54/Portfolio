@@ -532,6 +532,7 @@ export function DepthFlythrough({
 
     const raw = heroProgress.get()
     const handover = FLIGHT_CONFIG.HANDOVER_P
+
     if (raw < handover) {
       for (let i = 0; i < cards.length; i++) {
         const obj = cardContainerRefs.current[i]
@@ -544,6 +545,7 @@ export function DepthFlythrough({
     }
 
     const flightP = Math.max(0, Math.min(1.0, (raw - handover) / (1 - handover)))
+    const revealFactor = 1.0
     const safeDelta = Math.min(delta, 0.05)
 
     const DEPTH = FLIGHT_CONFIG.DEPTH || 126.0
@@ -586,7 +588,7 @@ export function DepthFlythrough({
         distFade = Math.max(0, 1.0 - (d - 55.0) / 25.0)
       }
 
-      const totalOpacity = lensDissolve * distFade
+      const totalOpacity = lensDissolve * distFade * revealFactor
 
       if (card.isReal && card.project) {
         const pMat = mat as THREE.ShaderMaterial
@@ -644,13 +646,13 @@ export function DepthFlythrough({
         if (bMat.isMeshBasicMaterial) {
           const phLensDissolve = smoothstep(0.4, 4.0, d)
           const phDistFade = d > 60.0 ? Math.max(0, 1.0 - (d - 60.0) / 25.0) : 1.0
-          bMat.opacity = phLensDissolve * phDistFade
+          bMat.opacity = phLensDissolve * phDistFade * revealFactor
         }
       }
     }
 
     heroProgress.debug.activeCards = activeCount
-    const showTitle = flightP < 0.94 && nearProject !== null
+    const showTitle = raw >= handover && flightP < 0.94 && nearProject !== null
     heroProgress.activeProjectTitle = showTitle && nearProject ? nearProject.title : ''
     heroProgress.activeProjectOpacity = showTitle ? 1.0 : 0.0
   })
