@@ -46,4 +46,5 @@ The logos for React, Python, Flutter, Supabase, Firebase, GitHub, and Tailwind C
 ## Project Screenshots & Inspiration
 - **Placeholder Images**: Temporary random photos from Lorem Picsum. Replace each file with real screenshots, keeping the same filename.
 - **Scroll3DGrid and Infinite Scroll Transitions**: Concept and animation structure inspired by Codrops articles / demos by Mary Lou and Codrops team. Re-implemented natively in React + GSAP without copying assets.
+- **Pixel Scan Transition**: Pixel scan transition inspired by Smertimba Graphics' After Effects tutorial 'Pixel Scan Logo Animation' (a style inspiration; no assets used).
 
