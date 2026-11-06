@@ -8,22 +8,22 @@
 export const FLIGHT_CONFIG = {
   // Pinned scroll distances (in vh)
   DIVE_SCROLL_VH: 80,      // Phase A: dive into monitor (80vh)
-  FLIGHT_SCROLL_VH: 160,   // Phase B: card flight (160vh - clean transition after projects)
+  FLIGHT_SCROLL_VH: 400,   // Phase B: card flight (400vh for smooth tunnel flythrough matching HTML)
 
   // Derived handover point: fraction of total hero scroll where transition ends and flight begins
-  // 80 / (80 + 160) = 0.333333...
-  HANDOVER_P: 80 / (80 + 160),
+  // 80 / (80 + 400) = 80 / 480 = 0.166667...
+  HANDOVER_P: 80 / (80 + 400),
 
   // Camera & Perspective: 100px = 1.0 Three.js unit
   PERSPECTIVE_DISTANCE: 15.0, // 1500px -> 15.0 units
-  CAMERA_FOV: 38.0,           // Vertical FOV equivalent to 1500px CSS perspective
+  CAMERA_FOV: 60.0,           // Vertical FOV 60 matching HTML exactly
   CAMERA_Y: -1000,            // Card scene isolated at Y = -1000
   CAMERA_POS: [0, -1000 + 0.6, 15.0] as const,
   CAMERA_TARGET: [0, -1000 - 0.25, 0] as const,
 
   // Total Z travel for all cards
-  Z_TRAVEL_TOTAL: 36.0,
-  DEPTH: 26.0,
+  Z_TRAVEL_TOTAL: 136.0,
+  DEPTH: 126.0,
   GRID_TOTAL_HEIGHT: 900,     // Total grid height in CSS px
 
   // Grid layout scale (2100px width -> covers roughly +-45% of viewport width at bottom edge)
