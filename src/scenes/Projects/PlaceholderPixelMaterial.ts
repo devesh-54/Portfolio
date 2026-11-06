@@ -90,12 +90,12 @@ const fragmentShader = /* glsl */ `
       // -------------------------------------------------------------
       // 2. AHEAD OF THE WAVE: Deep OLED black with subtle dormant grid & sparks
       // -------------------------------------------------------------
-      vec3 darkBase = vec3(0.005, 0.008, 0.015); // Deep jet black
+      vec3 darkBase = vec3(0.0, 0.0, 0.0); // Deep solid OLED black
 
       // Faint dormant technical grid line
       float dormantGrid = step(0.04, cellUv.x) * step(cellUv.x, 0.96) *
                           step(0.04, cellUv.y) * step(cellUv.y, 0.96);
-      darkBase += vec3(0.01, 0.02, 0.04) * (1.0 - dormantGrid);
+      darkBase += vec3(0.015, 0.025, 0.045) * (1.0 - dormantGrid);
 
       // Digital sparks leaping ahead of the incoming wave front
       float sparkAhead = hash2(blockId + vec2(flicker * 0.06 + uSeed * 3.1, 41.7));
@@ -112,7 +112,7 @@ const fragmentShader = /* glsl */ `
       float isCorner = (step(edgeX, 0.035) * step(edgeY, 0.055)) +
                        (step(edgeX, 0.055) * step(edgeY, 0.035));
       if (isCorner > 0.0) {
-        darkBase = mix(darkBase, vec3(0.10, 0.25, 0.50), 0.55);
+        darkBase = mix(darkBase, vec3(0.18, 0.82, 1.0), 0.65);
       }
 
       rgb = darkBase;
@@ -126,7 +126,7 @@ export function createPlaceholderPixelMaterial(
   texture: THREE.Texture,
   seed = 0,
   aspect = 1.5,
-  resolution = 22.0
+  resolution = 20.0
 ): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     uniforms: {
@@ -147,3 +147,4 @@ export function createPlaceholderPixelMaterial(
     side: THREE.DoubleSide,
   })
 }
+
