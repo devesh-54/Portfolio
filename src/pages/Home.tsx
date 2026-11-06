@@ -220,6 +220,19 @@ export function Home() {
     if (!hash) {
       window.scrollTo(0, 0)
     }
+    ;(window as any).__setHeroProgress = (pHero: number) => {
+      heroProgress.set(pHero)
+      if (heroTriggerRef.current) {
+        const start = heroTriggerRef.current.start
+        const end = heroTriggerRef.current.end
+        const targetScroll = start + pHero * (end - start)
+        window.scrollTo(0, targetScroll)
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(targetScroll, { immediate: true })
+        }
+      }
+      invalidate()
+    }
     ;(window as any).__setFlightProgress = (flightP: number) => {
       const handover = FLIGHT_CONFIG.HANDOVER_P
       const pHero = handover + flightP * (1 - handover)
@@ -322,7 +335,7 @@ export function Home() {
       heroTriggerRef.current = ScrollTrigger.create({
         trigger: '#hero',
         start: 'top top',
-        end: `+=${FLIGHT_CONFIG.DIVE_SCROLL_VH + FLIGHT_CONFIG.FLIGHT_SCROLL_VH}%`,
+        end: `+=${FLIGHT_CONFIG.TOTAL_SCROLL_VH || (FLIGHT_CONFIG.DIVE_SCROLL_VH + FLIGHT_CONFIG.FLIGHT_SCROLL_VH)}%`,
         pin: true,
         anticipatePin: 1,
         scrub: true,

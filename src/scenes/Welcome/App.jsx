@@ -1,6 +1,6 @@
 import { Suspense, useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { useNavigate } from 'react-router-dom'
 import { Leva } from 'leva'
 import { SketchMaterial } from './sketch/SketchMaterial'
@@ -20,6 +20,9 @@ import { welcomeLayout } from '../../config/welcomeLayout'
 import { darkTheme } from '../../config/theme'
 import { ScreenDive } from './ScreenDive'
 import { DepthFlythrough } from '../Projects/DepthFlythrough'
+import { CardStreamBridge } from '../Projects/CardStreamBridge'
+import { FLIGHT_CONFIG } from '../Projects/flightConfig'
+import { heroProgress } from './heroProgress'
 import { navigateWithFade } from '../../ui/navigateWithFade'
 
 // the camera starts where the intro does, already looking at its point of interest
@@ -58,6 +61,7 @@ export default function App({
   const navigate = useNavigate()
   const [diveCompleted, setDiveCompleted] = useState(false)
   const [isCorridor, setIsCorridor] = useState(false)
+  const [isWhiteWorld, setIsWhiteWorld] = useState(false)
   const [washed, setWashed] = useState(false)
   const [c] = useSketchControls(setWashed)
   const [sceneReady, setSceneReady] = useState(false)
@@ -152,22 +156,52 @@ export default function App({
 
 function BackgroundController({ isCorridor }) {
   const { gl, scene } = useThree()
-  useEffect(() => {
-    gl.setClearColor(isCorridor ? 0xffffff : 0x000000, 1.0)
-    if (isCorridor) {
-      scene.fog = new THREE.Fog(0xffffff, 25, 95)
-    } else {
+  const colorRef = useRef(new THREE.Color(0x000000))
+  const fogRef = useRef(new THREE.Fog(0xffffff, 25, 95))
+
+  useFrame(() => {
+    const p = heroProgress.get()
+    const pStart = FLIGHT_CONFIG.STREAM_START_P || 0.138
+    const pHandover = FLIGHT_CONFIG.HANDOVER_P || 0.240
+
+    if (p < pStart) {
+      gl.setClearColor(0x000000, 1.0)
       scene.fog = null
+    } else if (p < pHandover) {
+      const s = (p - pStart) / (pHandover - pStart)
+      // Keep deep black void during corridor flight, then smoothly sweep to white as window fills screen
+      if (s < 0.82) {
+        gl.setClearColor(0x000000, 1.0)
+        scene.fog = null
+      } else {
+        const whiteT = (s - 0.82) / (1.0 - 0.82)
+        const easedWhite = whiteT * whiteT * (3 - 2 * whiteT)
+        colorRef.current.setRGB(easedWhite, easedWhite, easedWhite)
+        gl.setClearColor(colorRef.current, 1.0)
+        if (easedWhite > 0.8) {
+          scene.fog = fogRef.current
+          fogRef.current.near = 25
+          fogRef.current.far = 95
+        } else {
+          scene.fog = null
+        }
+      }
+    } else {
+      gl.setClearColor(0xffffff, 1.0)
+      scene.fog = fogRef.current
+      fogRef.current.near = 25
+      fogRef.current.far = 95
     }
-  }, [gl, scene, isCorridor])
-  return <color attach="background" args={[isCorridor ? '#ffffff' : '#000000']} />
+  })
+
+  return null
 }
 
   return (
     <div
       className="welcome-root theme-dark"
       style={{
-        background: isCorridor ? '#ffffff' : '#000000',
+        background: isWhiteWorld ? '#ffffff' : '#000000',
         width: '100%',
         height: '100%',
         position: 'relative',
@@ -180,10 +214,10 @@ function BackgroundController({ isCorridor }) {
         gl={{ powerPreference: 'high-performance', preserveDrawingBuffer: true }}
         frameloop={frameloop}
         camera={{ position: INTRO_START.position, fov: 35 }}
-        style={{ background: isCorridor ? '#ffffff' : '#000000' }}
+        style={{ background: isWhiteWorld ? '#ffffff' : '#000000' }}
         onCreated={({ camera, gl }) => {
           camera.lookAt(...INTRO_START.target)
-          gl.setClearColor(isCorridor ? 0xffffff : 0x000000, 1.0)
+          gl.setClearColor(isWhiteWorld ? 0xffffff : 0x000000, 1.0)
           if (typeof window !== 'undefined') {
             window.__gl = gl
             window.__canvas = gl.domElement
@@ -342,6 +376,9 @@ function BackgroundController({ isCorridor }) {
             )}
           </group>
 
+          {/* 3D Card Stream Transition Bridge at y = -1000 */}
+          <CardStreamBridge />
+
           {/* Multi-plane Depth Flythrough at y = -1000 */}
           <DepthFlythrough
             visible={isCorridor}
@@ -355,6 +392,7 @@ function BackgroundController({ isCorridor }) {
               externalPose={externalPose}
               onDiveCompleteChange={setDiveCompleted}
               onHandoverChange={setIsCorridor}
+              onWhiteWorldChange={setIsWhiteWorld}
               inHeroOverlayRef={inHeroOverlayRef}
               creditsRef={creditsRef}
               scrollHintRef={scrollHintRef}

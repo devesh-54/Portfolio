@@ -26,6 +26,7 @@ export interface ScreenDiveProps {
   externalPose: React.MutableRefObject<ExternalPose>
   onDiveCompleteChange?: (completed: boolean) => void
   onHandoverChange?: (isCorridor: boolean) => void
+  onWhiteWorldChange?: (isWhiteWorld: boolean) => void
   inHeroOverlayRef?: React.RefObject<HTMLDivElement | null>
   creditsRef?: React.RefObject<HTMLDivElement | null>
   scrollHintRef?: React.RefObject<HTMLDivElement | null>
@@ -37,6 +38,7 @@ export function ScreenDive({
   externalPose,
   onDiveCompleteChange,
   onHandoverChange,
+  onWhiteWorldChange,
   inHeroOverlayRef,
   creditsRef,
   scrollHintRef,
@@ -45,6 +47,7 @@ export function ScreenDive({
   const { camera, size } = useThree()
   const isCompleteRef = useRef(false)
   const isCorridorRef = useRef(false)
+  const isWhiteWorldRef = useRef(false)
 
   // Camera dive poses
   const startPosition = useRef(new THREE.Vector3(...settings.end.position)).current
@@ -167,10 +170,12 @@ export function ScreenDive({
   // Pure function of scroll progress setting camera pose
   const applyHeroState = useCallback(
     (p: number, delta: number, pointer?: { x: number; y: number }) => {
-      const handover = FLIGHT_CONFIG.HANDOVER_P
-      const isCorridor = p >= handover
+      const streamStart = FLIGHT_CONFIG.STREAM_START_P || 0.138
+      const handover = FLIGHT_CONFIG.HANDOVER_P || 0.240
+      const isCorridor = p >= streamStart
+      const isWhiteWorld = p >= handover
 
-      // Threshold crossing for Handover
+      // Threshold crossing for Handover / Corridor
       if (isCorridor !== isCorridorRef.current) {
         isCorridorRef.current = isCorridor
         onHandoverChange?.(isCorridor)
@@ -181,13 +186,19 @@ export function ScreenDive({
         }
       }
 
+      // Threshold crossing for White Projects World
+      if (isWhiteWorld !== isWhiteWorldRef.current) {
+        isWhiteWorldRef.current = isWhiteWorld
+        onWhiteWorldChange?.(isWhiteWorld)
+      }
+
       if (!isCorridor) {
-        // --- PHASE A: Dive into Monitor (p in [0, handover]) ---
+        // --- PHASE A: Dive into Monitor (p in [0, streamStart]) ---
         if (!curveRef.current) {
           computePoseAndCurve()
         }
 
-        const u = Math.min(1, Math.max(0, p / handover))
+        const u = Math.min(1, Math.max(0, p / streamStart))
         const e = easeInOutCubic(u)
 
         if (curveRef.current) {
@@ -219,6 +230,16 @@ export function ScreenDive({
         externalPose.current.position.copy(tempPos)
         externalPose.current.target.copy(tempTarget)
         externalPose.current.e = e
+      } else if (p < handover) {
+        // --- PHASE A->B: 3D Streaming Cards Bridge (p in [streamStart, handover]) ---
+        // Camera holds steady at corridor origin, looking down the depth tunnel as 3D blocks fly past
+        tempPos.set(0, FLIGHT_CONFIG.CAMERA_Y, 8.0)
+        tempTarget.set(0, FLIGHT_CONFIG.CAMERA_Y, -20.0)
+
+        externalPose.current.active = true
+        externalPose.current.position.copy(tempPos)
+        externalPose.current.target.copy(tempTarget)
+        externalPose.current.e = 1.0
       } else {
         // --- PHASE B: Selected Work Depth Flythrough (calibrated to end cleanly after last project) ---
         const DEPTH = FLIGHT_CONFIG.DEPTH || 126.0
