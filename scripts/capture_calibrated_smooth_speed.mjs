@@ -8,7 +8,7 @@ const ARTIFACT_DIR = 'C:\\Users\\deves\\.gemini\\antigravity\\brain\\2de691e0-67
 async function capture() {
   const chrome = spawn(CHROME_PATH, [
     '--headless=new',
-    '--remote-debugging-port=9312',
+    '--remote-debugging-port=9311',
     '--use-gl=angle',
     '--window-size=1280,800',
     '--no-sandbox',
@@ -16,7 +16,7 @@ async function capture() {
   ]);
   await new Promise(r => setTimeout(r, 2000));
   try {
-    const listRes = await fetch('http://127.0.0.1:9312/json/list');
+    const listRes = await fetch('http://127.0.0.1:9311/json/list');
     const pages = await listRes.json();
     const target = pages.find(p => p.type === 'page');
     const ws = new WebSocket(target.webSocketDebuggerUrl);
@@ -41,18 +41,15 @@ async function capture() {
     await send('Page.enable');
     await send('Runtime.enable');
     await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
-    // Navigate without p= query param so intro ended and scroll progress work cleanly
-    await send('Page.navigate', { url: 'http://localhost:5174/' });
-    await new Promise(r => setTimeout(r, 4500));
+    await send('Page.navigate', { url: 'http://localhost:5174?p=0.00' });
+    await new Promise(r => setTimeout(r, 4000));
 
     const milestones = [
-      { name: 'verify_01_corridor_plates_p0220.png', p: 0.220, label: 'p = 0.220: Perspective corridor, top & bottom plates streaming, open black center horizon' },
-      { name: 'verify_02_center_blocks_appear_p0270.png', p: 0.270, label: 'p = 0.270: Multiple white blocks rushing from top and bottom' },
-      { name: 'verify_03_slit_wiped_by_blocks_p0282.png', p: 0.282, label: 'p = 0.282: Center blocks (yellow marks) rush along horizontal black slit, wiping it' },
-      { name: 'verify_04_full_white_screen_p0292.png', p: 0.292, label: 'p = 0.292: Screen blanketed in pure white by blocks, Project 01 softly emerging with blur' },
-      { name: 'verify_05_handover_clean_form_p0296.png', p: 0.296, label: 'p = 0.296: Handover point: Project 01 in crisp clean form, distant cards blurred' },
-      { name: 'verify_06_flight_individual_blur_p0350.png', p: 0.350, label: 'p = 0.350: Flight forward: Project 01 active, Project 02 behind retains distance blur' },
-      { name: 'verify_07_project02_focuses_p0420.png', p: 0.420, label: 'p = 0.420: Approach Project 02: blur clears individually as it gets close, Project 03 blurred' },
+      { name: 'speed_01_glide_p0150.png', p: 0.150, label: 'p = 0.150: Calibrated speed runway glide' },
+      { name: 'speed_02_mid_stream_p0200.png', p: 0.200, label: 'p = 0.200: Smooth video-like corridor flight' },
+      { name: 'speed_03_white_blocks_cover_p0250.png', p: 0.250, label: 'p = 0.250: Multi-quadrant white blocks covering screen' },
+      { name: 'speed_04_handover_blur_p0270.png', p: 0.270, label: 'p = 0.270: 100% white handover with soft optical blur' },
+      { name: 'speed_05_focused_project_p0300.png', p: 0.300, label: 'p = 0.300: Project 01 focused with Graham Mast pixel scan' },
     ];
 
     for (const m of milestones) {
@@ -66,7 +63,7 @@ async function capture() {
           }
           if (window.__setHeroProgress) {
             window.__setHeroProgress(${m.p});
-          } else if (window.heroProgress) {
+          } else {
             window.heroProgress.set(${m.p});
           }
         })()`,
