@@ -6,7 +6,8 @@
  * - Flat horizontal floor and ceiling perspective plates in black & white monochrome.
  * - Open center horizon (white center box removed as requested).
  * - Slower, smoother pacing (STREAM_SCROLL_VH = 90vh).
- * - In the final phase (s in [0.65, 1.00]), multiple white blocks appear across the field,
+ * - Center horizontal gap covering blocks added right at the user's yellow marks.
+ * - In the final phase (s in [0.70, 1.00]), multiple white blocks appear across the field,
  *   streaming towards the camera and expanding to physically cover the entire screen in pure white.
  * - Perfectly synchronized with heroProgress, 100% reversible.
  */
@@ -54,13 +55,14 @@ interface HorizonPlateDef {
   zStart: number
   passS: number      // progress s in [0, 1] when plate passes camera Z = 8.0
   w: number          // width along X
-  l: number          // length along Z
+  l: number          // length / height
   isFloor: boolean   // true = floor, false = ceiling
   style: 'solidWhite' | 'frostWhite' | 'ghostGlass' | 'blackCyber' | 'charcoalPlate'
   isTransitionCover?: boolean // whether this plate is part of the final screen-covering white wave
+  isCenterBlock?: boolean     // blocks facing camera directly to seal the horizontal center slit (user yellow marks)
 }
 
-// 56 perspective plates matching gemini_generated_video_a1994a58.mp4
+// 60 perspective plates matching gemini_generated_video_a1994a58.mp4
 // With open center horizon and dense screen-covering white blocks at the end
 const PLATES: HorizonPlateDef[] = [
   // ==================== FLOOR PLANE (Y ≈ -2.2, facing up) ====================
@@ -96,28 +98,44 @@ const PLATES: HorizonPlateDef[] = [
   { x:  0.8, y:  2.0, zStart: -48.0, passS: 0.70, w: 3.0, l: 4.2, isFloor: false, style: 'frostWhite' },
 
   // ==================== END TRANSITION: MULTIPLE WHITE BLOCKS COVERING SCREEN ====================
-  // "make multiple block appear and that cover screen fully as it move later project show up"
-  // Wave 1: Dense rushing white plates emerging across upper and lower fields (s in [0.70, 0.85])
-  { x: -4.8, y: -1.8, zStart: -46.0, passS: 0.74, w: 5.5, l: 7.5, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
-  { x:  4.2, y:  1.8, zStart: -47.0, passS: 0.76, w: 5.5, l: 7.5, isFloor: false, style: 'solidWhite', isTransitionCover: true },
-  { x:  1.0, y: -1.6, zStart: -48.0, passS: 0.78, w: 4.8, l: 6.8, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
-  { x: -1.5, y:  1.6, zStart: -49.0, passS: 0.80, w: 4.8, l: 6.8, isFloor: false, style: 'solidWhite', isTransitionCover: true },
-  { x:  6.0, y: -1.7, zStart: -50.0, passS: 0.82, w: 5.8, l: 8.0, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
-  { x: -5.8, y:  1.7, zStart: -51.0, passS: 0.84, w: 5.8, l: 8.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
+  // Wave 1: Rushing white plates emerging across upper and lower fields (s in [0.72, 0.85])
+  { x: -4.8, y: -2.0, zStart: -46.0, passS: 0.74, w: 5.5, l: 8.0, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
+  { x:  4.2, y:  2.0, zStart: -47.0, passS: 0.76, w: 5.5, l: 8.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
+  { x:  1.0, y: -1.8, zStart: -48.0, passS: 0.78, w: 5.0, l: 7.5, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
+  { x: -1.5, y:  1.8, zStart: -49.0, passS: 0.80, w: 5.0, l: 7.5, isFloor: false, style: 'solidWhite', isTransitionCover: true },
+  { x:  6.0, y: -1.9, zStart: -50.0, passS: 0.82, w: 6.0, l: 8.5, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
+  { x: -5.8, y:  1.9, zStart: -51.0, passS: 0.84, w: 6.0, l: 8.5, isFloor: false, style: 'solidWhite', isTransitionCover: true },
 
-  // Wave 2: Converging multi-quadrant large white blocks filling corners & center (s in [0.85, 0.95])
-  { x: -3.2, y: -1.2, zStart: -52.0, passS: 0.87, w: 6.5, l: 9.0, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
-  { x:  3.0, y:  1.2, zStart: -53.0, passS: 0.89, w: 6.5, l: 9.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
-  { x:  5.2, y: -0.8, zStart: -54.0, passS: 0.91, w: 7.0, l: 9.5, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
-  { x: -5.0, y:  0.8, zStart: -55.0, passS: 0.93, w: 7.0, l: 9.5, isFloor: false, style: 'solidWhite', isTransitionCover: true },
-  { x: -0.5, y: -1.0, zStart: -56.0, passS: 0.94, w: 7.5, l: 10.0, isFloor: true, style: 'solidWhite', isTransitionCover: true },
-  { x:  0.5, y:  1.0, zStart: -57.0, passS: 0.95, w: 7.5, l: 10.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
+  // Wave 2: Converging floor & ceiling blocks (s in [0.85, 0.94])
+  { x: -3.2, y: -1.2, zStart: -45.0, passS: 0.87, w: 6.5, l: 9.0, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
+  { x:  3.0, y:  1.2, zStart: -46.0, passS: 0.89, w: 6.5, l: 9.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
+  { x:  4.8, y: -0.8, zStart: -47.0, passS: 0.91, w: 7.0, l: 9.5, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
+  { x: -4.6, y:  0.8, zStart: -48.0, passS: 0.93, w: 7.0, l: 9.5, isFloor: false, style: 'solidWhite', isTransitionCover: true },
+  { x:  0.0, y: -0.5, zStart: -49.0, passS: 0.94, w: 8.0, l: 10.0, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
+  { x:  0.0, y:  0.5, zStart: -50.0, passS: 0.95, w: 8.0, l: 10.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
 
-  // Wave 3: Massive screen-blanketing white blocks passing camera lens (s in [0.95, 1.00])
-  { x: -2.5, y: -0.4, zStart: -58.0, passS: 0.965, w: 8.5, l: 12.0, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
-  { x:  2.5, y:  0.4, zStart: -59.0, passS: 0.975, w: 8.5, l: 12.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
-  { x:  0.0, y: -0.2, zStart: -60.0, passS: 0.985, w: 9.5, l: 14.0, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
-  { x:  0.0, y:  0.2, zStart: -61.0, passS: 0.995, w: 9.5, l: 14.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
+  // ==================== CENTER HORIZONTAL GAP COVERING BLOCKS (USER YELLOW MARKS) ====================
+  // Directly seals the horizontal black slit marked by the user in Image 4.
+  // Oriented facing camera (rotX = 0) right along Y ≈ 0 with substantial vertical height
+  // so they physically wipe across and obliterate the horizontal black slit!
+  // 1. Left yellow mark from user's drawing:
+  { x: -3.2, y:  0.0, zStart: -38.0, passS: 0.920, w: 5.2, l: 2.6, isFloor: false, style: 'solidWhite', isTransitionCover: true, isCenterBlock: true },
+  // 2. Right yellow mark from user's drawing:
+  { x:  3.2, y:  0.0, zStart: -39.0, passS: 0.935, w: 5.2, l: 2.6, isFloor: false, style: 'solidWhite', isTransitionCover: true, isCenterBlock: true },
+  // 3. Center overlap block sealing the middle between left and right:
+  { x:  0.0, y:  0.0, zStart: -40.0, passS: 0.955, w: 6.5, l: 3.2, isFloor: false, style: 'solidWhite', isTransitionCover: true, isCenterBlock: true },
+  // 4. Staggered wide left block:
+  { x: -1.8, y:  0.0, zStart: -42.0, passS: 0.970, w: 8.0, l: 4.0, isFloor: false, style: 'solidWhite', isTransitionCover: true, isCenterBlock: true },
+  // 5. Staggered wide right block:
+  { x:  1.8, y:  0.0, zStart: -43.0, passS: 0.975, w: 8.0, l: 4.0, isFloor: false, style: 'solidWhite', isTransitionCover: true, isCenterBlock: true },
+  // 6. Final screen-blanketing pure white wave covering 100% of viewport:
+  { x:  0.0, y:  0.0, zStart: -45.0, passS: 0.985, w: 9.5, l: 6.0, isFloor: false, style: 'solidWhite', isTransitionCover: true, isCenterBlock: true },
+
+  // Wave 3: Screen-blanketing floor & ceiling white blocks passing camera lens (s in [0.96, 1.00])
+  { x: -2.0, y: -0.20, zStart: -48.0, passS: 0.975, w: 8.0, l: 12.0, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
+  { x:  2.0, y:  0.20, zStart: -49.0, passS: 0.980, w: 8.0, l: 12.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
+  { x:  0.0, y: -0.08, zStart: -50.0, passS: 0.990, w: 9.0, l: 14.0, isFloor: true,  style: 'solidWhite', isTransitionCover: true },
+  { x:  0.0, y:  0.08, zStart: -51.0, passS: 0.995, w: 9.0, l: 14.0, isFloor: false, style: 'solidWhite', isTransitionCover: true },
 ]
 
 function createMonochromeTextures(): Record<string, THREE.CanvasTexture> {
@@ -269,7 +287,7 @@ export function CardStreamBridge() {
     })
   }, [textures])
 
-  // Fullscreen pure white flood quad right at the handover
+  // Fullscreen pure white flood quad right at the final frame (s in [0.97, 1.00])
   const fullWhiteGeom = useMemo(() => new THREE.PlaneGeometry(120, 120), [])
   const fullWhiteMat = useMemo(() => {
     return new THREE.MeshBasicMaterial({
@@ -301,25 +319,46 @@ export function CardStreamBridge() {
     const s = Math.max(0, Math.min(1.0, (raw - pStart) / (pEnd - pStart)))
     const camZ = 8.0 // Camera is at Z = 8.0
 
-    // Animate each flat horizontal plate streaming along the Z-axis towards and past the camera
+    // Animate each plate streaming along the Z-axis towards and past the camera
     PLATES.forEach((plate, i) => {
       const mesh = plateMeshesRef.current[i]
       if (!mesh) return
 
-      // Distance plate travels to pass camera Z = 8.0 at plate.passS
-      const travelTotal = (camZ + 8.0) - plate.zStart
-      const currentZ = plate.zStart + (s / plate.passS) * travelTotal
+      // Visibility gating:
+      // Center blocks (yellow marks) only appear during the final gap-covering phase (s >= 0.82)
+      // to keep the center horizon completely open and box-free during early corridor flight!
+      if (plate.isCenterBlock && s < 0.82) {
+        mesh.visible = false
+        return
+      }
 
-      // Distance to camera lens
+      // Wave 1 and Wave 2 transition cover plates only appear when s >= 0.65
+      if (plate.isTransitionCover && !plate.isCenterBlock && s < 0.65) {
+        mesh.visible = false
+        return
+      }
+
+      // Distance plate travels so its leading edge/center reaches camera lens Z = 8.0 at plate.passS
+      const travelToCam = camZ - plate.zStart
+      const currentZ = plate.zStart + (s / plate.passS) * travelToCam
+
+      // Distance to camera lens (positive = in front of lens, negative = passed behind lens)
       const distToCam = camZ - currentZ
 
-      // Dissolve smoothly right as plate passes camera lens
       const baseOp = plate.style === 'ghostGlass' ? 0.55 : plate.style === 'frostWhite' ? 0.90 : 1.0
       let opacity = baseOp
+
+      if (plate.isCenterBlock) {
+        // Soft emergence from distance at s in [0.82, 0.87]
+        opacity *= smoothstep(0.82, 0.87, s)
+      }
+
       if (plate.isTransitionCover) {
-        // Transition cover blocks stay solid white longer to cover the viewport
-        if (distToCam < 1.0) {
-          opacity = baseOp * smoothstep(0.0, 1.0, distToCam)
+        // Transition cover blocks stay 100% solid white all the way to and through the camera lens
+        // so they physically wipe over and cover the screen without pre-fading!
+        if (distToCam < 0) {
+          // Fade quickly once fully behind the lens
+          opacity *= smoothstep(-1.8, 0.0, distToCam)
         }
       } else {
         if (distToCam < 2.5) {
@@ -330,34 +369,33 @@ export function CardStreamBridge() {
         opacity *= smoothstep(80, 65, distToCam)
       }
 
-      // Plate is visible when in front of or just passing camera
-      const isVisible = distToCam >= -1.0 && distToCam <= 85.0 && opacity > 0.01
+      // Plate is visible when approaching, at lens, or just passing behind camera
+      const isVisible = distToCam >= -2.0 && distToCam <= 85.0 && opacity > 0.01
       mesh.visible = isVisible
 
       if (isVisible) {
         mesh.position.set(plate.x, FLIGHT_CONFIG.CAMERA_Y + plate.y, currentZ)
 
-        // Flat horizontal orientation in X-Z plane:
-        // Floor plates face UP (rotation.x = -PI/2)
-        // Ceiling plates face DOWN (rotation.x = +PI/2)
-        const rotX = plate.isFloor ? -Math.PI / 2 : Math.PI / 2
+        // Orientation:
+        // Center blocks directly face camera (rotX = 0) to cover the horizontal center gap
+        // Floor plates face UP (rotX = -PI/2)
+        // Ceiling plates face DOWN (rotX = +PI/2)
+        const rotX = plate.isCenterBlock ? 0 : plate.isFloor ? -Math.PI / 2 : Math.PI / 2
         mesh.rotation.set(rotX, 0, 0)
 
         materials[i].opacity = opacity
       }
     })
 
-    // Seamless full-screen pure white flood quad right as multiple white blocks cover the screen (s in [0.88, 1.00])
-    // Guarantees 100% pure white coverage without any seam or background pop
+    // Seamless full-screen pure white flood quad right at the very end of block passage (s in [0.98, 1.00])
     if (fullWhiteQuadRef.current) {
-      if (s < 0.88) {
+      if (s < 0.98) {
         fullWhiteQuadRef.current.visible = false
       } else {
         fullWhiteQuadRef.current.visible = true
-        const whiteT = (s - 0.88) / (1.00 - 0.88)
+        const whiteT = (s - 0.98) / (1.00 - 0.98)
         const whiteOp = whiteT * whiteT * (3 - 2 * whiteT)
         fullWhiteMat.opacity = whiteOp
-        // Position directly in front of camera lens
         fullWhiteQuadRef.current.position.set(0, FLIGHT_CONFIG.CAMERA_Y, camZ - 0.4)
       }
     }
@@ -365,7 +403,7 @@ export function CardStreamBridge() {
 
   return (
     <group ref={groupRef} visible={false}>
-      {/* 56 Flat Horizontal Perspective Plates with End Screen-Covering Wave */}
+      {/* 60 Perspective Plates with Center Gap Cover Blocks & End Screen-Covering Wave */}
       {PLATES.map((_, i) => (
         <mesh
           key={`horizon-plate-${i}`}
