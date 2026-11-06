@@ -151,10 +151,15 @@ export default function App({
     )
 
 function BackgroundController({ isCorridor }) {
-  const { gl } = useThree()
+  const { gl, scene } = useThree()
   useEffect(() => {
     gl.setClearColor(isCorridor ? 0xffffff : 0x000000, 1.0)
-  }, [gl, isCorridor])
+    if (isCorridor) {
+      scene.fog = new THREE.Fog(0xffffff, 25, 95)
+    } else {
+      scene.fog = null
+    }
+  }, [gl, scene, isCorridor])
   return <color attach="background" args={[isCorridor ? '#ffffff' : '#000000']} />
 }
 

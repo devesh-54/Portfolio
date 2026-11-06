@@ -74,7 +74,7 @@ export function ScreenDive({
         onHandoverChange?.(isCorridor)
         onDiveCompleteChange?.(isCorridor)
         if (camera instanceof THREE.PerspectiveCamera) {
-          camera.fov = isCorridor ? FLIGHT_CONFIG.CAMERA_FOV : 35
+          camera.fov = isCorridor ? 60 : 35
           camera.updateProjectionMatrix()
         }
       }
@@ -105,17 +105,15 @@ export function ScreenDive({
         externalPose.current.target.copy(tempTarget)
         externalPose.current.e = 0
       } else {
-        // --- PHASE B: Fixed camera looking straight down -z at y = -1000 ---
-        tempPos.set(
-          FLIGHT_CONFIG.CAMERA_POS[0],
-          FLIGHT_CONFIG.CAMERA_POS[1],
-          FLIGHT_CONFIG.CAMERA_POS[2]
-        )
-        tempTarget.set(
-          FLIGHT_CONFIG.CAMERA_TARGET[0],
-          FLIGHT_CONFIG.CAMERA_TARGET[1],
-          FLIGHT_CONFIG.CAMERA_TARGET[2]
-        )
+        // --- PHASE B: Selected Work Depth Flythrough (from user's reference code) ---
+        const DEPTH = 150.0
+        const flightP = Math.max(0, Math.min(1.0, (p - handover) / (1 - handover)))
+        const camZ = 8.0 - flightP * (DEPTH + 10.0)
+        const camX = Math.sin(flightP * 6.0) * 0.6
+        const camY = Math.sin(flightP * 4.0) * 0.3
+
+        tempPos.set(camX, FLIGHT_CONFIG.CAMERA_Y + camY, camZ)
+        tempTarget.set(camX * 0.5, FLIGHT_CONFIG.CAMERA_Y + camY * 0.5, camZ - 20.0)
 
         externalPose.current.active = true
         externalPose.current.position.copy(tempPos)
