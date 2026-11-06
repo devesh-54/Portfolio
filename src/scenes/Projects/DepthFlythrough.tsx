@@ -313,7 +313,7 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
     const r = rnd(3.5, 16.0)
     const x = Math.cos(a) * r * 1.6
     const y = Math.sin(a) * r * 0.9
-    const z = -rnd(4.0, 122.0)
+    const z = -rnd(14.0, 122.0)
     const rotY = rnd(-0.35, 0.35)
     const rotX = rnd(-0.1, 0.1)
 
@@ -582,12 +582,15 @@ export function DepthFlythrough({
 
   // ─── Render Loop (Pure Function of Scroll, Zero Falling Motion) ────────────
   useFrame((_, delta) => {
-    if (!visible) return
-
     const raw = heroProgress.get()
     const handover = FLIGHT_CONFIG.HANDOVER_P
+    // Emergence begins as multiple white blocks are rushing and covering the screen
+    const emergenceStart = handover - 0.012
 
-    if (raw < handover) {
+    if (!visible || raw < emergenceStart) {
+      if (groupRef.current) {
+        groupRef.current.visible = false
+      }
       for (let i = 0; i < cards.length; i++) {
         const obj = cardContainerRefs.current[i]
         if (obj) obj.visible = false
@@ -598,8 +601,22 @@ export function DepthFlythrough({
       return
     }
 
-    const flightP = Math.max(0, Math.min(1.0, (raw - handover) / (1 - handover)))
-    const revealFactor = 1.0
+    if (groupRef.current) {
+      groupRef.current.visible = true
+    }
+
+    // Emergence progression into full white screen (0.0 at emergenceStart -> 1.0 at handover)
+    const isEmerging = raw < handover
+    const tEmerge = isEmerging
+      ? Math.max(0, Math.min(1.0, (raw - emergenceStart) / (handover - emergenceStart)))
+      : 1.0
+
+    // Smooth emergence opacity: Project 01 and nearby cards slowly appear with soft blur
+    const entryOpacity = isEmerging ? smoothstep(0.0, 1.0, tEmerge) : 1.0
+    // Initial emergence blur: slowly goes off as white screen covers the monitor, clearing by tEmerge ~ 0.95
+    const entryBlur = isEmerging ? (1.0 - smoothstep(0.10, 0.95, tEmerge)) : 0.0
+
+    const flightP = raw >= handover ? Math.max(0, Math.min(1.0, (raw - handover) / (1 - handover))) : 0
     const safeDelta = Math.min(delta, 0.05)
 
     const DEPTH = FLIGHT_CONFIG.DEPTH || 126.0
@@ -615,11 +632,11 @@ export function DepthFlythrough({
       const mat = cardMaterials[i]
       if (!obj || !mat) continue
 
-      // Distance in front of camera
+      // Distance in front of camera lens
       const d = camZ - card.z
 
-      // Visible when in front of lens and within fog distance
-      const isVisible = d > 0.4 && d < 95.0
+      // Visible when in front of lens and within viewing depth
+      const isVisible = d > 0.4 && d < 70.0
 
       if (!isVisible) {
         obj.visible = false
@@ -633,30 +650,36 @@ export function DepthFlythrough({
       obj.position.set(card.x, card.y, card.z)
       obj.rotation.set(card.rotX, card.rotY, card.rotZ || 0)
 
-      // Smooth lens dissolve right as card passes camera lens (matches HTML ss(0.4, 5, d))
-      const lensDissolve = smoothstep(0.4, 5.0, d)
+      // Smooth lens dissolve right as card passes camera lens (matches HTML ss(0.4, 4, d))
+      const lensDissolve = smoothstep(0.4, 4.0, d)
 
-      // Distant fog fade to white
-      let distFade = 1.0
-      if (d > 55.0) {
-        distFade = Math.max(0, 1.0 - (d - 55.0) / 25.0)
+      // Distance fade: distant cards far back in depth gently fade in from the white background
+      // Cards beyond d = 50 are invisible so they don't pop in all at once!
+      const distFade = 1.0 - smoothstep(28.0, 50.0, d)
+
+      // Combined card opacity
+      const totalOpacity = lensDissolve * distFade * entryOpacity
+
+      // Optical blur effect for each individual project and placeholder:
+      // 1. Distance blur for this specific card based strictly on its own distance d to the camera:
+      // - When close to camera (d <= 21.0), blur is 0.0 (clean, crisp focus)
+      // - When mid-distance (d in [21.0, 36.0]), blur density increases smoothly from 0.0 to 1.0
+      // - When far away in depth (d >= 36.0), blur density is 1.0 (softly blurred in distance)
+      const distBlur = smoothstep(21.0, 36.0, d)
+
+      // 2. Individual card blur:
+      // - As white screen covers the monitor, Project 01 (nearest card at d ~ 22.0) starts with soft blur
+      //   and slowly clears up to 0.0 right as white covers the screen (showing in correct and clean form).
+      // - Projects and placeholders behind it (Project 02 at d ~ 39, Project 03 at d ~ 56) maintain their own distance blur!
+      // - Each picture has its own blur density that goes away ONLY as that specific card gets close to the screen!
+      let cardBlur = distBlur
+      if (isEmerging) {
+        // Near cards have extra emergence blur that clears as tEmerge -> 1.0
+        const fgWeight = 1.0 - smoothstep(18.0, 28.0, d)
+        cardBlur = Math.min(1.0, Math.max(distBlur, entryBlur * fgWeight))
+      } else {
+        cardBlur = distBlur
       }
-
-      const totalOpacity = lensDissolve * distFade * revealFactor
-
-      // Optical blur effect on each project and placeholder
-      // 1. Distance blur: cards far away in depth are softly blurred, clearing up as they approach the camera
-      const distBlur = smoothstep(10.0, 26.0, d)
-
-      // 2. Initial emergence blur right when white screen comes (handover):
-      // Projects show with a soft blur instead of popping up all of a sudden, sharpening as user scrolls
-      const entryBlur = smoothstep(handover + 0.045, handover, raw)
-
-      // Prioritize focus when card is close in front of camera (d <= 12.0)
-      const focusProximity = 1.0 - smoothstep(8.0, 14.0, d)
-      const effectiveEntryBlur = entryBlur * (1.0 - 0.75 * focusProximity)
-
-      const cardBlur = Math.min(1.0, Math.max(0.0, distBlur * 0.70 + effectiveEntryBlur * 0.75))
 
       if (card.isReal && card.project) {
         const pMat = mat as THREE.ShaderMaterial
@@ -713,9 +736,7 @@ export function DepthFlythrough({
         // Placeholder ShaderMaterial with optical blur effect
         const phMat = mat as THREE.ShaderMaterial
         if (phMat.uniforms) {
-          const phLensDissolve = smoothstep(0.4, 4.0, d)
-          const phDistFade = d > 60.0 ? Math.max(0, 1.0 - (d - 60.0) / 25.0) : 1.0
-          phMat.uniforms.uOpacity.value = phLensDissolve * phDistFade * revealFactor
+          phMat.uniforms.uOpacity.value = totalOpacity
           phMat.uniforms.uBrightness.value = 1.0
           phMat.uniforms.uBlur.value = cardBlur
         }
@@ -729,7 +750,7 @@ export function DepthFlythrough({
   })
 
   return (
-    <group ref={groupRef} position={[0, FLIGHT_CONFIG.CAMERA_Y, 0]} visible={visible}>
+    <group ref={groupRef} position={[0, FLIGHT_CONFIG.CAMERA_Y, 0]} visible={false}>
       {cards.map((card, i) => {
         const mat = cardMaterials[i]
         const isReal = card.isReal && card.project

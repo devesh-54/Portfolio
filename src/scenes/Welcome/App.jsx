@@ -169,12 +169,13 @@ function BackgroundController({ isCorridor }) {
       scene.fog = null
     } else if (p < pHandover) {
       const s = (p - pStart) / (pHandover - pStart)
-      // Keep deep black void during corridor flight, then smoothly sweep to white as blocks cover screen
-      if (s < 0.88) {
+      // Void stays pure black while blocks stream; background switches to white only at the very end (s >= 0.96)
+      // when screen is already physically covered by the solid white geometry
+      if (s < 0.96) {
         gl.setClearColor(0x000000, 1.0)
         scene.fog = null
       } else {
-        const whiteT = (s - 0.88) / (1.0 - 0.88)
+        const whiteT = (s - 0.96) / (1.0 - 0.96)
         const easedWhite = whiteT * whiteT * (3 - 2 * whiteT)
         colorRef.current.setRGB(easedWhite, easedWhite, easedWhite)
         gl.setClearColor(colorRef.current, 1.0)
