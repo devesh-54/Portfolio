@@ -64,71 +64,47 @@ async function run() {
       console.log(`Saved screenshot: ${filename} (size: ${buf.length} bytes)`);
     }
 
-    // 1. Pixel Wave sweeping from Left to Right (at p = 0.138, middle of transition)
-    // Left side is white, middle is dark pixel wave, right side is Welcome room!
+    // 1. Pixel Wave sweeping from Left to Right (at p = 0.07, middle of handover transition)
+    // Left side is white, middle is chunky square pixel wave, right side is Welcome room!
     console.log('Milestone 1: Pixel Wave sweeping left-to-right (revealing white)...');
     await send('Runtime.evaluate', {
       expression: `
         (() => {
+          window.heroProgress.set(0.07);
           const heroTr = window.ScrollTrigger.getAll().find(t => t.trigger?.id === 'hero');
-          const target = heroTr.start + (heroTr.end - heroTr.start) * 0.137931;
-          window.lenis.scrollTo(target, { immediate: true });
-          window.ScrollTrigger.update();
+          if (heroTr) {
+            const target = heroTr.start + (heroTr.end - heroTr.start) * 0.07;
+            window.scrollTo(0, target);
+            if (window.lenis) window.lenis.scrollTo(target, { immediate: true });
+          }
         })()
       `,
     });
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 800));
     await capture('pixel_wave_left_to_right.png');
 
-    // 2. White Background in Projects with 3D card field (at flightP = 0.18)
+    // 2. White Background in Projects with 3D card tunnel (at flightP = 0.02)
     console.log('Milestone 2: White Background Projects 3D Corridor...');
     await send('Runtime.evaluate', {
-      expression: `
-        (() => {
-          const handover = 80 / 580;
-          const p = handover + 0.18 * (1 - handover);
-          const heroTr = window.ScrollTrigger.getAll().find(t => t.trigger?.id === 'hero');
-          const target = heroTr.start + (heroTr.end - heroTr.start) * p;
-          window.lenis.scrollTo(target, { immediate: true });
-          window.ScrollTrigger.update();
-        })()
-      `,
+      expression: 'window.__setFlightProgress(0.02)',
     });
-    await new Promise(r => setTimeout(r, 1200));
+    await new Promise(r => setTimeout(r, 1000));
     await capture('projects_white_background.png');
 
-    // 3. Card Pixel Wave Sweeping across Card Surface (JeevaLink approaching at flightP = 0.24)
+    // 3. Card Pixel Wave Sweeping across Card Surface (JeevaLink approaching at flightP = 0.06)
     console.log('Milestone 3: Pixel Wave sweeping across card surface...');
     await send('Runtime.evaluate', {
-      expression: `
-        (() => {
-          const handover = 80 / 580;
-          const p = handover + 0.24 * (1 - handover);
-          const heroTr = window.ScrollTrigger.getAll().find(t => t.trigger?.id === 'hero');
-          const target = heroTr.start + (heroTr.end - heroTr.start) * p;
-          window.lenis.scrollTo(target, { immediate: true });
-          window.ScrollTrigger.update();
-        })()
-      `,
+      expression: 'window.__setFlightProgress(0.06)',
     });
-    await new Promise(r => setTimeout(r, 1200));
+    await new Promise(r => setTimeout(r, 1000));
     await capture('card_pixel_wave_mid.png');
 
-    // 4. Completed Project Card at Focus Crest (JeevaLink at flightP = 0.35)
+    // 4. Completed Project Card at Focus Crest (JeevaLink at flightP = 0.09)
     console.log('Milestone 4: Completed Card Picture at Focus Crest...');
     await send('Runtime.evaluate', {
-      expression: `
-        (() => {
-          const handover = 80 / 580;
-          const p = handover + 0.35 * (1 - handover);
-          const heroTr = window.ScrollTrigger.getAll().find(t => t.trigger?.id === 'hero');
-          const target = heroTr.start + (heroTr.end - heroTr.start) * p;
-          window.lenis.scrollTo(target, { immediate: true });
-          window.ScrollTrigger.update();
-        })()
-      `,
+      expression: 'window.__setFlightProgress(0.09)',
     });
-    await new Promise(r => setTimeout(r, 1200));
+    await new Promise(r => setTimeout(r, 1000));
     await capture('card_pixel_wave_complete.png');
 
     ws.close();

@@ -45,9 +45,10 @@ export function PixelateTransitionOverlay() {
     window.addEventListener('resize', resize)
 
     // Handover window: wave sweeps from left to right as user scrolls from Welcome to Projects
+    // Wave completes exactly at P_HANDOVER where Three.js takes over with white background
     const P_HANDOVER = FLIGHT_CONFIG.HANDOVER_P
-    const P_START = Math.max(0.01, P_HANDOVER - 0.10)
-    const P_END = P_HANDOVER + 0.10
+    const P_START = 0.02
+    const P_END = P_HANDOVER
 
     // Colors in ABGR (0xAABBGGRR) format for direct 32-bit write
     const COLOR_WHITE = 0xFFFFFFFF       // #ffffff (revealed project background)
