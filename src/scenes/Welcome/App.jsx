@@ -1,6 +1,6 @@
 import { Suspense, useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import { useNavigate } from 'react-router-dom'
 import { Leva } from 'leva'
 import { SketchMaterial } from './sketch/SketchMaterial'
@@ -76,7 +76,8 @@ export default function App({
     }
     const visited = sessionStorage.getItem('welcomeIntroPlayed') === 'true'
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    return visited || reducedMotion
+    const hasP = window.location.search.includes('p=')
+    return visited || reducedMotion || hasP
   })
 
   const handleIntroEnd = useCallback(() => {
@@ -149,11 +150,19 @@ export default function App({
       />
     )
 
+function BackgroundController({ isCorridor }) {
+  const { gl } = useThree()
+  useEffect(() => {
+    gl.setClearColor(isCorridor ? 0xffffff : 0x000000, 1.0)
+  }, [gl, isCorridor])
+  return <color attach="background" args={[isCorridor ? '#ffffff' : '#000000']} />
+}
+
   return (
     <div
       className="welcome-root theme-dark"
       style={{
-        background: '#000000',
+        background: isCorridor ? '#ffffff' : '#000000',
         width: '100%',
         height: '100%',
         position: 'relative',
@@ -166,17 +175,17 @@ export default function App({
         gl={{ powerPreference: 'high-performance', preserveDrawingBuffer: true }}
         frameloop={frameloop}
         camera={{ position: INTRO_START.position, fov: 35 }}
-        style={{ background: '#000000' }}
+        style={{ background: isCorridor ? '#ffffff' : '#000000' }}
         onCreated={({ camera, gl }) => {
           camera.lookAt(...INTRO_START.target)
-          gl.setClearColor(0x000000, 1.0)
+          gl.setClearColor(isCorridor ? 0xffffff : 0x000000, 1.0)
           if (typeof window !== 'undefined') {
             window.__gl = gl
             window.__canvas = gl.domElement
           }
         }}
       >
-        <color attach="background" args={['#000000']} />
+        <BackgroundController isCorridor={isCorridor} />
         <directionalLight position={light.clone().multiplyScalar(8)} />
         {!isCorridor && (
           <RevealEffect

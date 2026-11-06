@@ -9,9 +9,8 @@ function hash3(a: number, b: number, c: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296
 }
 
-function smoothstep(min: number, max: number, value: number): number {
-  const x = Math.max(0, Math.min(1, (value - min) / (max - min)))
-  return x * x * (3 - 2 * x)
+function easeInOutCubic(x: number): number {
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
 }
 
 export function PixelateTransitionOverlay() {
@@ -45,10 +44,18 @@ export function PixelateTransitionOverlay() {
     resize()
     window.addEventListener('resize', resize)
 
+    // Handover window: wave sweeps from left to right as user scrolls from Welcome to Projects
     const P_HANDOVER = FLIGHT_CONFIG.HANDOVER_P
-    const P_SPAN = P_HANDOVER * 0.70
-    const P_START = Math.max(0.01, P_HANDOVER - P_SPAN)
-    const P_END = P_HANDOVER + P_SPAN
+    const P_START = Math.max(0.01, P_HANDOVER - 0.10)
+    const P_END = P_HANDOVER + 0.10
+
+    // Colors in ABGR (0xAABBGGRR) format for direct 32-bit write
+    const COLOR_WHITE = 0xFFFFFFFF       // #ffffff (revealed project background)
+    const COLOR_DARK_VOID = 0xFF0A0503   // #03050a (Welcome void background)
+    const COLOR_DARK_NAVY = 0xFF50120F   // #0f1250 (Dark navy from Welcome palette)
+    const COLOR_INK_BLUE  = 0xFF911A10   // #101a91 (Ink blue)
+    const COLOR_CYAN_GLOW = 0xFFFFD02F   // #2fd0ff (Cyber cyan accent at wave crest)
+    const COLOR_TRANSPARENT = 0x00000000 // Shows underlying dark Welcome 3D scene
 
     const render = () => {
       const p = heroProgress.get()
@@ -70,16 +77,15 @@ export function PixelateTransitionOverlay() {
         lastActive = true
       }
 
-      const tau = (p - P_START) / (P_END - P_START)
-      // Triangle wave 0 -> 1 -> 0
-      const rawIntensity = 1.0 - Math.abs(2.0 * tau - 1.0)
-      const intensity = smoothstep(0.0, 1.0, rawIntensity)
-
       const W = canvas.width
       const H = canvas.height
 
-      // Cell size steps up from 8px to 44px as intensity rises
-      const cell = Math.max(8, Math.min(44, Math.round(8 + 36 * intensity)))
+      // Normalized progress 0.0 -> 1.0
+      const t = Math.max(0, Math.min(1, (p - P_START) / (P_END - P_START)))
+      const easedT = easeInOutCubic(t)
+
+      // Cell size: ~28px square retro pixels
+      const cell = Math.max(20, Math.min(38, Math.round(H / 28)))
       const cols = Math.ceil(W / cell)
       const rows = Math.ceil(H / cell)
 
@@ -90,53 +96,59 @@ export function PixelateTransitionOverlay() {
 
       const imgData = offCtx.createImageData(cols, rows)
       const buf32 = new Uint32Array(imgData.data.buffer)
-      buf32.fill(0) // Transparent black
 
-      // Reversible flicker step
-      const flicker = Math.floor(tau * 120)
-
-      // Color palette in ABGR (0xAABBGGRR) format for direct 32-bit pixel buffer write
-      // #ffffff -> 0xFFFFFFFF
-      // #2fd0ff -> 0xFFFFD02F
-      // #8fc4ff -> 0xFFFFC48F
-      // #4d73d9 -> 0xFFD9734D
-      // #ff7a3d -> 0xFF3D7AFF
-      // #03050a -> 0xFF0A0503
-      const colorsABGR = [
-        0xFFFFFFFF,
-        0xFFFFD02F,
-        0xFFFFC48F,
-        0xFFD9734D,
-        0xFF3D7AFF,
-      ]
-
-      const halfC = cols / 2
-      const halfR = rows / 2
+      // Wave band geometry (width ~6 cells)
+      const bandCols = 6
+      const edgeBase = easedT * (cols + bandCols + 4) - 2
+      const flicker = Math.floor(t * 120)
 
       for (let r = 0; r < rows; r++) {
-        const dy = (r - halfR) / halfR
+        // Deterministic edge jitter per row
+        const jitter = (hash3(r, 11, flicker) - 0.5) * 2.2
+        const edgeR = edgeBase + jitter
+
+        const rowOffset = r * cols
+
         for (let c = 0; c < cols; c++) {
-          const dx = (c - halfC) / halfC
-          const dist = Math.sqrt(dx * dx + dy * dy)
+          const idx = rowOffset + c
 
-          const h1 = hash3(c, r, flicker)
-          const h2 = hash3(r, c, flicker + 37)
+          if (c < edgeR - bandCols) {
+            // 1. BEHIND THE WAVE (left side):
+            // Swept clean to pure WHITE (#ffffff) project background
+            buf32[idx] = COLOR_WHITE
 
-          // Probability of cell being active rises with intensity and center focus
-          const threshold = intensity * (1.15 - 0.35 * Math.min(1.0, dist))
+          } else if (c <= edgeR) {
+            // 2. INSIDE THE PIXEL WAVE BAND:
+            // Moving wave made of dark Welcome-colored pixels with glowing leading edge
+            const bandT = (c - (edgeR - bandCols)) / bandCols // 0 at rear, 1 at front
+            const h = hash3(c, r, flicker)
+            const hColor = hash3(r, c, flicker + 37)
 
-          if (h1 < threshold) {
-            let colorIdx = 0
-            if (h2 < 0.35) colorIdx = 0      // White core
-            else if (h2 < 0.65) colorIdx = 1 // Cyan
-            else if (h2 < 0.85) colorIdx = 2 // Electric blue
-            else if (h2 < 0.95) colorIdx = 3 // Deep blue
-            else colorIdx = 4                // Orange spark
+            if (bandT > 0.82 && h < 0.40) {
+              // Leading edge glowing cyan / white hot crest
+              buf32[idx] = hColor < 0.5 ? COLOR_CYAN_GLOW : COLOR_WHITE
+            } else if (h < 0.90) {
+              // Dark Welcome page colors
+              if (hColor < 0.45) buf32[idx] = COLOR_DARK_VOID
+              else if (hColor < 0.75) buf32[idx] = COLOR_DARK_NAVY
+              else buf32[idx] = COLOR_INK_BLUE
+            } else {
+              buf32[idx] = COLOR_WHITE
+            }
 
-            buf32[r * cols + c] = colorsABGR[colorIdx]
-          } else if (h1 < threshold + 0.15 * intensity) {
-            // Dark void matrix background block with alpha
-            buf32[r * cols + c] = 0xAA0A0503
+          } else if (c < edgeR + 2) {
+            // 3. SPARKS JUST AHEAD OF THE WAVE:
+            const h = hash3(c, r, flicker)
+            if (h < 0.18) {
+              buf32[idx] = COLOR_DARK_VOID
+            } else {
+              buf32[idx] = COLOR_TRANSPARENT
+            }
+
+          } else {
+            // 4. AHEAD OF THE WAVE (right side):
+            // Transparent (shows dark Welcome 3D scene underneath)
+            buf32[idx] = COLOR_TRANSPARENT
           }
         }
       }
@@ -148,14 +160,13 @@ export function PixelateTransitionOverlay() {
       ctx.clearRect(0, 0, W, H)
       ctx.drawImage(offscreen, 0, 0, cols, rows, 0, 0, W, H)
 
-      // Draw to glow canvas
+      // Draw glow canvas (blurred)
       glowCtx.imageSmoothingEnabled = false
       glowCtx.clearRect(0, 0, W, H)
       glowCtx.drawImage(offscreen, 0, 0, cols, rows, 0, 0, W, H)
 
-      const op = (intensity * 0.95).toFixed(3)
-      canvas.style.opacity = op
-      glow.style.opacity = (intensity * 0.75).toFixed(3)
+      canvas.style.opacity = '1'
+      glow.style.opacity = '0.6'
     }
 
     gsap.ticker.add(render)
@@ -168,7 +179,7 @@ export function PixelateTransitionOverlay() {
 
   return (
     <>
-      {/* Crisp Digital Mosaic Layer */}
+      {/* Crisp Pixel Wave Layer (wipes from left to right, revealing white) */}
       <canvas
         ref={canvasRef}
         id="pixelate-crisp-canvas"
@@ -180,10 +191,9 @@ export function PixelateTransitionOverlay() {
           pointerEvents: 'none',
           zIndex: 8,
           display: 'none',
-          opacity: 0,
         }}
       />
-      {/* Glowing Bloom Mosaic Layer */}
+      {/* Soft Glow Layer */}
       <canvas
         ref={glowCanvasRef}
         id="pixelate-glow-canvas"
@@ -195,8 +205,7 @@ export function PixelateTransitionOverlay() {
           pointerEvents: 'none',
           zIndex: 7,
           display: 'none',
-          opacity: 0,
-          filter: 'blur(8px) brightness(1.35)',
+          filter: 'blur(6px) brightness(1.2)',
         }}
       />
     </>

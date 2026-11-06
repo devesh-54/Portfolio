@@ -128,7 +128,7 @@
 .flight-title h2 {
   font-size: clamp(2.5rem, 6vw, 5.5rem);
   font-weight: 700;
-  color: #e8f1ff;
+  color: #101A91;
   letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.05;
@@ -139,7 +139,7 @@
   font-family: monospace;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #7fa6e8;
+  color: #4d73d9;
   margin-top: 8px;
 }
 
@@ -153,8 +153,12 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.05em;
-  color: #8fc4ff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+  color: #101A91;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(16, 26, 145, 0.25);
+  box-shadow: 2px 2px 0px 0px #101A91;
+  border-radius: 4px;
+  padding: 6px 12px;
   pointer-events: none;
   opacity: 0;
   transform: translateY(6px);
@@ -177,13 +181,17 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: #101A91;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(16, 26, 145, 0.25);
+  box-shadow: 3px 3px 0px 0px #101A91;
+  padding: 8px 20px;
+  border-radius: 4px;
   pointer-events: none;
   text-align: center;
   opacity: 0;
   transition: opacity 0.25s ease, transform 0.25s ease;
   z-index: 80;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95), 0 0 20px rgba(110, 168, 255, 0.35);
   white-space: nowrap;
 }
 

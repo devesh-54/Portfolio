@@ -294,6 +294,7 @@ export function Home() {
     lenisRef.current = lenis
     if (typeof window !== 'undefined') {
       ;(window as any).lenis = lenis
+      ;(window as any).heroProgress = heroProgress
     }
 
     lenis.on('scroll', () => {
@@ -339,6 +340,13 @@ export function Home() {
 
           const handover = FLIGHT_CONFIG.HANDOVER_P
           const flightP = p >= handover ? (p - handover) / (1 - handover) : 0
+
+          // Switch header theme: dark during Welcome (p < handover), light during Projects (p >= handover on white background)
+          const nextTheme = p >= handover ? 'light' : 'dark'
+          const headerEl = document.getElementById('site-header')
+          if (headerEl && headerEl.getAttribute('data-theme') !== nextTheme) {
+            headerEl.setAttribute('data-theme', nextTheme)
+          }
 
           // Fade "Selected work" and hint out between flightP = 0.04 and 0.12 (config HEADING_FADE)
           let headingOp = 0
