@@ -291,6 +291,9 @@ export function Home() {
       touchMultiplier: 2,
     })
     lenisRef.current = lenis
+    if (typeof window !== 'undefined') {
+      ;(window as any).lenis = lenis
+    }
 
     lenis.on('scroll', () => {
       ScrollTrigger.update()

@@ -27,9 +27,9 @@ export const PIXEL_SCAN_CONFIG = {
   cellMax: 48,
   cellDivisor: 28,
 
-  // Band geometry
-  bandCells: 6,
-  jitterCells: 3,
+  // Band geometry: tuned for 60fps target performance
+  bandCells: 4,
+  jitterCells: 2,
   sparkCells: 2, // sparks just ahead of the edge
 
   // Reversible flicker quantization: flicker frame = floor(p * 120)

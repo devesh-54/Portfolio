@@ -10,6 +10,10 @@ import './PixelStage.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
+if (typeof window !== 'undefined') {
+  ;(window as any).ScrollTrigger = ScrollTrigger
+}
+
 // Sequence cumulative vh values
 // Trans 0 (void -> about): 100vh  -> [0, 100]
 // Hold about:              70vh   -> [100, 170], mid = 135
@@ -201,6 +205,16 @@ export function PixelStage({ onStageTriggerCreated, onCanvasPauseChange }: Pixel
     onCanvasPauseChange?.(P0 >= 0.5)
   }, [onCanvasPauseChange])
 
+  // Expose global helper for QA test automation
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      ;(window as any).__applyStage = applyStage
+    }
+    return () => {
+      delete (window as any).__applyStage
+    }
+  }, [applyStage])
+
   // Setup canvases and ScrollTrigger
   useEffect(() => {
     const stage = stageRef.current
@@ -214,7 +228,8 @@ export function PixelStage({ onStageTriggerCreated, onCanvasPauseChange }: Pixel
     const updateDimensions = () => {
       const W = window.innerWidth
       const H = window.innerHeight
-      const dpr = Math.min(1.5, window.devicePixelRatio || 1)
+      // Backing store DPR 1.0 for optimal 60fps performance and crisp retro pixel grid
+      const dpr = 1.0
 
       engine.resize(W, H)
 
@@ -270,8 +285,43 @@ export function PixelStage({ onStageTriggerCreated, onCanvasPauseChange }: Pixel
     triggerRef.current = trigger
     onStageTriggerCreated?.(trigger)
 
-    // Initial render at progress 0
-    applyStage(trigger.progress || 0)
+    // Initial render: check if deep link hash was requested on load
+    const initialHash = typeof window !== 'undefined' ? window.location.hash : ''
+    let initialP = trigger.progress || 0
+    if (initialHash === '#about') initialP = STAGE_HOLD_PROGRESS.about
+    else if (initialHash === '#skills') initialP = STAGE_HOLD_PROGRESS.skills
+    else if (initialHash === '#contact') initialP = STAGE_HOLD_PROGRESS.contact
+
+    if (initialHash && initialP > 0) {
+      const scrollPos = trigger.start + initialP * (trigger.end - trigger.start)
+      window.scrollTo(0, scrollPos)
+      if ((window as any).lenis) {
+        ;(window as any).lenis.scrollTo(scrollPos, { immediate: true })
+      }
+      trigger.scroll(scrollPos)
+    }
+
+    applyStage(initialP)
+
+    const handleHashChange = () => {
+      const hash = window.location.hash
+      let targetProgress: number | null = null
+      if (hash === '#about') targetProgress = STAGE_HOLD_PROGRESS.about
+      else if (hash === '#skills') targetProgress = STAGE_HOLD_PROGRESS.skills
+      else if (hash === '#contact') targetProgress = STAGE_HOLD_PROGRESS.contact
+
+      if (targetProgress !== null && triggerRef.current) {
+        const tr = triggerRef.current
+        const scrollPos = tr.start + targetProgress * (tr.end - tr.start)
+        if ((window as any).lenis) {
+          ;(window as any).lenis.scrollTo(scrollPos, { immediate: true })
+        } else {
+          window.scrollTo(0, scrollPos)
+        }
+        applyStage(targetProgress)
+      }
+    }
+    window.addEventListener('hashchange', handleHashChange)
 
     const handleResize = () => {
       updateDimensions()
@@ -300,6 +350,7 @@ export function PixelStage({ onStageTriggerCreated, onCanvasPauseChange }: Pixel
     window.addEventListener('load', handleWindowLoad, { once: true })
 
     return () => {
+      window.removeEventListener('hashchange', handleHashChange)
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('load', handleWindowLoad)
       trigger.kill()
