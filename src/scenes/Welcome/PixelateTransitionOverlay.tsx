@@ -9,10 +9,6 @@ function hash3(a: number, b: number, c: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296
 }
 
-function easeInOutCubic(x: number): number {
-  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
-}
-
 export function PixelateTransitionOverlay() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const glowCanvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -45,9 +41,9 @@ export function PixelateTransitionOverlay() {
     window.addEventListener('resize', resize)
 
     // Handover window: wave sweeps from left to right as user scrolls from Welcome to Projects
-    // Wave completes exactly at P_HANDOVER where Three.js takes over with white background
+    // Starts right as scroll begins and finishes exactly at P_HANDOVER
     const P_HANDOVER = FLIGHT_CONFIG.HANDOVER_P
-    const P_START = 0.02
+    const P_START = 0.005
     const P_END = P_HANDOVER
 
     // Colors in ABGR (0xAABBGGRR) format for direct 32-bit write
@@ -79,10 +75,11 @@ export function PixelateTransitionOverlay() {
 
       // Normalized progress 0.0 -> 1.0
       const t = Math.max(0, Math.min(1, (p - P_START) / (P_END - P_START)))
-      const easedT = easeInOutCubic(t)
+      // Constant linear velocity: ensures 1:1 smooth movement matching scroll without acceleration surge at 50%
+      const easedT = t
 
-      // Cell size: ~18 rows vertically, exactly matching the Graham Mast video block scale
-      const cell = Math.max(32, Math.round(H / 18))
+      // Cell size: reduced by half (from H / 18 to H / 36) for fine, crisp square blocks
+      const cell = Math.max(16, Math.round(H / 36))
       const cols = Math.ceil(W / cell)
       const rows = Math.ceil(H / cell)
 
@@ -94,13 +91,13 @@ export function PixelateTransitionOverlay() {
       const imgData = offCtx.createImageData(cols, rows)
       const buf32 = new Uint32Array(imgData.data.buffer)
 
-      // Total travel distance in cells: from -4 to cols + 4
-      const edgeBase = easedT * (cols + 8) - 4
-      const flicker = Math.floor(t * 60)
+      // Total travel distance in cells: from -5 to cols + 5
+      const edgeBase = easedT * (cols + 10) - 5
+      const flicker = Math.floor(t * 80)
 
       for (let r = 0; r < rows; r++) {
-        // Row-by-row jitter for the wavy stair-step edge
-        const rowJitter = (hash3(r, 7, flicker) - 0.5) * 3.0
+        // Row-by-row jitter for the wavy stair-step edge (calibrated for half cell size)
+        const rowJitter = (hash3(r, 7, flicker) - 0.5) * 3.5
         const rowOffset = r * cols
 
         for (let c = 0; c < cols; c++) {
@@ -110,7 +107,7 @@ export function PixelateTransitionOverlay() {
           const dist = c - (edgeBase + rowJitter)
 
           // Cell-level scatter noise matching Graham Mast After Effects wipe
-          const noise = (hash3(c, r, flicker + 13) - 0.5) * 2.2
+          const noise = (hash3(c, r, flicker + 13) - 0.5) * 2.5
           const val = dist + noise
 
           if (val <= 0) {
