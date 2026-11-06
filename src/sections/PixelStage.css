@@ -1,0 +1,235 @@
+/* PixelStage Styles */
+
+#stage.pixel-stage {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  height: 100vh;
+  overflow: clip;
+  background: #03050a;
+}
+
+.ps-screen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  color: #101A91;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  pointer-events: none;
+  box-sizing: border-box;
+  will-change: clip-path;
+}
+
+.ps-screen--void {
+  background: #03050a;
+  visibility: visible;
+  z-index: 1;
+}
+
+.ps-screen-content {
+  width: 100%;
+  max-width: 1080px;
+  height: 100%;
+  max-height: 100svh;
+  max-height: 100vh;
+  padding: clamp(16px, 3vh, 32px) clamp(16px, 3vw, 36px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.ps-screen-content .section-heading {
+  font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #101A91;
+  margin: 0 0 clamp(6px, 1.2vh, 16px) 0;
+  text-align: center;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Tight Responsive Overrides for Embedded Screens inside PixelStage
+   Ensures 100% viewport fit at 1920x1080, 1366x768, and 1280x720
+   ========================================================================== */
+
+/* 1. About Screen */
+.ps-screen-content .about-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-screen-content .about-bio-section {
+  gap: clamp(4px, 0.8vh, 12px);
+  margin-bottom: clamp(8px, 1.4vh, 18px);
+}
+
+.ps-screen-content .about-bio-p {
+  font-size: clamp(0.85rem, 1.1vw, 1.02rem);
+  line-height: 1.5;
+}
+
+.ps-screen-content .about-card {
+  padding: clamp(8px, 1.2vh, 14px) clamp(12px, 1.5vw, 18px);
+  margin-bottom: clamp(6px, 1vh, 14px);
+  border-radius: 10px;
+}
+
+.ps-screen-content .about-card:last-child {
+  margin-bottom: 0;
+}
+
+.ps-screen-content .about-card-title {
+  font-size: 0.72rem;
+  margin-bottom: 4px;
+}
+
+.ps-screen-content .about-card-text {
+  font-size: clamp(0.82rem, 1vw, 0.95rem);
+}
+
+.ps-screen-content .about-chips-wrap {
+  gap: clamp(4px, 0.6vw, 8px);
+  margin-top: 6px;
+}
+
+.ps-screen-content .about-chip {
+  padding: clamp(3px, 0.5vh, 5px) clamp(8px, 1vw, 12px);
+  font-size: clamp(0.72rem, 0.9vw, 0.82rem);
+}
+
+/* 2. Skills Screen */
+.ps-screen-content .skills-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-screen-content .skills-body .page-intro-text {
+  font-size: clamp(0.82rem, 1vw, 0.95rem);
+  line-height: 1.45;
+  margin: 0 0 clamp(8px, 1.2vh, 16px) 0;
+  text-align: center;
+  color: #101A91;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.ps-screen-content .skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(8px, 1.2vw, 16px);
+  margin-top: 4px;
+  width: 100%;
+}
+
+.ps-screen-content .skill-category-card {
+  padding: clamp(8px, 1.2vh, 14px) clamp(10px, 1.2vw, 16px);
+  border-radius: 10px;
+  gap: clamp(6px, 1vh, 10px);
+}
+
+.ps-screen-content .skill-category-title {
+  font-size: clamp(0.72rem, 0.9vw, 0.82rem);
+}
+
+.ps-screen-content .skills-chip-list {
+  gap: clamp(4px, 0.6vw, 8px);
+}
+
+.ps-screen-content .skill-chip {
+  padding: clamp(3px, 0.5vh, 5px) clamp(8px, 0.9vw, 12px);
+  font-size: clamp(0.72rem, 0.85vw, 0.82rem);
+  gap: 6px;
+}
+
+.ps-screen-content .skill-logo {
+  width: clamp(14px, 1.2vw, 18px);
+  height: clamp(14px, 1.2vw, 18px);
+}
+
+/* 3. Contact Screen */
+.ps-screen-content .contact-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-screen-content .contact-body .page-intro-text {
+  font-size: clamp(0.82rem, 1vw, 0.95rem);
+  line-height: 1.45;
+  margin: 0 0 clamp(8px, 1.2vh, 16px) 0;
+  text-align: center;
+  color: #101A91;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.ps-screen-content .contact-rows-card {
+  margin-top: 0;
+  border-radius: 10px;
+}
+
+.ps-screen-content .contact-row {
+  padding: clamp(6px, 1vh, 12px) clamp(12px, 1.5vw, 20px);
+  gap: clamp(8px, 1vw, 14px);
+}
+
+.ps-screen-content .contact-row-label {
+  font-size: 0.7rem;
+}
+
+.ps-screen-content .contact-row-value {
+  font-size: clamp(0.82rem, 1vw, 0.95rem);
+}
+
+.ps-screen-content .copy-btn {
+  padding: clamp(3px, 0.5vh, 5px) clamp(8px, 1vw, 12px);
+  font-size: clamp(0.72rem, 0.85vw, 0.8rem);
+}
+
+.ps-screen-content .download-resume-btn {
+  padding: clamp(4px, 0.6vh, 7px) clamp(10px, 1.2vw, 16px);
+  font-size: clamp(0.75rem, 0.9vw, 0.85rem);
+}
+
+.ps-screen-content .contact-footer {
+  margin-top: clamp(8px, 1.2vh, 18px) !important;
+  padding-top: clamp(6px, 1vh, 12px) !important;
+  flex-shrink: 0;
+}
+
+/* Canvas Overlay Layers */
+.ps-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.05s linear;
+}
+
+.ps-crisp {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.ps-glow {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: blur(10px) brightness(1.4);
+  mix-blend-mode: screen;
+}

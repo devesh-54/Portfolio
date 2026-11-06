@@ -12,6 +12,7 @@ import { About } from './About'
 import { Skills } from './Skills'
 import { Contact } from './Contact'
 import ProjectDetail from '../ui/ProjectDetail'
+import { PixelStage, STAGE_HOLD_PROGRESS } from '../sections/PixelStage'
 import type { ProjectItem } from '../config/projects'
 
 import { heroProgress } from '../scenes/Welcome/heroProgress'
@@ -120,6 +121,39 @@ export function Home() {
   const flightHintRef = useRef<HTMLDivElement | null>(null)
   const projectLabelRef = useRef<HTMLDivElement | null>(null)
   const heroTriggerRef = useRef<ScrollTrigger | null>(null)
+  const stageTriggerRef = useRef<ScrollTrigger | null>(null)
+
+  // Fallback mode for mobile (<= 768px) and reduced-motion
+  // Note: A vertical scan for portrait screens is a possible future improvement.
+  const [isFallback, setIsFallback] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const mobile = window.matchMedia('(max-width: 768px)').matches
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    return mobile || motion
+  })
+
+  useEffect(() => {
+    const mqlMobile = window.matchMedia('(max-width: 768px)')
+    const mqlMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+    const checkFallback = () => {
+      const next = mqlMobile.matches || mqlMotion.matches
+      setIsFallback((prev) => {
+        if (prev !== next) {
+          ScrollTrigger.refresh()
+          return next
+        }
+        return prev
+      })
+    }
+
+    mqlMobile.addEventListener('change', checkFallback)
+    mqlMotion.addEventListener('change', checkFallback)
+    return () => {
+      mqlMobile.removeEventListener('change', checkFallback)
+      mqlMotion.removeEventListener('change', checkFallback)
+    }
+  }, [])
 
   // Project Detail modal state
   const [activeProject, setActiveProject] = useState<ProjectItem | null>(null)
@@ -325,72 +359,97 @@ export function Home() {
       })
     }
 
-    // Header theme ScrollTrigger per section
+    // Header theme ScrollTrigger per section (used in fallback mode)
     const sectionIds = ['#hero', '#projects', '#about', '#skills', '#contact']
     const themeTriggers: ScrollTrigger[] = []
+    const reveals: gsap.core.Tween[] = []
 
-    // Pause canvas only when white About section covers the screen
-    const aboutEl = document.getElementById('about')
-    if (aboutEl) {
-      const aboutTrigger = ScrollTrigger.create({
-        trigger: aboutEl,
-        start: 'top top',
-        onEnter: () => setIsCanvasPaused(true),
-        onLeaveBack: () => {
-          setIsCanvasPaused(false)
-          invalidate()
-        },
+    if (isFallback) {
+      // Pause canvas only when white About section covers the screen
+      const aboutEl = document.getElementById('about')
+      if (aboutEl) {
+        const aboutTrigger = ScrollTrigger.create({
+          trigger: aboutEl,
+          start: 'top top',
+          onEnter: () => setIsCanvasPaused(true),
+          onLeaveBack: () => {
+            setIsCanvasPaused(false)
+            invalidate()
+          },
+        })
+        themeTriggers.push(aboutTrigger)
+      }
+
+      sectionIds.forEach((id) => {
+        const el = document.querySelector(id)
+        if (!el) return
+        const isDark = el.getAttribute('data-theme') === 'dark'
+        const trigger = ScrollTrigger.create({
+          trigger: el,
+          start: 'top 64px',
+          end: 'bottom 64px',
+          onToggle: (self) => {
+            if (self.isActive) {
+              const nextTheme = isDark ? 'dark' : 'light'
+              setHeaderTheme(nextTheme)
+              const headerEl = document.getElementById('site-header')
+              if (headerEl) {
+                headerEl.setAttribute('data-theme', nextTheme)
+              }
+            }
+          },
+        })
+        themeTriggers.push(trigger)
       })
-      themeTriggers.push(aboutTrigger)
+
+      // Reveal animations for white sections in fallback mode
+      gsap.utils.toArray<HTMLElement>('.section-reveal').forEach((el) => {
+        const tween = gsap.fromTo(
+          el,
+          { opacity: 0, y: 36 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        )
+        reveals.push(tween)
+      })
     }
 
-    sectionIds.forEach((id) => {
-      const el = document.querySelector(id)
-      if (!el) return
-      const isDark = el.getAttribute('data-theme') === 'dark'
-      const trigger = ScrollTrigger.create({
-        trigger: el,
-        start: 'top 64px',
-        end: 'bottom 64px',
-        onToggle: (self) => {
-          if (self.isActive) {
-            const nextTheme = isDark ? 'dark' : 'light'
-            setHeaderTheme(nextTheme)
-            const headerEl = document.getElementById('site-header')
-            if (headerEl) {
-              headerEl.setAttribute('data-theme', nextTheme)
-            }
-          }
-        },
-      })
-      themeTriggers.push(trigger)
-    })
-
-    // Reveal animations for white sections
-    const reveals: gsap.core.Tween[] = []
-    gsap.utils.toArray<HTMLElement>('.section-reveal').forEach((el) => {
-      const tween = gsap.fromTo(
-        el,
-        { opacity: 0, y: 36 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      )
-      reveals.push(tween)
-    })
-
-    // Deep link handling (e.g. /#about)
-    const hash = window.location.hash
-    if (hash) {
+    // Deep link handling (e.g. /#about, /#skills, /#contact)
+    const handleDeepLink = () => {
+      const hash = window.location.hash
+      if (!hash) return
       ScrollTrigger.refresh()
+
+      if (!isFallback && stageTriggerRef.current) {
+        const st = stageTriggerRef.current
+        let targetP: number | null = null
+        if (hash === '#about') targetP = STAGE_HOLD_PROGRESS.about
+        else if (hash === '#skills') targetP = STAGE_HOLD_PROGRESS.skills
+        else if (hash === '#contact') targetP = STAGE_HOLD_PROGRESS.contact
+
+        if (targetP !== null) {
+          setIsCanvasPaused(true)
+          heroProgress.set(1)
+          const targetScroll = st.start + targetP * (st.end - st.start)
+          lenis.scrollTo(targetScroll, { immediate: true })
+          setHeaderTheme('light')
+          const headerEl = document.getElementById('site-header')
+          if (headerEl) {
+            headerEl.setAttribute('data-theme', 'light')
+          }
+          return
+        }
+      }
+
       const targetEl = document.querySelector(hash)
       if (targetEl) {
         setIsCanvasPaused(true)
@@ -405,7 +464,11 @@ export function Home() {
       }
     }
 
+    handleDeepLink()
+    window.addEventListener('hashchange', handleDeepLink)
+
     return () => {
+      window.removeEventListener('hashchange', handleDeepLink)
       gsap.ticker.remove(tickerCb)
       if (heroTriggerRef.current) heroTriggerRef.current.kill()
       themeTriggers.forEach((t) => t.kill())
@@ -413,7 +476,7 @@ export function Home() {
       ScrollTrigger.getAll().forEach((t) => t.kill())
       lenis.destroy()
     }
-  }, [reducedMotion])
+  }, [reducedMotion, isFallback])
 
   // Sync scroll lock with introEnded
   useEffect(() => {
@@ -557,29 +620,40 @@ export function Home() {
         {/* Projects section anchor */}
         <section id="projects" data-theme="dark" style={{ minHeight: '1px' }} />
 
-        {/* Light About Section */}
-        <section id="about" data-theme="light" className="page-section section-light">
-          <div className="section-inner section-reveal">
-            <h2 className="section-heading">About</h2>
-            <About embedded />
-          </div>
-        </section>
+        {!isFallback ? (
+          <PixelStage
+            onStageTriggerCreated={(trigger) => {
+              stageTriggerRef.current = trigger
+            }}
+            onCanvasPauseChange={setIsCanvasPaused}
+          />
+        ) : (
+          <>
+            {/* Light About Section */}
+            <section id="about" data-theme="light" className="page-section section-light">
+              <div className="section-inner section-reveal">
+                <h2 className="section-heading">About</h2>
+                <About embedded />
+              </div>
+            </section>
 
-        {/* Light Skills Section */}
-        <section id="skills" data-theme="light" className="page-section section-light">
-          <div className="section-inner section-reveal">
-            <h2 className="section-heading">Skills</h2>
-            <Skills embedded />
-          </div>
-        </section>
+            {/* Light Skills Section */}
+            <section id="skills" data-theme="light" className="page-section section-light">
+              <div className="section-inner section-reveal">
+                <h2 className="section-heading">Skills</h2>
+                <Skills embedded />
+              </div>
+            </section>
 
-        {/* Light Contact Section */}
-        <section id="contact" data-theme="light" className="page-section section-light">
-          <div className="section-inner section-reveal">
-            <h2 className="section-heading">Contact</h2>
-            <Contact embedded />
-          </div>
-        </section>
+            {/* Light Contact Section */}
+            <section id="contact" data-theme="light" className="page-section section-light">
+              <div className="section-inner section-reveal">
+                <h2 className="section-heading">Contact</h2>
+                <Contact embedded />
+              </div>
+            </section>
+          </>
+        )}
       </main>
 
       {/* Project Detail Overlay */}
