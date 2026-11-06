@@ -247,55 +247,49 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
   const rng = mulberry32(123456)
   const rnd = (min: number, max: number) => min + rng() * (max - min)
 
-  const DEPTH = 150.0
+  const DEPTH = FLIGHT_CONFIG.DEPTH || 26.0
   const realList = realProjects.slice(0, 7)
   let cardIndex = 0
 
-  // 1. 70 Placeholders flanking at the SIDES, periphery and deep tunnel
-  // Center corridor (|x| < 6.2 && |y| < 4.0 && z > -28) is kept 100% CLEAR for real projects!
-  const PLACEHOLDERS = 70
+  // 1. Reduced Placeholders around the sofa cluster (26 total, capped at z >= -28)
+  // Zero placeholders deep in the background after the projects!
+  // Center corridor (|x| < 7.6 && |y| < 5.2 && z > -28) is kept 100% CLEAR for real projects!
+  const PLACEHOLDERS = 26
   for (let i = 0; i < PLACEHOLDERS; i++) {
-    const w = rnd(2.0, 4.2)
+    const w = rnd(2.2, 4.0)
     const h = w * rnd(0.6, 0.75)
 
-    // Side selection: 0 = Left Wing, 1 = Right Wing, 2 = Top Flank, 3 = Bottom Flank, 4 = Deep Periphery
-    const sideChoice = i % 5
+    // Side selection: 0 = Left Wing, 1 = Right Wing, 2 = Top Flank, 3 = Bottom Flank
+    const sideChoice = i % 4
     let x = 0
     let y = 0
     let z = 0
 
     if (sideChoice === 0) {
       // Left Wing
-      x = rnd(-18.0, -7.0)
-      y = rnd(-5.5, 5.5)
-      z = -rnd(8.0, 75.0)
+      x = rnd(-19.0, -8.5)
+      y = rnd(-5.0, 5.0)
+      z = -rnd(8.0, 26.0)
     } else if (sideChoice === 1) {
       // Right Wing
-      x = rnd(7.0, 18.0)
-      y = rnd(-5.5, 5.5)
-      z = -rnd(8.0, 75.0)
+      x = rnd(8.5, 19.0)
+      y = rnd(-5.0, 5.0)
+      z = -rnd(8.0, 26.0)
     } else if (sideChoice === 2) {
       // Top Flank
       x = rnd(-14.0, 14.0)
-      y = rnd(4.6, 10.5)
-      z = -rnd(14.0, 95.0)
-    } else if (sideChoice === 3) {
+      y = rnd(5.4, 9.8)
+      z = -rnd(10.0, 26.0)
+    } else {
       // Bottom Flank
       x = rnd(-14.0, 14.0)
-      y = rnd(-10.5, -4.6)
-      z = -rnd(14.0, 95.0)
-    } else {
-      // Deep tunnel periphery
-      const a = rnd(0, Math.PI * 2)
-      const r = rnd(6.5, 18.0)
-      x = Math.cos(a) * r * 1.5
-      y = Math.sin(a) * r * 0.9
-      z = -rnd(28.0, DEPTH)
+      y = rnd(-9.8, -5.4)
+      z = -rnd(10.0, 26.0)
     }
 
-    // Safety: ensure no placeholder ever overlaps the center sofa cluster
-    if (Math.abs(x) < 6.4 && Math.abs(y) < 4.2 && z > -28.0) {
-      x += x >= 0 ? 6.8 : -6.8
+    // Safety: ensure no placeholder ever encroaches on the center sofa cluster
+    if (Math.abs(x) < 7.6 && Math.abs(y) < 5.2 && z > -28.0) {
+      x += x >= 0 ? 8.0 : -8.0
     }
 
     const rotY = rnd(-0.35, 0.35)
@@ -318,85 +312,78 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
     })
   }
 
-  // 2. Real Project Cards in Floating 3D "Invisible Sofa" Layout
-  // Based on user specification and reference image (media_1793958850046_b4186054.jpg):
-  // - Slot 0 (Project 01): Prominent center focal card, largest, slightly in front
-  // - Slot 1 (Project 02): Top headrest, angled slightly forward/down
-  // - Slot 2 (Project 03): Middle-left armrest, angled inward/right
-  // - Slot 3 (Project 04): Middle-right backrest, angled inward/left
-  // - Slot 4 (Project 05): Bottom-right lounge cushion, angled up/left
-  // - Slot 5 (Project 06): Bottom-left lounge cushion, angled up/right
-  // - Slot 6 (Project 07): Upper-right accent backrest
+  // 2. Real Project Cards in Floating 3D "Invisible Sofa" Layout with GENEROUS NON-OVERLAPPING SPACING
+  // Each card has its own clean breathing room with ZERO visual overlap
   const sofaSlots = [
     {
-      // Slot 0: Center / Middle (Project 01 - largest focal card)
-      x: -0.3,
-      y: -0.1,
-      z: -15.0,
+      // Slot 0: Center / Middle (Project 01 - JeevaLink)
+      x: 0.0,
+      y: 0.0,
+      z: -14.0,
       rotX: 0.06,
-      rotY: -0.06,
-      rotZ: -0.04,
-      scale: 1.05,
-    },
-    {
-      // Slot 1: Top / Headrest (Project 02)
-      x: -2.2,
-      y: 3.4,
-      z: -18.5,
-      rotX: -0.16,
-      rotY: 0.08,
-      rotZ: 0.05,
-      scale: 0.90,
-    },
-    {
-      // Slot 2: Mid-Left Armrest (Project 03)
-      x: -5.2,
-      y: 1.0,
-      z: -17.5,
-      rotX: 0.05,
-      rotY: 0.22,
-      rotZ: 0.06,
-      scale: 0.88,
-    },
-    {
-      // Slot 3: Mid-Right Backrest (Project 04)
-      x: 4.4,
-      y: 1.8,
-      z: -19.5,
-      rotX: -0.06,
-      rotY: -0.22,
-      rotZ: -0.04,
-      scale: 0.92,
-    },
-    {
-      // Slot 4: Bottom-Right Cushion (Project 05)
-      x: 5.4,
-      y: -2.5,
-      z: -17.0,
-      rotX: 0.12,
-      rotY: -0.18,
-      rotZ: 0.04,
+      rotY: -0.05,
+      rotZ: -0.03,
       scale: 0.95,
     },
     {
-      // Slot 5: Bottom-Left Cushion (Project 06)
-      x: -5.2,
-      y: -2.8,
+      // Slot 1: Top / Headrest (Project 02 - ChitGuard)
+      x: -1.8,
+      y: 4.6,
+      z: -18.0,
+      rotX: -0.16,
+      rotY: 0.08,
+      rotZ: 0.04,
+      scale: 0.82,
+    },
+    {
+      // Slot 2: Mid-Left Armrest (Project 03 - DR Detection)
+      x: -7.0,
+      y: 0.8,
+      z: -16.5,
+      rotX: 0.05,
+      rotY: 0.22,
+      rotZ: 0.05,
+      scale: 0.82,
+    },
+    {
+      // Slot 3: Mid-Right Backrest (Project 04 - CashPilot)
+      x: 7.0,
+      y: 1.2,
+      z: -18.5,
+      rotX: -0.06,
+      rotY: -0.22,
+      rotZ: -0.04,
+      scale: 0.82,
+    },
+    {
+      // Slot 4: Bottom-Right Cushion (Project 05 - MediGuard AI)
+      x: 6.4,
+      y: -3.8,
       z: -16.0,
+      rotX: 0.12,
+      rotY: -0.18,
+      rotZ: 0.04,
+      scale: 0.82,
+    },
+    {
+      // Slot 5: Bottom-Left Cushion (Project 06 - HireConnect)
+      x: -6.4,
+      y: -3.8,
+      z: -15.0,
       rotX: 0.14,
       rotY: 0.18,
       rotZ: -0.05,
-      scale: 0.92,
+      scale: 0.82,
     },
     {
-      // Slot 6: Upper-Right Accent (Project 07)
-      x: 5.8,
-      y: 3.6,
-      z: -21.0,
+      // Slot 6: Top-Right Accent (Project 07 - Campus IMS)
+      x: 6.0,
+      y: 4.6,
+      z: -20.5,
       rotX: -0.08,
       rotY: -0.15,
       rotZ: 0.03,
-      scale: 0.82,
+      scale: 0.78,
     },
   ]
 
@@ -407,10 +394,10 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
     const slot = sofaSlots[i % sofaSlots.length]
 
     // Subtle deterministic organic jitter so each card feels naturally hand-placed
-    const jitterX = rnd(-0.12, 0.12)
-    const jitterY = rnd(-0.12, 0.12)
-    const jitterZ = rnd(-0.35, 0.35)
-    const jitterRot = rnd(-0.02, 0.02)
+    const jitterX = rnd(-0.04, 0.04)
+    const jitterY = rnd(-0.04, 0.04)
+    const jitterZ = rnd(-0.15, 0.15)
+    const jitterRot = rnd(-0.015, 0.015)
 
     const x = slot.x + jitterX
     const y = slot.y + jitterY
@@ -421,8 +408,8 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
     const scale = slot.scale
 
     // Focus moment progress: where camZ reaches z + 6.0
-    // camZ = 8.0 - flightP * 160.0
-    const pFocus = Math.max(0, Math.min(1.0, (8.0 - (z + 6.0)) / 160.0))
+    // camZ = 8.0 - flightP * 36.0
+    const pFocus = Math.max(0, Math.min(1.0, (8.0 - (z + 6.0)) / (DEPTH + 10.0)))
 
     cards.push({
       id: p.id,
@@ -679,7 +666,7 @@ export function DepthFlythrough({
     const flightP = Math.max(0, Math.min(1.0, (raw - handover) / (1 - handover)))
     const safeDelta = Math.min(delta, 0.05)
 
-    const DEPTH = 150.0
+    const DEPTH = FLIGHT_CONFIG.DEPTH || 26.0
     const camZ = 8.0 - flightP * (DEPTH + 10.0)
 
     let activeCount = 0
@@ -730,13 +717,13 @@ export function DepthFlythrough({
           pMat.uniforms.uFlickerStep.value = Math.floor(flightP * 120)
 
           // Distance-based Left-to-Right Graham Mast pixel wipe:
-          // In sofa view (d in [14, 34]), cards have their pixel wave smoothly sweeping across,
+          // In sofa view (d in [12, 28]), cards have their pixel wave smoothly sweeping across,
           // revealing the project photos just like in the reference image!
           let waveProg = 0.0
-          if (d <= 14.0) {
+          if (d <= 12.0) {
             waveProg = 1.0
-          } else if (d < 34.0) {
-            waveProg = 1.0 - (d - 14.0) / 20.0
+          } else if (d < 28.0) {
+            waveProg = 1.0 - (d - 12.0) / 16.0
           } else {
             waveProg = 0.0
           }
@@ -767,7 +754,7 @@ export function DepthFlythrough({
         }
 
         // Nearest project detection for active title label (matches reference code)
-        if (d > 2.0 && d < 34.0 && d < minProjectDist) {
+        if (d > 1.5 && d < 28.0 && d < minProjectDist) {
           minProjectDist = d
           nearProject = card.project
         }

@@ -91,21 +91,21 @@ async function run() {
     await new Promise(r => setTimeout(r, 1200));
     await capture('sofa_floating_layout.png');
 
-    // 3. Card Pixel Wave Sweeping across Card Surface (JeevaLink approaching at flightP = 0.06)
-    console.log('Milestone 3: Pixel Wave sweeping across card surface...');
+    // 3. Mid Flight: flying through sofa projects (at flightP = 0.45)
+    console.log('Milestone 3: Flying through sofa projects...');
     await send('Runtime.evaluate', {
-      expression: 'window.__setFlightProgress(0.06)',
+      expression: 'window.__setFlightProgress(0.45)',
     });
     await new Promise(r => setTimeout(r, 1000));
-    await capture('card_pixel_wave_mid.png');
+    await capture('sofa_mid_flight.png');
 
-    // 4. Completed Project Card at Focus Crest (JeevaLink at flightP = 0.09)
-    console.log('Milestone 4: Completed Card Picture at Focus Crest...');
+    // 4. End Flight: small space after last project, ending page (at flightP = 0.95)
+    console.log('Milestone 4: Small space after last project, ending page...');
     await send('Runtime.evaluate', {
-      expression: 'window.__setFlightProgress(0.09)',
+      expression: 'window.__setFlightProgress(0.95)',
     });
     await new Promise(r => setTimeout(r, 1000));
-    await capture('card_pixel_wave_complete.png');
+    await capture('sofa_end_flight.png');
 
     ws.close();
   } finally {
