@@ -232,9 +232,14 @@ export function ScreenDive({
         externalPose.current.e = e
       } else if (p < handover) {
         // --- PHASE A->B: 3D Streaming Cards Bridge (p in [streamStart, handover]) ---
-        // Camera holds steady at corridor origin, looking down the depth tunnel as 3D blocks fly past
-        tempPos.set(0, FLIGHT_CONFIG.CAMERA_Y, 8.0)
-        tempTarget.set(0, FLIGHT_CONFIG.CAMERA_Y, -20.0)
+        // Smooth cinematic camera forward glide down the corridor towards Z = 8.0 (video-like tracking shot)
+        const s = Math.max(0, Math.min(1.0, (p - streamStart) / (handover - streamStart)))
+        const sEase = s * s * (3 - 2 * s)
+        const camZ = 8.8 - sEase * 0.8
+        const camY = Math.sin(sEase * Math.PI) * 0.08
+
+        tempPos.set(0, FLIGHT_CONFIG.CAMERA_Y + camY, camZ)
+        tempTarget.set(0, FLIGHT_CONFIG.CAMERA_Y, camZ - 25.0)
 
         externalPose.current.active = true
         externalPose.current.position.copy(tempPos)
