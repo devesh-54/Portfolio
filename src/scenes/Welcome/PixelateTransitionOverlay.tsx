@@ -45,10 +45,10 @@ export function PixelateTransitionOverlay() {
     resize()
     window.addEventListener('resize', resize)
 
-    const P_HANDOVER = FLIGHT_CONFIG.HANDOVER_P // ~0.230769
-    const P_SPAN = 0.045                        // +/- 4.5% scroll window
-    const P_START = P_HANDOVER - P_SPAN        // ~0.1858
-    const P_END = P_HANDOVER + P_SPAN          // ~0.2758
+    const P_HANDOVER = FLIGHT_CONFIG.HANDOVER_P
+    const P_SPAN = P_HANDOVER * 0.70
+    const P_START = Math.max(0.01, P_HANDOVER - P_SPAN)
+    const P_END = P_HANDOVER + P_SPAN
 
     const render = () => {
       const p = heroProgress.get()

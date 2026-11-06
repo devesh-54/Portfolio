@@ -5,10 +5,6 @@ import { heroProgress } from './heroProgress'
 import settings from './camera-settings.json'
 import { FLIGHT_CONFIG } from '../Projects/flightConfig'
 
-function easeInOutCubic(x: number): number {
-  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
-}
-
 function smoothstep(min: number, max: number, value: number): number {
   const x = Math.max(0, Math.min(1, (value - min) / (max - min)))
   return x * x * (3 - 2 * x)
@@ -22,7 +18,7 @@ export interface ExternalPose {
 }
 
 export interface ScreenDiveProps {
-  screenMeshRef: React.RefObject<THREE.Mesh | null>
+  screenMeshRef?: React.RefObject<THREE.Mesh | null>
   externalPose: React.MutableRefObject<ExternalPose>
   onDiveCompleteChange?: (completed: boolean) => void
   onHandoverChange?: (isCorridor: boolean) => void
@@ -33,7 +29,6 @@ export interface ScreenDiveProps {
 }
 
 export function ScreenDive({
-  screenMeshRef,
   externalPose,
   onDiveCompleteChange,
   onHandoverChange,
@@ -42,15 +37,13 @@ export function ScreenDive({
   scrollHintRef,
   introEnded = true,
 }: ScreenDiveProps) {
-  const { camera, size } = useThree()
+  const { camera } = useThree()
   const isCompleteRef = useRef(false)
   const isCorridorRef = useRef(false)
 
+  // Natural wide viewing pose of the settled desk room (no zoom into monitor)
   const startPosition = useRef(new THREE.Vector3(...settings.end.position)).current
   const startTarget = useRef(new THREE.Vector3(...settings.end.target)).current
-  const finalPosition = useRef(new THREE.Vector3()).current
-  const finalTarget = useRef(new THREE.Vector3()).current
-  const curveRef = useRef<THREE.CatmullRomCurve3 | null>(null)
 
   const tempPos = useRef(new THREE.Vector3()).current
   const tempTarget = useRef(new THREE.Vector3()).current
@@ -61,7 +54,7 @@ export function ScreenDive({
   const cursorRight = useRef(new THREE.Vector3()).current
   const cursorUp = useRef(new THREE.Vector3()).current
 
-  // Set camera.near = 0.05
+  // Camera near plane
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
       camera.near = 0.05
@@ -69,100 +62,7 @@ export function ScreenDive({
     }
   }, [camera])
 
-  const computePoseAndCurve = useCallback(() => {
-    const mesh = screenMeshRef.current
-    if (!mesh || !mesh.geometry) return
-
-    mesh.updateWorldMatrix(true, false)
-    const geom = mesh.geometry
-    const posAttr = geom.attributes.position
-    const normAttr = geom.attributes.normal
-    if (!posAttr) return
-
-    const worldMat = mesh.matrixWorld
-    const normalMat = new THREE.Matrix3().getNormalMatrix(worldMat)
-
-    // Compute center C
-    const worldBox = new THREE.Box3().setFromObject(mesh)
-    const C = new THREE.Vector3()
-    worldBox.getCenter(C)
-
-    // Compute outward normal N (average of vertex normals in world coordinates)
-    const N = new THREE.Vector3()
-    if (normAttr) {
-      const tempN = new THREE.Vector3()
-      for (let i = 0; i < normAttr.count; i++) {
-        tempN.fromBufferAttribute(normAttr, i).applyMatrix3(normalMat).normalize()
-        N.add(tempN)
-      }
-      N.normalize()
-    } else {
-      N.set(0, 0, 1).applyMatrix3(normalMat).normalize()
-    }
-
-    // Ensure N points toward the viewer (start camera position)
-    const toStart = startPosition.clone().sub(C)
-    if (N.dot(toStart) < 0) {
-      N.negate()
-    }
-
-    const worldUp = new THREE.Vector3(0, 1, 0)
-    const R = new THREE.Vector3().crossVectors(worldUp, N).normalize()
-    const U = new THREE.Vector3().crossVectors(N, R).normalize()
-
-    // Project bbox / vertices onto screen's R and U plane
-    let minR = Infinity, maxR = -Infinity
-    let minU = Infinity, maxU = -Infinity
-    const tempV = new THREE.Vector3()
-
-    for (let i = 0; i < posAttr.count; i++) {
-      tempV.fromBufferAttribute(posAttr, i).applyMatrix4(worldMat)
-      const rel = tempV.sub(C)
-      const projR = rel.dot(R)
-      const projU = rel.dot(U)
-      if (projR < minR) minR = projR
-      if (projR > maxR) maxR = projR
-      if (projU < minU) minU = projU
-      if (projU > maxU) maxU = projU
-    }
-
-    const Wq = Math.max(0.1, maxR - minR)
-    const Hq = Math.max(0.1, maxU - minU)
-
-    const aspect = size.width / Math.max(size.height, 1)
-    const fov = (camera as THREE.PerspectiveCamera).fov || 35
-    const halfFovRad = THREE.MathUtils.degToRad(fov / 2)
-    const tanHalfFov = Math.tan(halfFovRad)
-
-    // d = min( Hq / (2 * tan(fov/2)), Wq / (2 * tan(fov/2) * aspect) ) * 0.90
-    // Camera fills 100% of the viewport with the black OLED screen
-    const d = Math.min(Hq / (2 * tanHalfFov), Wq / (2 * tanHalfFov * aspect)) * 0.90
-
-    finalPosition.copy(C).addScaledVector(N, d)
-    finalTarget.copy(C)
-
-    // Start-to-target distance
-    const dist = startPosition.distanceTo(startTarget)
-    const forward = finalPosition.clone().sub(startPosition).normalize()
-    const side = new THREE.Vector3().crossVectors(worldUp, forward).normalize()
-
-    // Midpoint offset sideways and slightly up by 15% of start-to-target distance
-    const midpoint = new THREE.Vector3().lerpVectors(startPosition, finalPosition, 0.5)
-    midpoint.addScaledVector(side, 0.15 * dist)
-    midpoint.addScaledVector(worldUp, 0.05 * dist)
-
-    curveRef.current = new THREE.CatmullRomCurve3(
-      [startPosition.clone(), midpoint, finalPosition.clone()],
-      false,
-      'centripetal'
-    )
-  }, [screenMeshRef, camera, size.width, size.height, startPosition, startTarget, finalPosition, finalTarget])
-
-  useEffect(() => {
-    computePoseAndCurve()
-  }, [computePoseAndCurve])
-
-  // Pure function of progress setting camera pose
+  // Pure function of scroll progress setting camera pose
   const applyHeroState = useCallback(
     (p: number, delta: number, pointer?: { x: number; y: number }) => {
       const handover = FLIGHT_CONFIG.HANDOVER_P
@@ -180,28 +80,21 @@ export function ScreenDive({
       }
 
       if (!isCorridor) {
-        // --- PHASE A: Dive into Monitor (p in [0, handover]) ---
-        if (!curveRef.current) return
+        // --- PHASE A: Welcome desk room settled view (steady wide angle, NO zoom into monitor) ---
+        tempPos.copy(startPosition)
+        tempTarget.copy(startTarget)
 
-        const u = Math.min(1, Math.max(0, p / handover))
-        const e = easeInOutCubic(u)
-
-        // 1. CatmullRom Curve evaluation
-        curveRef.current.getPoint(e, tempPos)
-        tempTarget.lerpVectors(startTarget, finalTarget, e)
-
-        // 2. Cursor Parallax scaled by (1 - e)
+        // Smooth cursor parallax on the desk room
         if (pointer) {
-          const eParallax = Math.max(0, 1 - e)
-          cursorGoal.set(pointer.x, pointer.y, 0).multiplyScalar(0.4)
+          cursorGoal.set(pointer.x, pointer.y, 0).multiplyScalar(0.35)
           const dFollow = THREE.MathUtils.damp(0, 1, 3, delta)
           cursorOffset.lerp(cursorGoal, dFollow)
 
           cursorRight.set(1, 0, 0).applyQuaternion(camera.quaternion)
           cursorUp.set(0, 1, 0).applyQuaternion(camera.quaternion)
 
-          tempPos.addScaledVector(cursorRight, cursorOffset.x * eParallax)
-          tempPos.addScaledVector(cursorUp, cursorOffset.y * eParallax)
+          tempPos.addScaledVector(cursorRight, cursorOffset.x)
+          tempPos.addScaledVector(cursorUp, cursorOffset.y)
         }
 
         // Camera Pose ownership
@@ -210,7 +103,7 @@ export function ScreenDive({
         }
         externalPose.current.position.copy(tempPos)
         externalPose.current.target.copy(tempTarget)
-        externalPose.current.e = e
+        externalPose.current.e = 0
       } else {
         // --- PHASE B: Fixed camera looking straight down -z at y = -1000 ---
         tempPos.set(
@@ -232,7 +125,6 @@ export function ScreenDive({
         externalPose.current.e = 1.0
       }
 
-      // In-hero overlay is kept at 0 opacity
       if (inHeroOverlayRef?.current) {
         inHeroOverlayRef.current.style.opacity = '0'
       }
@@ -274,7 +166,6 @@ export function ScreenDive({
       introEnded,
       startPosition,
       startTarget,
-      finalTarget,
       onDiveCompleteChange,
       onHandoverChange,
       externalPose,
@@ -291,15 +182,8 @@ export function ScreenDive({
   )
 
   useFrame(({ pointer }, delta) => {
-    if (!curveRef.current) {
-      computePoseAndCurve()
-      if (!curveRef.current) return
-    }
-
     // Lenis is the single source of truth for smoothed scroll progress
     const p = heroProgress.get()
-
-    // Call applyHeroState
     applyHeroState(p, delta, pointer)
   })
 
