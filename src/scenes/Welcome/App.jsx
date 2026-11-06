@@ -161,20 +161,20 @@ function BackgroundController({ isCorridor }) {
 
   useFrame(() => {
     const p = heroProgress.get()
-    const pStart = FLIGHT_CONFIG.STREAM_START_P || 0.138
-    const pHandover = FLIGHT_CONFIG.HANDOVER_P || 0.240
+    const pStart = FLIGHT_CONFIG.STREAM_START_P
+    const pHandover = FLIGHT_CONFIG.HANDOVER_P
 
     if (p < pStart) {
       gl.setClearColor(0x000000, 1.0)
       scene.fog = null
     } else if (p < pHandover) {
       const s = (p - pStart) / (pHandover - pStart)
-      // Keep deep black void during corridor flight, then smoothly sweep to white as window fills screen
-      if (s < 0.82) {
+      // Keep deep black void during corridor flight, then smoothly sweep to white as blocks cover screen
+      if (s < 0.88) {
         gl.setClearColor(0x000000, 1.0)
         scene.fog = null
       } else {
-        const whiteT = (s - 0.82) / (1.0 - 0.82)
+        const whiteT = (s - 0.88) / (1.0 - 0.88)
         const easedWhite = whiteT * whiteT * (3 - 2 * whiteT)
         colorRef.current.setRGB(easedWhite, easedWhite, easedWhite)
         gl.setClearColor(colorRef.current, 1.0)

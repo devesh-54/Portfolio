@@ -8,14 +8,14 @@
 export const FLIGHT_CONFIG = {
   // Pinned scroll distances (in vh)
   DIVE_SCROLL_VH: 70,      // Phase A: dive into monitor (70vh)
-  STREAM_SCROLL_VH: 50,    // Transition: 3D streaming cards bridge (50vh)
+  STREAM_SCROLL_VH: 90,    // Transition: 3D streaming cards bridge (slower, 90vh)
   FLIGHT_SCROLL_VH: 380,   // Phase B: card flight (380vh for golden-angle tunnel)
-  TOTAL_SCROLL_VH: 500,    // Total pinned hero scroll (500vh)
+  TOTAL_SCROLL_VH: 540,    // Total pinned hero scroll (540vh)
 
   // Derived progress milestones
-  DIVE_END_P: 70 / 500,     // 0.140
-  STREAM_START_P: 0.138,   // Trigger moment matching exact user reading
-  HANDOVER_P: 120 / 500,   // 0.240 - White covers full screen, Projects scene starts
+  DIVE_END_P: 70 / 540,     // 0.1296
+  STREAM_START_P: 0.128,   // Trigger moment matching dive close-up
+  HANDOVER_P: 160 / 540,   // 0.2963 - White covers full screen, Projects scene starts
 
   // Camera & Perspective: 100px = 1.0 Three.js unit
   PERSPECTIVE_DISTANCE: 15.0, // 1500px -> 15.0 units
