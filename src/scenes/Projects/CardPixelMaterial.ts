@@ -107,12 +107,14 @@ const fragmentShader = /* glsl */ `
                           step(0.04, cellUv.y) * step(cellUv.y, 0.96);
       darkBase += vec3(0.015, 0.025, 0.045) * (1.0 - dormantGrid);
 
-      // Digital sparks leaping ahead of incoming wave (matching placeholders)
-      float sparkAhead = hash2(blockId + vec2(flicker * 0.06 + uSeed * 3.1, 41.7));
-      if (d < edge + 0.16 && sparkAhead > 0.80) {
-        darkBase = mix(darkBase, vec3(0.18, 0.82, 1.0), 0.70);
-      } else if (sparkAhead > 0.97) {
-        darkBase = mix(darkBase, vec3(0.30, 0.60, 1.0), 0.40);
+      // Digital sparks ONLY right ahead of an active moving wave
+      if (uWaveProgress > 0.01 && uWaveProgress < 0.98 && d < edge + 0.16 && d >= edge) {
+        float sparkAhead = hash2(blockId + vec2(flicker * 0.06 + uSeed * 3.1, 41.7));
+        if (sparkAhead > 0.80) {
+          darkBase = mix(darkBase, vec3(0.18, 0.82, 1.0), 0.70);
+        } else if (sparkAhead > 0.60) {
+          darkBase = mix(darkBase, vec3(0.30, 0.60, 1.0), 0.40);
+        }
       }
 
       // Faint dormant corner tick marks
