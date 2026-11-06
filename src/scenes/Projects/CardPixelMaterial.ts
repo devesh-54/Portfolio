@@ -15,6 +15,7 @@ const fragmentShader = /* glsl */ `
   uniform float uResolution;   // pixel block density (~20.0 rows for chunky square pixels)
   uniform float uBrightness;   // depth brightness
   uniform float uOpacity;      // total card opacity
+  uniform float uBlur;         // soft blur / depth-of-field effect
   uniform float uHover;        // hover pop
   uniform float uFlickerStep;  // discrete step
   uniform float uAspect;       // 1.5 aspect ratio
@@ -27,6 +28,27 @@ const fragmentShader = /* glsl */ `
     p = fract(p * vec2(123.34, 456.21));
     p += dot(p, p + 45.32);
     return fract(p.x * p.y);
+  }
+
+  // 12-tap Poisson/Vogel disc pattern for smooth photographic optical blur
+  vec4 sampleBlurred(sampler2D tex, vec2 uv, float blur) {
+    if (blur <= 0.002) {
+      return texture2D(tex, uv);
+    }
+    vec4 sum = texture2D(tex, uv) * 0.20;
+    float weight = 0.20;
+    float rBase = blur * 0.026;
+
+    for (int i = 1; i <= 12; i++) {
+      float fi = float(i);
+      float angle = fi * 2.39996323; // Golden angle
+      float rad = sqrt(fi / 12.0) * rBase;
+      vec2 offset = vec2(cos(angle), sin(angle)) * rad;
+      float w = 1.0 - (rad / (rBase * 1.25));
+      sum += texture2D(tex, uv + offset) * w;
+      weight += w;
+    }
+    return sum / weight;
   }
 
   void main() {
@@ -62,7 +84,7 @@ const fragmentShader = /* glsl */ `
       vec4 texColor;
       if (uWaveProgress < 0.98 && d > edge - 0.14) {
         // Chunky square pixel blocks right at the wave transition front
-        texColor = texture2D(map, blockUv);
+        texColor = sampleBlurred(map, blockUv, uBlur);
 
         // Bright cyan & pure white electrical spark accents right on wave front (identical to placeholders)
         float spark = hash2(blockId + vec2(flicker * 0.08 + uSeed, 17.2));
@@ -73,11 +95,18 @@ const fragmentShader = /* glsl */ `
         }
         texColor.rgb *= (0.85 + 0.15 * border);
       } else {
-        // 100% crisp high-resolution project image
-        texColor = texture2D(map, uv);
+        // High-resolution project image (with optical blur if uBlur > 0)
+        texColor = sampleBlurred(map, uv, uBlur);
       }
 
       rgb = texColor.rgb;
+
+      // When blurred, soften outer edges into pure white background
+      if (uBlur > 0.001) {
+        float minEdge = min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y));
+        float edgeSoft = smoothstep(0.0, 0.04 * uBlur, minEdge);
+        rgb = mix(vec3(1.0, 1.0, 1.0), rgb, edgeSoft);
+      }
 
       // Subtle cyber corner tick marks (#2fd0ff)
       float edgeX = min(uv.x, 1.0 - uv.x);
@@ -126,6 +155,13 @@ const fragmentShader = /* glsl */ `
         darkBase = mix(darkBase, vec3(0.18, 0.82, 1.0), 0.65);
       }
 
+      // Soften dark base outer edges into white background when blurred
+      if (uBlur > 0.001) {
+        float minEdge = min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y));
+        float edgeSoft = smoothstep(0.0, 0.04 * uBlur, minEdge);
+        darkBase = mix(vec3(1.0, 1.0, 1.0), darkBase, edgeSoft);
+      }
+
       rgb = darkBase;
     }
 
@@ -146,6 +182,7 @@ export function createCardPixelMaterial(
       uResolution: { value: resolution },
       uBrightness: { value: 1.0 },
       uOpacity: { value: 0.0 },
+      uBlur: { value: 0.0 },
       uHover: { value: 0.0 },
       uFlickerStep: { value: 0.0 },
       uAspect: { value: aspect },

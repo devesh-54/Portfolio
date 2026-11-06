@@ -170,8 +170,8 @@ export function ScreenDive({
   // Pure function of scroll progress setting camera pose
   const applyHeroState = useCallback(
     (p: number, delta: number, pointer?: { x: number; y: number }) => {
-      const streamStart = FLIGHT_CONFIG.STREAM_START_P || 0.138
-      const handover = FLIGHT_CONFIG.HANDOVER_P || 0.240
+      const streamStart = FLIGHT_CONFIG.STREAM_START_P
+      const handover = FLIGHT_CONFIG.HANDOVER_P
       const isCorridor = p >= streamStart
       const isWhiteWorld = p >= handover
 

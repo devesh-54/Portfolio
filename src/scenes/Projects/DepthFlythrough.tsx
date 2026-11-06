@@ -122,6 +122,67 @@ function createButtonShadowTexture(): THREE.CanvasTexture {
   return tex
 }
 
+// ─── Placeholder Shader Material with Optical Blur ────────────────────────────
+
+function createPlaceholderShaderMaterial(texture: THREE.Texture): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      map: { value: texture },
+      uOpacity: { value: 0.0 },
+      uBlur: { value: 0.0 },
+      uBrightness: { value: 1.0 },
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D map;
+      uniform float uOpacity;
+      uniform float uBlur;
+      uniform float uBrightness;
+      varying vec2 vUv;
+
+      vec4 sampleBlurred(sampler2D tex, vec2 uv, float blur) {
+        if (blur <= 0.002) return texture2D(tex, uv);
+        vec4 sum = texture2D(tex, uv) * 0.20;
+        float weight = 0.20;
+        float rBase = blur * 0.026;
+        for (int i = 1; i <= 12; i++) {
+          float fi = float(i);
+          float angle = fi * 2.39996323;
+          float rad = sqrt(fi / 12.0) * rBase;
+          vec2 offset = vec2(cos(angle), sin(angle)) * rad;
+          float w = 1.0 - (rad / (rBase * 1.25));
+          sum += texture2D(tex, uv + offset) * w;
+          weight += w;
+        }
+        return sum / weight;
+      }
+
+      void main() {
+        vec4 texCol = sampleBlurred(map, vUv, uBlur);
+        vec3 rgb = texCol.rgb * uBrightness;
+
+        if (uBlur > 0.001) {
+          float minEdge = min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y));
+          float edgeSoft = smoothstep(0.0, 0.04 * uBlur, minEdge);
+          rgb = mix(vec3(1.0, 1.0, 1.0), rgb, edgeSoft);
+        }
+
+        gl_FragColor = vec4(rgb, texCol.a * uOpacity);
+      }
+    `,
+    transparent: true,
+    depthWrite: true,
+    depthTest: true,
+    side: THREE.DoubleSide,
+  })
+}
+
 // ─── Placeholder: Deep OLED Black Cyber Block with High-Contrast Blue/Cyan Details ──
 
 function createBlackBoxPlaceholderTextures(): THREE.CanvasTexture[] {
@@ -402,14 +463,7 @@ export function DepthFlythrough({
         })
       } else {
         const tex = placeholderTextures[card.index % placeholderTextures.length]
-        return new THREE.MeshBasicMaterial({
-          map: tex,
-          transparent: true,
-          opacity: 0,
-          depthWrite: true,
-          depthTest: true,
-          side: THREE.DoubleSide,
-        })
+        return createPlaceholderShaderMaterial(tex)
       }
     })
   }, [cards, projectTextures, placeholderTextures])
@@ -590,12 +644,27 @@ export function DepthFlythrough({
 
       const totalOpacity = lensDissolve * distFade * revealFactor
 
+      // Optical blur effect on each project and placeholder
+      // 1. Distance blur: cards far away in depth are softly blurred, clearing up as they approach the camera
+      const distBlur = smoothstep(10.0, 26.0, d)
+
+      // 2. Initial emergence blur right when white screen comes (handover):
+      // Projects show with a soft blur instead of popping up all of a sudden, sharpening as user scrolls
+      const entryBlur = smoothstep(handover + 0.045, handover, raw)
+
+      // Prioritize focus when card is close in front of camera (d <= 12.0)
+      const focusProximity = 1.0 - smoothstep(8.0, 14.0, d)
+      const effectiveEntryBlur = entryBlur * (1.0 - 0.75 * focusProximity)
+
+      const cardBlur = Math.min(1.0, Math.max(0.0, distBlur * 0.70 + effectiveEntryBlur * 0.75))
+
       if (card.isReal && card.project) {
         const pMat = mat as THREE.ShaderMaterial
         if (pMat.uniforms) {
           pMat.uniforms.uOpacity.value = totalOpacity
           pMat.uniforms.uBrightness.value = 1.0
           pMat.uniforms.uFlickerStep.value = Math.floor(flightP * 120)
+          pMat.uniforms.uBlur.value = cardBlur
 
           // Graham Mast Left-to-Right pixel wave as camera approaches this card:
           // In the tunnel, projects are spaced 17.14 units apart along Z (from HTML reference).
@@ -627,12 +696,12 @@ export function DepthFlythrough({
         const s = baseScale * (1.0 + 0.05 * nextHover)
         obj.scale.set(s, s, s)
 
-        // Drop shadow mesh behind card
+        // Drop shadow mesh behind card (softened when blurred)
         const sMesh = shadowMeshRefs.current[i]
         const sMat = shadowMaterials[i]
         if (sMesh && sMat) {
           sMesh.visible = totalOpacity > 0.01
-          sMat.opacity = totalOpacity * (0.85 + 0.15 * nextHover)
+          sMat.opacity = totalOpacity * (0.85 + 0.15 * nextHover) * (1.0 - cardBlur * 0.4)
         }
 
         // Nearest project detection for active title label (matches HTML d in [3, 22])
@@ -641,12 +710,14 @@ export function DepthFlythrough({
           nearProject = card.project
         }
       } else {
-        // Static Placeholder: clean dark blueprint tile (ZERO pixel animation, ZERO blue borders)
-        const bMat = mat as THREE.MeshBasicMaterial
-        if (bMat.isMeshBasicMaterial) {
+        // Placeholder ShaderMaterial with optical blur effect
+        const phMat = mat as THREE.ShaderMaterial
+        if (phMat.uniforms) {
           const phLensDissolve = smoothstep(0.4, 4.0, d)
           const phDistFade = d > 60.0 ? Math.max(0, 1.0 - (d - 60.0) / 25.0) : 1.0
-          bMat.opacity = phLensDissolve * phDistFade * revealFactor
+          phMat.uniforms.uOpacity.value = phLensDissolve * phDistFade * revealFactor
+          phMat.uniforms.uBrightness.value = 1.0
+          phMat.uniforms.uBlur.value = cardBlur
         }
       }
     }
