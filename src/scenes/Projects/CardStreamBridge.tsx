@@ -67,35 +67,37 @@ interface HorizonPlateDef {
 const PLATES: HorizonPlateDef[] = [
   // ==================== FLOOR PLANE (Y ≈ -2.2, facing up) ====================
   // Early runway phase (s in [0.12, 0.45])
-  { x: -5.6, y: -2.3, zStart: -10.0, passS: 0.15, w: 4.4, l: 6.0, isFloor: true, style: 'solidWhite' },
-  { x:  3.8, y: -2.1, zStart: -13.0, passS: 0.20, w: 3.8, l: 5.2, isFloor: true, style: 'frostWhite' },
-  { x: -1.4, y: -2.0, zStart: -16.0, passS: 0.26, w: 2.8, l: 4.0, isFloor: true, style: 'blackCyber' },
-  { x:  6.4, y: -2.4, zStart: -20.0, passS: 0.32, w: 4.8, l: 6.5, isFloor: true, style: 'ghostGlass' },
-  { x: -4.2, y: -2.2, zStart: -24.0, passS: 0.38, w: 3.4, l: 4.8, isFloor: true, style: 'charcoalPlate' },
-  { x:  1.2, y: -2.0, zStart: -27.0, passS: 0.44, w: 2.6, l: 3.8, isFloor: true, style: 'solidWhite' },
+  // All plates start far back in depth (zStart <= -45) so they stream naturally from the horizon
+  { x: -5.2, y: -2.3, zStart: -45.0, passS: 0.15, w: 4.4, l: 6.0, isFloor: true, style: 'solidWhite' },
+  { x:  3.6, y: -2.1, zStart: -47.0, passS: 0.20, w: 3.8, l: 5.2, isFloor: true, style: 'solidWhite' },
+  { x: -1.4, y: -2.0, zStart: -49.0, passS: 0.26, w: 2.8, l: 4.0, isFloor: true, style: 'blackCyber' },
+  { x:  6.0, y: -2.4, zStart: -51.0, passS: 0.32, w: 4.8, l: 6.5, isFloor: true, style: 'solidWhite' },
+  { x: -3.8, y: -2.2, zStart: -53.0, passS: 0.38, w: 3.4, l: 4.8, isFloor: true, style: 'charcoalPlate' },
+  { x:  1.2, y: -2.0, zStart: -55.0, passS: 0.44, w: 2.8, l: 4.0, isFloor: true, style: 'solidWhite' },
 
   // Mid runway phase (s in [0.45, 0.65])
-  { x: -6.8, y: -2.5, zStart: -31.0, passS: 0.49, w: 4.6, l: 6.2, isFloor: true, style: 'frostWhite' },
-  { x:  4.6, y: -2.3, zStart: -35.0, passS: 0.54, w: 3.6, l: 5.0, isFloor: true, style: 'blackCyber' },
-  { x: -2.2, y: -2.1, zStart: -39.0, passS: 0.59, w: 3.2, l: 4.5, isFloor: true, style: 'ghostGlass' },
-  { x:  7.2, y: -2.6, zStart: -43.0, passS: 0.64, w: 5.0, l: 6.8, isFloor: true, style: 'solidWhite' },
-  { x: -0.6, y: -2.0, zStart: -47.0, passS: 0.69, w: 3.0, l: 4.2, isFloor: true, style: 'frostWhite' },
+  { x: -6.4, y: -2.5, zStart: -52.0, passS: 0.50, w: 4.6, l: 6.2, isFloor: true, style: 'solidWhite' },
+  { x:  4.4, y: -2.3, zStart: -54.0, passS: 0.55, w: 3.6, l: 5.0, isFloor: true, style: 'blackCyber' },
+  { x: -2.0, y: -2.1, zStart: -55.0, passS: 0.60, w: 3.2, l: 4.5, isFloor: true, style: 'solidWhite' },
+  { x:  6.8, y: -2.6, zStart: -56.0, passS: 0.65, w: 5.0, l: 6.8, isFloor: true, style: 'solidWhite' },
+  { x: -0.6, y: -2.0, zStart: -57.0, passS: 0.69, w: 3.0, l: 4.2, isFloor: true, style: 'solidWhite' },
 
   // ==================== CEILING PLANE (Y ≈ +2.2, facing down) ====================
   // Early runway phase (s in [0.12, 0.45])
-  { x:  5.4, y:  2.3, zStart: -11.0, passS: 0.17, w: 4.5, l: 6.2, isFloor: false, style: 'solidWhite' },
-  { x: -3.6, y:  2.1, zStart: -14.0, passS: 0.22, w: 3.6, l: 5.0, isFloor: false, style: 'frostWhite' },
-  { x:  1.8, y:  2.0, zStart: -17.0, passS: 0.28, w: 2.6, l: 3.8, isFloor: false, style: 'blackCyber' },
-  { x: -6.2, y:  2.4, zStart: -21.0, passS: 0.34, w: 4.8, l: 6.6, isFloor: false, style: 'ghostGlass' },
-  { x:  4.4, y:  2.2, zStart: -25.0, passS: 0.40, w: 3.4, l: 4.8, isFloor: false, style: 'charcoalPlate' },
-  { x: -1.0, y:  2.0, zStart: -28.0, passS: 0.46, w: 2.8, l: 4.0, isFloor: false, style: 'solidWhite' },
+  // All plates start far back in depth (zStart <= -46) so they stream naturally from the horizon
+  { x:  5.0, y:  2.3, zStart: -46.0, passS: 0.17, w: 4.4, l: 6.0, isFloor: false, style: 'solidWhite' },
+  { x: -3.4, y:  2.1, zStart: -48.0, passS: 0.22, w: 3.6, l: 5.0, isFloor: false, style: 'solidWhite' },
+  { x:  1.6, y:  2.0, zStart: -50.0, passS: 0.28, w: 2.6, l: 3.8, isFloor: false, style: 'blackCyber' },
+  { x: -5.8, y:  2.4, zStart: -52.0, passS: 0.34, w: 4.8, l: 6.6, isFloor: false, style: 'solidWhite' },
+  { x:  4.0, y:  2.2, zStart: -54.0, passS: 0.40, w: 3.4, l: 4.8, isFloor: false, style: 'charcoalPlate' },
+  { x: -1.0, y:  2.0, zStart: -56.0, passS: 0.46, w: 2.8, l: 4.0, isFloor: false, style: 'solidWhite' },
 
   // Mid runway phase (s in [0.45, 0.65])
-  { x:  6.6, y:  2.5, zStart: -32.0, passS: 0.51, w: 4.6, l: 6.4, isFloor: false, style: 'frostWhite' },
-  { x: -4.8, y:  2.3, zStart: -36.0, passS: 0.56, w: 3.8, l: 5.2, isFloor: false, style: 'blackCyber' },
-  { x:  2.4, y:  2.1, zStart: -40.0, passS: 0.61, w: 3.2, l: 4.4, isFloor: false, style: 'ghostGlass' },
-  { x: -7.2, y:  2.6, zStart: -44.0, passS: 0.66, w: 5.0, l: 6.8, isFloor: false, style: 'solidWhite' },
-  { x:  0.8, y:  2.0, zStart: -48.0, passS: 0.70, w: 3.0, l: 4.2, isFloor: false, style: 'frostWhite' },
+  { x:  6.4, y:  2.5, zStart: -53.0, passS: 0.52, w: 4.6, l: 6.4, isFloor: false, style: 'solidWhite' },
+  { x: -4.6, y:  2.3, zStart: -55.0, passS: 0.57, w: 3.8, l: 5.2, isFloor: false, style: 'blackCyber' },
+  { x:  2.2, y:  2.1, zStart: -56.0, passS: 0.62, w: 3.2, l: 4.4, isFloor: false, style: 'solidWhite' },
+  { x: -6.8, y:  2.6, zStart: -57.0, passS: 0.67, w: 5.0, l: 6.8, isFloor: false, style: 'solidWhite' },
+  { x:  0.8, y:  2.0, zStart: -58.0, passS: 0.70, w: 3.0, l: 4.2, isFloor: false, style: 'solidWhite' },
 
   // ==================== END TRANSITION: MULTIPLE WHITE BLOCKS COVERING SCREEN ====================
   // Wave 1: Rushing white plates emerging across upper and lower fields (s in [0.72, 0.85])
@@ -145,7 +147,7 @@ function createMonochromeTextures(): Record<string, THREE.CanvasTexture> {
 
   const texMap: Record<string, THREE.CanvasTexture> = {}
 
-  // 1. Solid White Plate (Pure brilliant white)
+  // 1. Solid White Plate (Pure brilliant crisp white, 100% luminous)
   {
     const canvas = document.createElement('canvas')
     canvas.width = width
@@ -156,50 +158,15 @@ function createMonochromeTextures(): Record<string, THREE.CanvasTexture> {
     ctx.roundRect(0, 0, width, height, r)
     ctx.fill()
     ctx.strokeStyle = '#ffffff'
-    ctx.lineWidth = 2
-    ctx.stroke()
-    const tex = new THREE.CanvasTexture(canvas)
-    texMap.solidWhite = tex
-  }
-
-  // 2. Frost White Glass Plate
-  {
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    const ctx = canvas.getContext('2d')!
-    const grad = ctx.createLinearGradient(0, 0, width, height)
-    grad.addColorStop(0, 'rgba(255, 255, 255, 0.92)')
-    grad.addColorStop(1, 'rgba(240, 245, 255, 0.78)')
-    ctx.fillStyle = grad
-    ctx.beginPath()
-    ctx.roundRect(0, 0, width, height, r)
-    ctx.fill()
-    ctx.strokeStyle = '#ffffff'
     ctx.lineWidth = 4
     ctx.stroke()
     const tex = new THREE.CanvasTexture(canvas)
+    texMap.solidWhite = tex
     texMap.frostWhite = tex
-  }
-
-  // 3. Ghost Glass Plate
-  {
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    const ctx = canvas.getContext('2d')!
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.42)'
-    ctx.beginPath()
-    ctx.roundRect(0, 0, width, height, r)
-    ctx.fill()
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)'
-    ctx.lineWidth = 3
-    ctx.stroke()
-    const tex = new THREE.CanvasTexture(canvas)
     texMap.ghostGlass = tex
   }
 
-  // 4. Black Cyber Plate (Deep black with crisp white grid and rim)
+  // 2. Black Cyber Plate (Deep black with crisp white grid and rim)
   {
     const canvas = document.createElement('canvas')
     canvas.width = width
@@ -232,7 +199,7 @@ function createMonochromeTextures(): Record<string, THREE.CanvasTexture> {
     texMap.blackCyber = tex
   }
 
-  // 5. Charcoal Plate (Dark slate with white corner brackets)
+  // 3. Charcoal Plate (Dark slate with white corner brackets)
   {
     const canvas = document.createElement('canvas')
     canvas.width = width
@@ -272,15 +239,14 @@ export function CardStreamBridge() {
     return PLATES.map((p) => makeRoundedRect(p.w, p.l, 0.18, 8))
   }, [])
 
-  // Materials for each plate
+  // Materials for each plate - ALL white plates have 1.0 opacity, never dim!
   const materials = useMemo(() => {
     return PLATES.map((p) => {
       const tex = textures[p.style] || textures.solidWhite
-      const baseOp = p.style === 'ghostGlass' ? 0.55 : p.style === 'frostWhite' ? 0.90 : 1.0
       return new THREE.MeshBasicMaterial({
         map: tex,
         transparent: true,
-        opacity: baseOp,
+        opacity: 1.0,
         side: THREE.DoubleSide,
         depthWrite: false,
       })
@@ -319,6 +285,10 @@ export function CardStreamBridge() {
     const s = Math.max(0, Math.min(1.0, (raw - pStart) / (pEnd - pStart)))
     const camZ = 8.0 // Camera is at Z = 8.0
 
+    // Smooth corridor entry fade:
+    // Seamlessly fades in the stream over s in [0.0, 0.08] so blocks never pop in abruptly
+    const entryFade = smoothstep(0.0, 0.08, s)
+
     // Animate each plate streaming along the Z-axis towards and past the camera
     PLATES.forEach((plate, i) => {
       const mesh = plateMeshesRef.current[i]
@@ -345,8 +315,7 @@ export function CardStreamBridge() {
       // Distance to camera lens (positive = in front of lens, negative = passed behind lens)
       const distToCam = camZ - currentZ
 
-      const baseOp = plate.style === 'ghostGlass' ? 0.55 : plate.style === 'frostWhite' ? 0.90 : 1.0
-      let opacity = baseOp
+      let opacity = 1.0 * entryFade
 
       if (plate.isCenterBlock) {
         // Soft emergence from distance at s in [0.82, 0.87]
@@ -362,7 +331,7 @@ export function CardStreamBridge() {
         }
       } else {
         if (distToCam < 2.5) {
-          opacity = baseOp * smoothstep(0.2, 2.5, distToCam)
+          opacity *= smoothstep(0.2, 2.5, distToCam)
         }
       }
       if (distToCam > 65) {
