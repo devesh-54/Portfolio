@@ -215,11 +215,36 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
   const realList = realProjects.slice(0, 7)
   let cardIndex = 0
 
-  // 1. Static Placeholders: spread radially around tunnel axis (from HTML file)
+  // 1. Compute project positions first (matching HTML gap sizes)
+  // EXACT gaps size, aspect ratio, and positioning from the HTML reference:
+  // w = 6.4, h = 4.0
+  // a = i * 2.4, r = 3.4 + (i % 3) * 0.8
+  // x = Math.cos(a) * r * 1.4
+  // y = Math.sin(a) * r * 0.7
+  // z = -(14 + i * ((150 - 30) / PROJECTS.length)) -> 17.142857 depth gap
+  // rotY = -Math.cos(a) * 0.18
+  const projW = 6.4
+  const projH = 4.0
+  const Z_START = 14.0
+  const Z_GAP = (150.0 - 30.0) / 7.0 // 17.142857 from HTML
+
+  const projSlots = realList.map((p, i) => {
+    const a = i * 2.4
+    const r = 3.4 + (i % 3) * 0.8
+    const x = Math.cos(a) * r * 1.4
+    const y = Math.sin(a) * r * 0.7
+    const z = -(Z_START + i * Z_GAP)
+    const rotY = -Math.cos(a) * 0.18
+    const rotX = 0
+    const rotZ = 0
+    const pFocus = Math.max(0, Math.min(1.0, (8.0 - (z + 6.0)) / (DEPTH + 10.0)))
+    return { p, i, x, y, z, rotX, rotY, rotZ, pFocus }
+  })
+
+  // 2. Static Placeholders: spread radially around tunnel axis (from HTML file)
   // Kept off the centre axis (r >= 3.5) so the camera flies between them
-  // Clean static dark blueprints with ZERO pixel animation (as requested)
-  // End around last project (-122.0) so there's a clean finish to the page
-  const PLACEHOLDERS = 50
+  // Crucial: remove any placeholder that sits in front of or blocks any project!
+  const PLACEHOLDERS = 60
   for (let i = 0; i < PLACEHOLDERS; i++) {
     const w = rnd(2.2, 5.0)
     const h = w * rnd(0.6, 0.8)
@@ -230,6 +255,22 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
     const z = -rnd(4.0, 122.0)
     const rotY = rnd(-0.35, 0.35)
     const rotX = rnd(-0.1, 0.1)
+
+    // Check if this placeholder sits in the line of sight in front of any project card
+    let isBlocked = false
+    for (const slot of projSlots) {
+      const dz = z - slot.z
+      // In front if between camera and project: z is greater than slot.z (closer to camera)
+      if (dz > -2.0 && dz < 30.0) {
+        const dx = Math.abs(x - slot.x)
+        const dy = Math.abs(y - slot.y)
+        if (dx < 6.8 && dy < 4.5) {
+          isBlocked = true
+          break
+        }
+      }
+    }
+    if (isBlocked) continue // Remove placeholder that is in front of a project!
 
     cards.push({
       id: `ph_${i}`,
@@ -246,49 +287,24 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
     })
   }
 
-  // 2. Real Projects: one behind another along the path, offset so each one is seen clearly
-  // EXACT gaps size, aspect ratio, and positioning from the HTML reference:
-  // w = 6.4, h = 4.0
-  // a = i * 2.4, r = 3.4 + (i % 3) * 0.8
-  // x = Math.cos(a) * r * 1.4
-  // y = Math.sin(a) * r * 0.7
-  // z = -(14 + i * ((150 - 30) / PROJECTS.length)) -> 17.142857 depth gap
-  // rotY = -Math.cos(a) * 0.18
-  const projW = 6.4
-  const projH = 4.0
-  const Z_START = 14.0
-  const Z_GAP = (150.0 - 30.0) / 7.0 // 17.142857 from HTML
-
-  realList.forEach((p, i) => {
-    const a = i * 2.4
-    const r = 3.4 + (i % 3) * 0.8
-    const x = Math.cos(a) * r * 1.4
-    const y = Math.sin(a) * r * 0.7
-    const z = -(Z_START + i * Z_GAP)
-    const rotY = -Math.cos(a) * 0.18
-    const rotX = 0
-    const rotZ = 0
-
-    // Focus moment progress: where camZ reaches z + 6.0
-    // camZ = 8.0 - flightP * (DEPTH + 10.0)
-    const pFocus = Math.max(0, Math.min(1.0, (8.0 - (z + 6.0)) / (DEPTH + 10.0)))
-
+  // 3. Add Real Projects
+  projSlots.forEach((slot) => {
     cards.push({
-      id: p.id,
+      id: slot.p.id,
       index: cardIndex++,
       isReal: true,
-      project: p,
+      project: slot.p,
       cardW: projW,
       cardH: projH,
       geomIdx: 0,
-      x,
-      y,
-      z,
-      rotX,
-      rotY,
-      rotZ,
+      x: slot.x,
+      y: slot.y,
+      z: slot.z,
+      rotX: slot.rotX,
+      rotY: slot.rotY,
+      rotZ: slot.rotZ,
       scale: 1.0,
-      pFocus,
+      pFocus: slot.pFocus,
     })
   })
 
