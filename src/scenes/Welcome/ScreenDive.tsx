@@ -220,12 +220,12 @@ export function ScreenDive({
         externalPose.current.target.copy(tempTarget)
         externalPose.current.e = e
       } else {
-        // --- PHASE B: Selected Work Depth Flythrough (from user's reference code) ---
-        const DEPTH = 150.0
+        // --- PHASE B: Selected Work Depth Flythrough (calibrated to end cleanly after last project) ---
+        const DEPTH = FLIGHT_CONFIG.DEPTH || 26.0
         const flightP = Math.max(0, Math.min(1.0, (p - handover) / (1 - handover)))
         const camZ = 8.0 - flightP * (DEPTH + 10.0)
-        const camX = Math.sin(flightP * 6.0) * 0.6
-        const camY = Math.sin(flightP * 4.0) * 0.3
+        const camX = Math.sin(flightP * 4.0) * 0.4
+        const camY = Math.sin(flightP * 3.0) * 0.2
 
         tempPos.set(camX, FLIGHT_CONFIG.CAMERA_Y + camY, camZ)
         tempTarget.set(camX * 0.5, FLIGHT_CONFIG.CAMERA_Y + camY * 0.5, camZ - 20.0)
