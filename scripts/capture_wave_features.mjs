@@ -83,13 +83,13 @@ async function run() {
     await new Promise(r => setTimeout(r, 800));
     await capture('pixel_wave_left_to_right.png');
 
-    // 2. White Background in Projects with 3D card tunnel (at flightP = 0.02)
-    console.log('Milestone 2: White Background Projects 3D Corridor...');
+    // 2. Floating 3D Sofa Layout overview (at flightP = 0.00)
+    console.log('Milestone 2: Floating 3D Sofa Layout overview...');
     await send('Runtime.evaluate', {
-      expression: 'window.__setFlightProgress(0.02)',
+      expression: 'window.__setFlightProgress(0.00)',
     });
-    await new Promise(r => setTimeout(r, 1000));
-    await capture('projects_white_background.png');
+    await new Promise(r => setTimeout(r, 1200));
+    await capture('sofa_floating_layout.png');
 
     // 3. Card Pixel Wave Sweeping across Card Surface (JeevaLink approaching at flightP = 0.06)
     console.log('Milestone 3: Pixel Wave sweeping across card surface...');

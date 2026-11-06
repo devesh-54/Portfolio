@@ -235,6 +235,8 @@ export interface CardData {
   z: number
   rotX: number
   rotY: number
+  rotZ?: number
+  scale?: number
   pFocus?: number
 }
 
@@ -249,18 +251,56 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
   const realList = realProjects.slice(0, 7)
   let cardIndex = 0
 
-  // 1. 70 Placeholders spread radially around tunnel axis (from reference code)
+  // 1. 70 Placeholders flanking at the SIDES, periphery and deep tunnel
+  // Center corridor (|x| < 6.2 && |y| < 4.0 && z > -28) is kept 100% CLEAR for real projects!
   const PLACEHOLDERS = 70
   for (let i = 0; i < PLACEHOLDERS; i++) {
-    const w = rnd(2.2, 5.0)
-    const h = w * rnd(0.6, 0.8)
-    const a = rnd(0, Math.PI * 2)
-    const r = rnd(3.5, 16.0)
-    const x = Math.cos(a) * r * 1.6
-    const y = Math.sin(a) * r * 0.9
-    const z = -rnd(4.0, DEPTH)
+    const w = rnd(2.0, 4.2)
+    const h = w * rnd(0.6, 0.75)
+
+    // Side selection: 0 = Left Wing, 1 = Right Wing, 2 = Top Flank, 3 = Bottom Flank, 4 = Deep Periphery
+    const sideChoice = i % 5
+    let x = 0
+    let y = 0
+    let z = 0
+
+    if (sideChoice === 0) {
+      // Left Wing
+      x = rnd(-18.0, -7.0)
+      y = rnd(-5.5, 5.5)
+      z = -rnd(8.0, 75.0)
+    } else if (sideChoice === 1) {
+      // Right Wing
+      x = rnd(7.0, 18.0)
+      y = rnd(-5.5, 5.5)
+      z = -rnd(8.0, 75.0)
+    } else if (sideChoice === 2) {
+      // Top Flank
+      x = rnd(-14.0, 14.0)
+      y = rnd(4.6, 10.5)
+      z = -rnd(14.0, 95.0)
+    } else if (sideChoice === 3) {
+      // Bottom Flank
+      x = rnd(-14.0, 14.0)
+      y = rnd(-10.5, -4.6)
+      z = -rnd(14.0, 95.0)
+    } else {
+      // Deep tunnel periphery
+      const a = rnd(0, Math.PI * 2)
+      const r = rnd(6.5, 18.0)
+      x = Math.cos(a) * r * 1.5
+      y = Math.sin(a) * r * 0.9
+      z = -rnd(28.0, DEPTH)
+    }
+
+    // Safety: ensure no placeholder ever overlaps the center sofa cluster
+    if (Math.abs(x) < 6.4 && Math.abs(y) < 4.2 && z > -28.0) {
+      x += x >= 0 ? 6.8 : -6.8
+    }
+
     const rotY = rnd(-0.35, 0.35)
-    const rotX = rnd(-0.1, 0.1)
+    const rotX = rnd(-0.15, 0.15)
+    const rotZ = rnd(-0.08, 0.08)
 
     cards.push({
       id: `ph_${i}`,
@@ -274,20 +314,111 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
       z,
       rotX,
       rotY,
+      rotZ,
     })
   }
 
-  // 2. 7 Real Projects along depth tunnel, golden-angle offset (from reference code)
+  // 2. Real Project Cards in Floating 3D "Invisible Sofa" Layout
+  // Based on user specification and reference image (media_1793958850046_b4186054.jpg):
+  // - Slot 0 (Project 01): Prominent center focal card, largest, slightly in front
+  // - Slot 1 (Project 02): Top headrest, angled slightly forward/down
+  // - Slot 2 (Project 03): Middle-left armrest, angled inward/right
+  // - Slot 3 (Project 04): Middle-right backrest, angled inward/left
+  // - Slot 4 (Project 05): Bottom-right lounge cushion, angled up/left
+  // - Slot 5 (Project 06): Bottom-left lounge cushion, angled up/right
+  // - Slot 6 (Project 07): Upper-right accent backrest
+  const sofaSlots = [
+    {
+      // Slot 0: Center / Middle (Project 01 - largest focal card)
+      x: -0.3,
+      y: -0.1,
+      z: -15.0,
+      rotX: 0.06,
+      rotY: -0.06,
+      rotZ: -0.04,
+      scale: 1.05,
+    },
+    {
+      // Slot 1: Top / Headrest (Project 02)
+      x: -2.2,
+      y: 3.4,
+      z: -18.5,
+      rotX: -0.16,
+      rotY: 0.08,
+      rotZ: 0.05,
+      scale: 0.90,
+    },
+    {
+      // Slot 2: Mid-Left Armrest (Project 03)
+      x: -5.2,
+      y: 1.0,
+      z: -17.5,
+      rotX: 0.05,
+      rotY: 0.22,
+      rotZ: 0.06,
+      scale: 0.88,
+    },
+    {
+      // Slot 3: Mid-Right Backrest (Project 04)
+      x: 4.4,
+      y: 1.8,
+      z: -19.5,
+      rotX: -0.06,
+      rotY: -0.22,
+      rotZ: -0.04,
+      scale: 0.92,
+    },
+    {
+      // Slot 4: Bottom-Right Cushion (Project 05)
+      x: 5.4,
+      y: -2.5,
+      z: -17.0,
+      rotX: 0.12,
+      rotY: -0.18,
+      rotZ: 0.04,
+      scale: 0.95,
+    },
+    {
+      // Slot 5: Bottom-Left Cushion (Project 06)
+      x: -5.2,
+      y: -2.8,
+      z: -16.0,
+      rotX: 0.14,
+      rotY: 0.18,
+      rotZ: -0.05,
+      scale: 0.92,
+    },
+    {
+      // Slot 6: Upper-Right Accent (Project 07)
+      x: 5.8,
+      y: 3.6,
+      z: -21.0,
+      rotX: -0.08,
+      rotY: -0.15,
+      rotZ: 0.03,
+      scale: 0.82,
+    },
+  ]
+
   const projW = 5.6
   const projH = projW / 1.6 // 3.5 (16:10 aspect ratio)
+
   realList.forEach((p, i) => {
-    const a = i * 2.4
-    const r = 3.4 + (i % 3) * 0.8
-    // Calibrated lateral & vertical scale so cards stay comfortably centered in view across FOV 60
-    const x = Math.cos(a) * r * 0.70
-    const y = Math.sin(a) * r * 0.50
-    const z = -(14.0 + i * ((DEPTH - 30.0) / realList.length))
-    const rotY = -Math.cos(a) * 0.14
+    const slot = sofaSlots[i % sofaSlots.length]
+
+    // Subtle deterministic organic jitter so each card feels naturally hand-placed
+    const jitterX = rnd(-0.12, 0.12)
+    const jitterY = rnd(-0.12, 0.12)
+    const jitterZ = rnd(-0.35, 0.35)
+    const jitterRot = rnd(-0.02, 0.02)
+
+    const x = slot.x + jitterX
+    const y = slot.y + jitterY
+    const z = slot.z + jitterZ
+    const rotX = slot.rotX + jitterRot
+    const rotY = slot.rotY + jitterRot
+    const rotZ = slot.rotZ + jitterRot
+    const scale = slot.scale
 
     // Focus moment progress: where camZ reaches z + 6.0
     // camZ = 8.0 - flightP * 160.0
@@ -304,8 +435,10 @@ export function createFlightCards(realProjects: ProjectItem[]): CardData[] {
       x,
       y,
       z,
-      rotX: 0,
+      rotX,
       rotY,
+      rotZ,
+      scale,
       pFocus,
     })
   })
@@ -483,8 +616,9 @@ export function DepthFlythrough({
         }
       }
 
-      const cardW = 5.6
-      const cardH = 3.5
+      const cardScale = cards[index]?.scale || 1.0
+      const cardW = 5.6 * cardScale
+      const cardH = 3.5 * cardScale
       mesh.updateMatrixWorld(true)
 
       const corners = [
@@ -572,9 +706,9 @@ export function DepthFlythrough({
       obj.visible = true
       activeCount++
 
-      // Card stays at its fixed golden-angle placement (zero falling movement!)
+      // Card stays at its floating 3D placement (zero falling movement!)
       obj.position.set(card.x, card.y, card.z)
-      obj.rotation.set(card.rotX, card.rotY, 0)
+      obj.rotation.set(card.rotX, card.rotY, card.rotZ || 0)
 
       // Smooth lens dissolve right as card passes camera lens
       // Keeps cards 100% solid, fully opaque in reading zone [1.8, 55.0]
@@ -596,14 +730,13 @@ export function DepthFlythrough({
           pMat.uniforms.uFlickerStep.value = Math.floor(flightP * 120)
 
           // Distance-based Left-to-Right Graham Mast pixel wipe:
-          // d >= 24.0: veiled blueprint state
-          // d in [6.5, 24.0]: pixel wave sweeps across card face
-          // d <= 6.5: 100% complete crisp high-resolution project screenshot
+          // In sofa view (d in [14, 34]), cards have their pixel wave smoothly sweeping across,
+          // revealing the project photos just like in the reference image!
           let waveProg = 0.0
-          if (d <= 6.5) {
+          if (d <= 14.0) {
             waveProg = 1.0
-          } else if (d < 24.0) {
-            waveProg = 1.0 - (d - 6.5) / 17.5
+          } else if (d < 34.0) {
+            waveProg = 1.0 - (d - 14.0) / 20.0
           } else {
             waveProg = 0.0
           }
@@ -620,8 +753,9 @@ export function DepthFlythrough({
           pMat.uniforms.uHover.value = nextHover
         }
 
-        // Button scale pop on hover (1.0 -> 1.05)
-        const s = 1.0 + 0.05 * nextHover
+        // Button scale pop on hover (1.0 -> 1.05) with individual card scale
+        const baseScale = card.scale || 1.0
+        const s = baseScale * (1.0 + 0.05 * nextHover)
         obj.scale.set(s, s, s)
 
         // Drop shadow mesh behind card
@@ -633,7 +767,7 @@ export function DepthFlythrough({
         }
 
         // Nearest project detection for active title label (matches reference code)
-        if (d > 2.5 && d < 22.0 && d < minProjectDist) {
+        if (d > 2.0 && d < 34.0 && d < minProjectDist) {
           minProjectDist = d
           nearProject = card.project
         }
