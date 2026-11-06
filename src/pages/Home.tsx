@@ -297,11 +297,6 @@ export function Home() {
 
     lenis.on('scroll', () => {
       ScrollTrigger.update()
-      // Clamp scroll cleanly after flight finishes (hold on blank pitch-black page)
-      const maxScroll = heroTriggerRef.current?.end || 0
-      if (maxScroll > 0 && lenis.targetScroll > maxScroll) {
-        lenis.targetScroll = maxScroll
-      }
     })
 
     const tickerCb = (time: number) => {
@@ -330,6 +325,13 @@ export function Home() {
         pin: true,
         anticipatePin: 1,
         scrub: true,
+        onLeave: () => {
+          setIsCanvasPaused(true)
+        },
+        onEnterBack: () => {
+          setIsCanvasPaused(false)
+          invalidate()
+        },
         onUpdate: (self) => {
           const p = self.progress
           heroProgress.set(p)
@@ -466,6 +468,10 @@ export function Home() {
         }
       }
     }
+
+    // Sort triggers by DOM order so #hero pin spacing correctly offsets #stage
+    ScrollTrigger.sort()
+    ScrollTrigger.refresh()
 
     handleDeepLink()
     window.addEventListener('hashchange', handleDeepLink)
@@ -619,16 +625,15 @@ export function Home() {
       </section>
 
       {/* Main Sections */}
-      <main>
+      <main style={{ marginTop: !isFallback ? '-100vh' : '0' }}>
         {/* Projects section anchor */}
-        <section id="projects" data-theme="dark" style={{ minHeight: '1px' }} />
+        <section id="projects" data-theme="dark" style={{ position: 'relative', height: 0, overflow: 'hidden' }} />
 
         {!isFallback ? (
           <PixelStage
             onStageTriggerCreated={(trigger) => {
               stageTriggerRef.current = trigger
             }}
-            onCanvasPauseChange={setIsCanvasPaused}
           />
         ) : (
           <>

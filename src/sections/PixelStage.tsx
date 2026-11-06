@@ -36,10 +36,9 @@ const TRANS_2 = { start: 340 / STAGE_TOTAL_VH, end: 440 / STAGE_TOTAL_VH }
 
 export interface PixelStageProps {
   onStageTriggerCreated?: (trigger: ScrollTrigger) => void
-  onCanvasPauseChange?: (paused: boolean) => void
 }
 
-export function PixelStage({ onStageTriggerCreated, onCanvasPauseChange }: PixelStageProps) {
+export function PixelStage({ onStageTriggerCreated }: PixelStageProps) {
   const stageRef = useRef<HTMLElement | null>(null)
   const aboutScreenRef = useRef<HTMLDivElement | null>(null)
   const skillsScreenRef = useRef<HTMLDivElement | null>(null)
@@ -200,10 +199,7 @@ export function PixelStage({ onStageTriggerCreated, onCanvasPauseChange }: Pixel
     if (headerEl && headerEl.getAttribute('data-theme') !== nextTheme) {
       headerEl.setAttribute('data-theme', nextTheme)
     }
-
-    // 9. Pause background WebGL canvas when About screen is revealed (P0 >= 0.5)
-    onCanvasPauseChange?.(P0 >= 0.5)
-  }, [onCanvasPauseChange])
+  }, [])
 
   // Expose global helper for QA test automation
   useEffect(() => {
@@ -273,7 +269,7 @@ export function PixelStage({ onStageTriggerCreated, onCanvasPauseChange }: Pixel
       end: `+=${STAGE_TOTAL_VH}%`,
       pin: true,
       anticipatePin: 1,
-      scrub: 0.6,
+      scrub: true,
       invalidateOnRefresh: true,
       onUpdate: (self) => applyStage(self.progress),
       onRefresh: (self) => {
