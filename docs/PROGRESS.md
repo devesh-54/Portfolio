@@ -8,3 +8,4 @@
 - [x] Phase 5 - Fallback Mode
 - [x] Phase 6 - Resize and Robustness
 - [x] Phase 7 - QA & Final Report
+- [x] Phase 8 - Linear Depth Flythrough & Left-to-Right Pixel Wipe (Zero Falling Motion, Golden-Angle Spiral, Pure White Background)
