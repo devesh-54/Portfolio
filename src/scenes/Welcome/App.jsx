@@ -6,7 +6,6 @@ import { Leva } from 'leva'
 import { SketchMaterial } from './sketch/SketchMaterial'
 import { SketchOutline } from './sketch/SketchOutline'
 import { RevealEffect } from './sketch/RevealEffect'
-import { ObjectGlow } from './sketch/ObjectGlow'
 import { CurvedMonitor } from './CurvedMonitor'
 import { GamingPC } from './GamingPC'
 import { BlockText } from './BlockText'
@@ -260,14 +259,6 @@ function BackgroundController({ isCorridor }) {
               />
               {showChrome && !diveCompleted && (
                 <>
-                  <ObjectGlow
-                    width={4.2}
-                    height={welcomeLayout.monitor.targetHeight}
-                    depth={0.8}
-                    billboardOpacity={0.18}
-                    discOpacity={0.14}
-                    hovered={hoveredObject === 'monitor'}
-                  />
                   {/* Invisible Hit Mesh */}
                   <mesh
                     position={[0, welcomeLayout.monitor.targetHeight * 0.5, 0]}
@@ -298,14 +289,6 @@ function BackgroundController({ isCorridor }) {
                   showInternals={c.showInternals ?? welcomeLayout.tower.showInternals ?? true}
                   material={material(darkTheme.hatchInk)}
                   outlineColor={darkTheme.outlineInk}
-                />
-                <ObjectGlow
-                  width={2.2}
-                  height={welcomeLayout.pcTower.targetHeight}
-                  depth={1.4}
-                  billboardOpacity={0.38}
-                  discOpacity={0.20}
-                  hovered={hoveredObject === 'pc'}
                 />
                 {/* Invisible Hit Mesh */}
                 {showChrome && (
@@ -339,14 +322,6 @@ function BackgroundController({ isCorridor }) {
                   material={material(darkTheme.hatchInk)}
                   outline={outline(darkTheme.outlineInk)}
                   scale={welcomeLayout.text.scale}
-                />
-                <ObjectGlow
-                  width={4.5 * welcomeLayout.text.scale}
-                  height={0.8 * welcomeLayout.text.scale}
-                  depth={0.4}
-                  discOpacity={0.14}
-                  billboardOpacity={0.12}
-                  hovered={hoveredObject === 'text'}
                 />
                 {/* Invisible Hit Mesh */}
                 {showChrome && (

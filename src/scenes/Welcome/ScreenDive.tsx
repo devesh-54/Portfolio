@@ -276,7 +276,7 @@ export function ScreenDive({
       const rawProgress = heroProgress.get()
       if (scrollHintRef?.current) {
         const showHint = rawProgress < 0.04 && introEnded
-        scrollHintRef.current.style.opacity = showHint ? '0.9' : '0'
+        scrollHintRef.current.style.opacity = showHint ? '1' : '0'
         scrollHintRef.current.style.transform = `translateX(-50%) translateY(${showHint ? '0px' : '8px'})`
       }
 

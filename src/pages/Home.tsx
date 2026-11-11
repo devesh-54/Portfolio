@@ -573,7 +573,7 @@ export function Home() {
           ref={scrollHintRef}
           className="scroll-hint"
           style={{
-            opacity: introEnded && !isCanvasPaused ? 0.9 : 0,
+            opacity: introEnded && !isCanvasPaused ? 1 : 0,
           }}
         >
           <span>Scroll</span>
