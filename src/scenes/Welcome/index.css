@@ -111,14 +111,14 @@ body,
   overflow-y: auto;
 }
 
-/* Loader: dark screen with cyan progress line for Welcome scene */
+/* Loader: dark screen with white progress line for Welcome scene */
 .loader {
   position: fixed;
   inset: 0;
   z-index: 10;
   display: grid;
   place-items: center;
-  background: #03050a;
+  background: #000000;
   transition: opacity 0.6s ease;
 }
 .loader--done {
@@ -128,13 +128,13 @@ body,
 .loader-track {
   width: min(240px, 60vw);
   height: 2px;
-  background: #0e1526;
+  background: #1a1a1a;
   overflow: hidden;
 }
 .loader-line {
   height: 100%;
-  background: #2fd0ff;
-  box-shadow: 0 0 10px #2fd0ff;
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.75);
   transform-origin: left;
   transition: transform 0.3s ease;
 }
@@ -143,83 +143,83 @@ body,
    Scoped Dark Theme (.theme-dark) for Welcome scene ONLY
    ========================================================= */
 .theme-dark {
-  --ink: #cfe3ff;
-  --bg-dark: #03050a;
-  --surface-fill: #090d18;
-  --hatch-blue: #4d73d9;
-  --outline-blue: #8fc4ff;
-  --cyan-glow: #2fd0ff;
-  background: #03050a;
+  --ink: #ffffff;
+  --bg-dark: #000000;
+  --surface-fill: #000000;
+  --hatch-blue: #ffffff;
+  --outline-blue: #ffffff;
+  --cyan-glow: #ffffff;
+  background: #000000;
 }
 
 .theme-dark .header {
-  color: #cfe3ff;
+  color: #ffffff;
 }
 
 .theme-dark .header-name {
-  color: #cfe3ff;
+  color: #ffffff;
 }
 
 .theme-dark .header-author {
-  color: #7fa6e8;
+  color: rgba(255, 255, 255, 0.7);
   opacity: 1;
 }
 
 .theme-dark .top-action-icon {
-  color: #cfe3ff;
+  color: #ffffff;
 }
 
 .theme-dark .top-action-icon:hover {
-  color: #2fd0ff;
+  color: rgba(255, 255, 255, 0.72);
   opacity: 1;
 }
 
 .theme-dark .resume-btn {
-  color: #cfe3ff;
-  background: rgba(9, 13, 24, 0.85);
-  border: 1.5px solid rgba(47, 208, 255, 0.4);
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
 }
 
 .theme-dark .resume-btn:hover {
-  border-color: #2fd0ff;
-  color: #2fd0ff;
-  background: rgba(47, 208, 255, 0.1);
+  border-color: #ffffff;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* Nav pill styling in dark theme */
 .theme-dark .site-nav-pill {
-  background: rgba(9, 13, 24, 0.85);
-  border: 1.5px solid rgba(47, 208, 255, 0.4);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(47, 208, 255, 0.12);
+  background: rgba(0, 0, 0, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
 .theme-dark .site-nav-item {
-  color: #cfe3ff;
+  color: #ffffff;
 }
 
 .theme-dark .site-nav-item:hover {
-  background-color: rgba(47, 208, 255, 0.15);
-  color: #2fd0ff;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 
 .theme-dark .site-nav-item--filled {
-  background-color: #2fd0ff;
-  color: #03050a;
+  background-color: #ffffff;
+  color: #000000;
   font-weight: 800;
 }
 
 .theme-dark .site-nav-item--filled:hover {
-  background-color: #5ce0ff;
-  color: #03050a;
+  background-color: #e6e6e6;
+  color: #000000;
 }
 
 /* Credits in dark theme */
 .theme-dark .credits {
-  color: #7fa6e8;
-  opacity: 0.85;
+  color: rgba(255, 255, 255, 0.65);
+  opacity: 1;
 }
 
 .theme-dark .credits a {
-  color: #cfe3ff;
+  color: rgba(255, 255, 255, 0.9);
 }
 

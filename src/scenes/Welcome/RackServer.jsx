@@ -4,7 +4,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { MergedSketchOutline } from './sketch/MergedSketchOutline'
 import { welcomeLayout } from '../../config/welcomeLayout'
 
-export function RackServer({ material, outline, outlineColor = '#8fc4ff', ...props }) {
+export function RackServer({ material, outline, outlineColor = '#ffffff', ...props }) {
   const { geometry, scale, offset } = useMemo(() => {
     const geoms = []
     const W = 2.2, H = 0.6, D = 1.3

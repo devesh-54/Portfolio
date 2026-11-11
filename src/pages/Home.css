@@ -4,7 +4,7 @@
   width: 100%;
   position: relative;
   background-color: #000000;
-  color: #cfe3ff;
+  color: #ffffff;
   overflow-x: hidden;
 }
 
@@ -14,35 +14,41 @@
 }
 
 #site-header[data-theme="dark"] {
-  color: #cfe3ff;
+  color: #ffffff;
 }
 
 #site-header[data-theme="dark"] .header-name {
-  color: #cfe3ff;
+  color: #ffffff;
 }
 
 #site-header[data-theme="dark"] .header-author {
-  color: #7fa6e8;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 #site-header[data-theme="dark"] .social-icon-btn {
-  color: #cfe3ff;
+  color: #ffffff;
 }
 
 #site-header[data-theme="dark"] .social-icon-btn:hover {
-  color: #2fd0ff;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+#site-header[data-theme="dark"] .social-icon-btn:focus-visible,
+#site-header[data-theme="dark"] .resume-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 
 #site-header[data-theme="dark"] .resume-btn {
-  color: #cfe3ff;
-  background: rgba(9, 13, 24, 0.85);
-  border: 1.5px solid rgba(47, 208, 255, 0.4);
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
 }
 
 #site-header[data-theme="dark"] .resume-btn:hover {
-  border-color: #2fd0ff;
-  color: #2fd0ff;
-  background: rgba(47, 208, 255, 0.1);
+  border-color: #ffffff;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 #site-header[data-theme="light"] {
@@ -204,6 +210,15 @@
   pointer-events: auto;
 }
 
+.hero-credits-wrap .credits {
+  color: rgba(255, 255, 255, 0.65);
+  opacity: 1;
+}
+
+.hero-credits-wrap .credits a {
+  color: rgba(255, 255, 255, 0.9);
+}
+
 /* Scroll Hint */
 .scroll-hint {
   position: absolute;
@@ -214,7 +229,7 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  color: #cfe3ff;
+  color: #ffffff;
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 11px;
   font-weight: 600;
@@ -252,12 +267,12 @@
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  color: #03050a;
-  background: #2fd0ff;
+  color: #000000;
+  background: #ffffff;
   border: none;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(47, 208, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.28);
 }
 
 /* Sections */

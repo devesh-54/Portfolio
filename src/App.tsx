@@ -14,7 +14,7 @@ export function App() {
             style={{
               width: '100vw',
               height: '100vh',
-              backgroundColor: '#03050a',
+              backgroundColor: '#000000',
             }}
           />
         }

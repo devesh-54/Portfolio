@@ -143,7 +143,7 @@
   place-items: center;
   width: 32px;
   height: 32px;
-  color: #cfe3ff;
+  color: #ffffff;
   font-size: 18px;
   border-radius: 6px;
   text-decoration: none;
@@ -157,7 +157,7 @@
 }
 
 .social-icon-btn:focus-visible {
-  outline: 2px solid #cfe3ff;
+  outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
 

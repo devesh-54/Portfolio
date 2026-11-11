@@ -271,9 +271,9 @@ export function GamingPC({
     })
   }, [internalGeometry, showInternals])
 
-  // Deep dark surface fill (#090d18) so lines read crisp on void
+  // Deep dark surface fill (#000000) so lines read crisp on void
   const darkFillMaterial = useMemo(() => {
-    return new THREE.MeshBasicMaterial({ color: 0x090d18 })
+    return new THREE.MeshBasicMaterial({ color: 0x000000 })
   }, [])
 
   useEffect(() => {
@@ -301,7 +301,7 @@ export function GamingPC({
       {/* Outer Shell Mesh with dark fill and optional sketch material */}
       {keptGeometry && (
         <mesh geometry={keptGeometry} castShadow>
-          {material || <meshBasicMaterial color={0x090d18} />}
+          {material || <meshBasicMaterial color={0x000000} />}
         </mesh>
       )}
 
@@ -323,7 +323,7 @@ export function GamingPC({
       {/* Internal Components with sketch hatching */}
       {showInternals && internalGeometry && (
         <mesh geometry={internalGeometry}>
-          {material || <meshBasicMaterial color={0x090d18} />}
+          {material || <meshBasicMaterial color={0x000000} />}
         </mesh>
       )}
 

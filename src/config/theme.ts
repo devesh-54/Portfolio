@@ -2,18 +2,18 @@
  * Dark theme tokens for the Welcome scene
  */
 export const darkTheme = {
-  background: '#03050a',
-  surfaceFill: '#090d18',
-  hatchInk: '#4d73d9',
-  outlineInk: '#8fc4ff',
-  glowCyan: '#2fd0ff',
+  background: '#000000',
+  surfaceFill: '#000000',
+  hatchInk: '#ffffff',
+  outlineInk: '#ffffff',
+  glowCyan: '#ffffff',
   text: {
-    primary: '#cfe3ff',
-    secondary: '#7fa6e8',
+    primary: '#ffffff',
+    secondary: '#b8b8b8',
   },
 }
 
-export const voidBg = '#03050a'
+export const voidBg = '#000000'
 export const pageBg = '#ffffff'
 export const pageInk = '#101A91'
 

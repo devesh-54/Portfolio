@@ -10,7 +10,7 @@ const DRACO_PATH = '/draco/'
 export function CurvedMonitor({
   material,
   outline,
-  outlineColor = '#8fc4ff',
+  outlineColor = '#ffffff',
   screenMeshRef,
   hideBody = false,
   ...props

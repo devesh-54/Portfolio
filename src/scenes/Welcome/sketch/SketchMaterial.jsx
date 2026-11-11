@@ -4,8 +4,8 @@ import { extend, useThree } from '@react-three/fiber'
 import { sketchGLSL } from './glsl'
 import { revealGLSL, revealUniforms } from './reveal'
 
-export const INK = '#4d73d9'
-export const PAPER = '#090d18'
+export const INK = '#ffffff'
+export const PAPER = '#000000'
 // default light: 138° around, high in front and to the left
 export const LIGHT = new THREE.Vector3(-0.63, 1, 0.57).normalize()
 

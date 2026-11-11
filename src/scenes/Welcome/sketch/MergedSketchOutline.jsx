@@ -123,7 +123,7 @@ export function buildMergedOutlineGeometry(geometry, options = {}) {
 /** Merged outline renderer: 1 draw call per object, capped segment budget */
 export function MergedSketchOutline({
   geometry,
-  color = '#8fc4ff',
+  color = '#ffffff',
   opacity = 0.85,
   jitter = 0.012,
   seed = 1,
