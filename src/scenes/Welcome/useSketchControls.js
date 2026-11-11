@@ -8,7 +8,7 @@ import { welcomeLayout } from '../../config/welcomeLayout'
 // hatching and outline controls, `color` is the ink it starts with and `inks` is its palette.
 export const TOOLS = {
   ballpoint: {
-    style: { width: 1.0, density: 22, loops: 0.55, tooth: 0.25, pressure: 0.7, outlineWidth: 1.7, outlineOpacity: 0.85, jitter: 0.018 },
+    style: { width: 1.0, density: 22, loops: 0.55, tooth: 0.0, pressure: 1.0, outlineWidth: 1.7, outlineOpacity: 1.0, jitter: 0.018 },
     color: 'blue',
     inks: { blue: INK, red: '#B0132B', green: '#0E6B3A', black: '#1C1C24', yellow: '#C99A00' },
   },
@@ -82,16 +82,16 @@ export function useSketchControls(setWashed) {
     }, { collapsed: true }),
     Hatching: folder({
       density: { value: 22, min: 5, max: 40, step: 1 },
-      pressure: { value: 0.7, min: 0.1, max: 1.5, step: 0.01 },
+      pressure: { value: 1.0, min: 0.1, max: 1.5, step: 0.01 },
       loops: { value: 0.55, min: 0, max: 1, step: 0.01 },
       width: { value: 1, min: 0.3, max: 4, step: 0.1, label: 'stroke width' },
-      tooth: { value: 0.25, min: 0, max: 1, step: 0.01, label: 'paper tooth' },
+      tooth: { value: 0.0, min: 0, max: 1, step: 0.01, label: 'paper tooth' },
       angle: { value: 34, min: 0, max: 180, step: 1, label: 'hatch angle°' },
     }, { collapsed: true }),
     Outline: folder({
       outline: { value: true, label: 'show' },
       outlineWidth: { value: 1.7, min: 0.5, max: 5, step: 0.01, label: 'width' },
-      outlineOpacity: { value: 0.85, min: 0, max: 1, step: 0.01, label: 'opacity' },
+      outlineOpacity: { value: 1.0, min: 0, max: 1, step: 0.01, label: 'opacity' },
       jitter: { value: 0.018, min: 0, max: 0.06, step: 0.001 },
     }, { collapsed: true }),
     Shadow: folder({

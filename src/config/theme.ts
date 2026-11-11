@@ -9,7 +9,7 @@ export const darkTheme = {
   glowCyan: '#ffffff',
   text: {
     primary: '#ffffff',
-    secondary: '#b8b8b8',
+    secondary: '#ffffff',
   },
 }
 

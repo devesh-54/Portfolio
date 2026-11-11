@@ -10,8 +10,8 @@ import { revealUniforms } from './reveal'
 // opacity scale the outline settings; overshoot is a [min, max] fraction of the edge length.
 const PASSES = [
   { width: 1.0, opacity: 1.0, wobble: 1.0, overshoot: [0.03, 0.13] },
-  { width: 0.85, opacity: 0.85, wobble: 1.3, overshoot: [0.0, 0.09] },
-  { width: 0.75, opacity: 0.7, wobble: 1.6, overshoot: [-0.02, 0.07] },
+  { width: 0.85, opacity: 1.0, wobble: 1.3, overshoot: [0.0, 0.09] },
+  { width: 0.75, opacity: 1.0, wobble: 1.6, overshoot: [-0.02, 0.07] },
 ]
 const SAMPLES = 28   // points per stroke
 
@@ -79,9 +79,10 @@ function buildEdgeStrokes(geometry, jitter, seed) {
 const hullMaterial = new THREE.ShaderMaterial({
   side: THREE.BackSide,
   transparent: true,
+  toneMapped: false,
   uniforms: {
     uInk: { value: new THREE.Color(INK) },
-    uOpacity: { value: 0.85 },
+    uOpacity: { value: 1.0 },
     uWidth: { value: 1.7 },
     uRes: { value: new THREE.Vector2(1, 1) },
   },
@@ -103,7 +104,7 @@ const hullMaterial = new THREE.ShaderMaterial({
 })
 
 /** Put inside a mesh, after its geometry: draws the mesh's outline in pen. */
-export function SketchOutline({ color = INK, width = 1.7, opacity = 0.85, jitter = 0.018, seed = 1 }) {
+export function SketchOutline({ color = INK, width = 1.7, opacity = 1.0, jitter = 0.018, seed = 1 }) {
   const ref = useRef()
   const [geometry, setGeometry] = useState(null)
   const { size, viewport } = useThree()
@@ -135,6 +136,7 @@ export function SketchOutline({ color = INK, width = 1.7, opacity = 0.85, jitter
         <Line
           key={i} ref={(l) => (lines.current[i] = l)} points={s.points} segments
           color={color} lineWidth={width * s.width} transparent opacity={opacity * s.opacity}
+          toneMapped={false}
         />
       ))}
     </group>

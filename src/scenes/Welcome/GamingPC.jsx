@@ -291,9 +291,9 @@ export function GamingPC({
       ? THREE.MathUtils.smoothstep(revealUniforms.uReveal.value, 0, 0.5)
       : 1
     if (lineGroupRef.current) lineGroupRef.current.visible = k > 0.001
-    if (lineMatRef.current) lineMatRef.current.opacity = 0.85 * k
+    if (lineMatRef.current) lineMatRef.current.opacity = k
     if (internalGroupRef.current) internalGroupRef.current.visible = showInternals && k > 0.001
-    if (internalMatRef.current) internalMatRef.current.opacity = 0.85 * k
+    if (internalMatRef.current) internalMatRef.current.opacity = k
   })
 
   return (
@@ -313,8 +313,9 @@ export function GamingPC({
               ref={lineMatRef}
               color={outlineColor}
               transparent
-              opacity={0.85}
+              opacity={1.0}
               depthWrite={false}
+              toneMapped={false}
             />
           </lineSegments>
         </group>
@@ -334,8 +335,9 @@ export function GamingPC({
               ref={internalMatRef}
               color={outlineColor}
               transparent
-              opacity={0.85}
+              opacity={1.0}
               depthWrite={false}
+              toneMapped={false}
             />
           </lineSegments>
         </group>

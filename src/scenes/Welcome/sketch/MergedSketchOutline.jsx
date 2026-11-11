@@ -124,7 +124,7 @@ export function buildMergedOutlineGeometry(geometry, options = {}) {
 export function MergedSketchOutline({
   geometry,
   color = '#ffffff',
-  opacity = 0.85,
+  opacity = 1.0,
   jitter = 0.012,
   seed = 1,
   thresholdAngle = 35,
@@ -165,6 +165,7 @@ export function MergedSketchOutline({
           transparent
           opacity={opacity}
           depthWrite={false}
+          toneMapped={false}
         />
       </lineSegments>
     </group>
