@@ -1,117 +1,426 @@
-/* Contact page styles */
-.contact-rows-card {
-  background: rgba(255, 255, 255, 0.45);
-  border: 1px solid rgba(16, 26, 145, 0.16);
-  border-radius: 12px;
-  overflow: hidden;
-  margin-top: 24px;
-}
+/* ==========================================================================
+   Contact.css — Modern Editorial Layout ("LET'S CONNECT.")
+   Matching reference screenshot with stacked hero & 2-column info grid
+   ========================================================================== */
 
-.contact-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 24px;
-  border-bottom: 1px solid rgba(16, 26, 145, 0.1);
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.contact-row:last-child {
-  border-bottom: none;
-}
-
-.contact-row-left {
+.contact-poster {
+  width: 100%;
+  max-width: 960px;
+  margin: auto;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  box-sizing: border-box;
+  padding: 0 clamp(16px, 2.5vw, 32px);
+  /* Keep bottom part stationary while title expands upwards */
+  transform: translateY(-26px);
 }
 
-.contact-row-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(16, 26, 145, 0.65);
-}
-
-.contact-row-value {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #101a91;
-  text-decoration: none;
-  word-break: break-all;
-}
-
-.contact-row-value:hover {
-  text-decoration: underline;
-}
-
-.contact-actions {
+/* --------------------------------------------------------------------------
+   1. Large Stacked Hero Typography ("LET'S CONNECT.")
+   Bigger scale with soft shadow below, expanding upwards
+   -------------------------------------------------------------------------- */
+.contact-hero-header {
+  width: 100%;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0 0 clamp(20px, 3.2vh, 32px) 0;
+  /* Move title a bit upper into whitespace, giving breathing room above details */
+  transform: translateY(-28px);
 }
 
-.copy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border: 1px solid rgba(16, 26, 145, 0.3);
-  border-radius: 999px;
-  background: rgba(242, 241, 237, 0.85);
-  color: #101a91;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.contact-hero-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(4.8rem, 11vw, 10.2rem);
+  font-weight: 900;
+  line-height: 0.84;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  text-transform: uppercase;
+  user-select: none;
+  text-align: left;
+  /* 3D isometric solid extrusion in rgba(15, 23, 42, 0.92) */
+  text-shadow:
+    1px 1px 0 rgba(15, 23, 42, 0.92),
+    2px 2px 0 rgba(15, 23, 42, 0.92),
+    3px 3px 0 rgba(15, 23, 42, 0.92),
+    4px 4px 0 rgba(15, 23, 42, 0.92),
+    5px 5px 0 rgba(15, 23, 42, 0.92),
+    6px 6px 0 rgba(15, 23, 42, 0.92),
+    7px 7px 0 rgba(15, 23, 42, 0.92),
+    8px 8px 0 rgba(15, 23, 42, 0.92),
+    9px 9px 0 rgba(15, 23, 42, 0.92),
+    10px 10px 0 rgba(15, 23, 42, 0.92),
+    11px 11px 0 rgba(15, 23, 42, 0.92),
+    12px 12px 0 rgba(15, 23, 42, 0.92),
+    13px 13px 0 rgba(15, 23, 42, 0.92),
+    14px 14px 0 rgba(15, 23, 42, 0.92);
 }
 
-.copy-btn:hover {
-  background-color: rgba(16, 26, 145, 0.08);
-  border-color: #101a91;
+.contact-hero-line {
+  display: block;
 }
 
-.copy-btn:focus-visible {
-  outline: 2px solid #101a91;
-  outline-offset: 2px;
+.contact-title-dot {
+  color: #2563eb; /* Cobalt royal blue period */
+  margin-left: 2px;
 }
 
-.copy-btn--copied {
-  background: #101a91;
-  color: #f2f1ed;
-  border-color: #101a91;
+/* --------------------------------------------------------------------------
+   2. Main Two-Column Editorial Grid
+   Left: Profile, Role, Availability, Actions
+   Right: Contact Links with Circular Badges
+   -------------------------------------------------------------------------- */
+.contact-main-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.25fr);
+  column-gap: clamp(32px, 6vw, 76px);
+  row-gap: 32px;
+  align-items: start;
 }
 
-.download-resume-btn {
+/* --------------------------------------------------------------------------
+   Left Column: Profile + Badge + Buttons
+   -------------------------------------------------------------------------- */
+.contact-profile-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 20px);
+}
+
+.contact-profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-profile-name {
+  font-family: var(--font-display, inherit);
+  font-size: clamp(1.4rem, 2vw, 1.85rem);
+  font-weight: 500;
+  color: rgba(15, 23, 42, 0.92);
+  margin: 0 0 4px 0;
+  line-height: 1.15;
+}
+
+.contact-profile-role {
+  font-family: var(--font-sans);
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  font-weight: 500;
+  color: #71717a;
+  margin: 0;
+}
+
+/* Availability Badge with Green Dot */
+.contact-availability-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 20px;
-  border: 1.5px solid #101a91;
+  align-self: flex-start;
+  padding: 6px 14px;
   border-radius: 999px;
-  background: #101a91;
-  color: #f2f1ed;
-  font-size: 0.88rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
 }
 
-.download-resume-btn:hover {
-  background-color: #0c1475;
+.contact-avail-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  flex-shrink: 0;
+}
+
+.contact-avail-text {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #3b82f6;
+  white-space: nowrap;
+}
+
+/* Action Buttons Group */
+.contact-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.contact-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.contact-action-btn--copy {
+  background: #ffffff;
+  color: rgba(15, 23, 42, 0.92);
+  border: 1.5px solid #e4e4e7;
+}
+
+.contact-action-btn--copy:hover {
+  border-color: rgba(15, 23, 42, 0.92);
   transform: translateY(-1px);
 }
 
-.download-resume-btn:focus-visible {
-  outline: 2px solid #101a91;
-  outline-offset: 2px;
+.contact-action-btn--copy.is-copied {
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  border-color: rgba(15, 23, 42, 0.92);
 }
 
-@media (max-width: 640px) {
-  .contact-row {
-    padding: 16px;
+.contact-action-btn--primary {
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  border: 1.5px solid rgba(15, 23, 42, 0.92);
+}
+
+.contact-action-btn--primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   Right Column: Contact Links with Circular Badges
+   -------------------------------------------------------------------------- */
+.contact-links-col {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.contact-link-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: clamp(12px, 1.8vh, 16px) 0;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.18s ease;
+}
+
+.contact-link-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #e4e4e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: rgba(15, 23, 42, 0.92);
+  background: #ffffff;
+  transition: all 0.18s ease;
+}
+
+.contact-link-card:hover .contact-link-icon-wrap {
+  border-color: #2563eb;
+  color: #2563eb;
+  transform: scale(1.05);
+}
+
+.contact-link-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-link-label {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.contact-link-val {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  font-weight: 700;
+  color: rgba(15, 23, 42, 0.92);
+  transition: color 0.18s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-link-card:hover .contact-link-val {
+  color: #2563eb;
+}
+
+.contact-link-arrow {
+  font-size: 1.15rem;
+  color: rgba(15, 23, 42, 0.92);
+  font-weight: 500;
+  transition: transform 0.18s ease, color 0.18s ease;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.contact-link-card:hover .contact-link-arrow {
+  color: #2563eb;
+  transform: translate(3px, -3px);
+}
+
+.contact-link-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Dark Mode Support
+   -------------------------------------------------------------------------- */
+:root[data-theme="dark"] .contact-hero-title {
+  color: #ffffff;
+  text-shadow:
+    1px 1px 0 #000000,
+    2px 2px 0 #000000,
+    3px 3px 0 #000000,
+    4px 4px 0 #000000,
+    5px 5px 0 #000000,
+    6px 6px 0 #000000,
+    7px 7px 0 #000000,
+    8px 8px 0 #000000,
+    9px 9px 0 #000000,
+    10px 10px 0 #000000,
+    11px 11px 0 #000000,
+    12px 12px 0 #000000,
+    13px 13px 0 #000000,
+    14px 14px 0 #000000;
+  filter: none;
+}
+
+:root[data-theme="dark"] .contact-profile-name,
+:root[data-theme="dark"] .contact-link-val,
+:root[data-theme="dark"] .contact-link-arrow {
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .contact-title-dot {
+  color: #38bdf8;
+}
+
+:root[data-theme="dark"] .contact-profile-role {
+  color: #a1a1aa;
+}
+
+:root[data-theme="dark"] .contact-availability-badge {
+  background: rgba(47, 208, 255, 0.08);
+  border-color: rgba(47, 208, 255, 0.2);
+}
+
+:root[data-theme="dark"] .contact-avail-text {
+  color: #38bdf8;
+}
+
+:root[data-theme="dark"] .contact-link-icon-wrap {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .contact-link-card:hover .contact-link-icon-wrap {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+:root[data-theme="dark"] .contact-link-card:hover .contact-link-val,
+:root[data-theme="dark"] .contact-link-card:hover .contact-link-arrow {
+  color: #38bdf8;
+}
+
+:root[data-theme="dark"] .contact-action-btn--copy {
+  background: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+:root[data-theme="dark"] .contact-action-btn--copy:hover {
+  border-color: #ffffff;
+}
+
+:root[data-theme="dark"] .contact-action-btn--primary {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+:root[data-theme="dark"] .contact-action-btn--primary:hover {
+  background: #38bdf8;
+  border-color: #38bdf8;
+  color: #000000;
+}
+
+:root[data-theme="dark"] .contact-link-divider {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   Tablet Layout (769px - 1024px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .contact-main-grid {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 36px;
+  }
+
+  .contact-hero-title {
+    font-size: clamp(3.4rem, 8vw, 5.6rem);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Layout (<= 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .contact-poster {
+    transform: none;
+    padding: clamp(20px, 3vh, 32px) 18px clamp(32px, 5vh, 48px);
+  }
+
+  .contact-hero-header {
+    transform: none;
+    margin-bottom: 24px;
+  }
+
+  .contact-hero-title {
+    font-size: clamp(3.4rem, 15vw, 5rem);
+    line-height: 0.88;
+  }
+
+  .contact-main-grid {
+    grid-template-columns: 1fr;
+    row-gap: 28px;
+  }
+
+  .contact-profile-col {
+    gap: 14px;
+  }
+
+  .contact-link-val {
+    white-space: normal;
   }
 }

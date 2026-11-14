@@ -52,31 +52,33 @@ float sk_scribble(vec2 p, float angle, float stepY, float bandW, float loops, fl
   if (sk_hash(vec2(kl + band * 23.0, seed + 9.0)) < loops * 0.5)
     dist = min(dist, sk_ellipse(vec2(X, Y) - vec2(rad.x, d2 * kl - 0.15 * d), rad));
 
-  // pen pressure varies slightly in width; keep stroke luminance pure so ink never turns gray
-  float hw = 0.5 * max(width, 1.0) * (1.0 - 0.15 * sk_noise(vec2(X / bandW * 4.0, Y / d + seed)));
-  float a = (1.0 - smoothstep(hw - 0.5, hw + 0.5, dist / px)) * min(1.0, hw * 2.0 + 0.35);
-  a *= smoothstep(0.11, 0.15, sk_noise(vec2(X / bandW * 5.0, Y / d * 0.5 + seed * 3.1))); // ink skips
+  // pen pressure varies along the stroke; thin lines get lighter instead of thinner
+  float hw = 0.5 * width * (1.0 - 0.25 * sk_noise(vec2(X / bandW * 4.0, Y / d + seed)));
+  float a = (1.0 - smoothstep(hw - 0.5, hw + 0.5, dist / px)) * min(1.0, hw * 2.0 + 0.3);
+  a *= 1.0 - 0.25 * sk_noise(vec2(X / bandW * 15.0, Y / d + seed));                  // uneven ink
+  a *= smoothstep(0.11, 0.17, sk_noise(vec2(X / bandW * 5.0, Y / d * 0.5 + seed * 3.1))); // ink skips
   return a;
 }
 
 // Tonal ladder, the way you'd shade by hand:
-//   light     -> one sparse scribble with bare patches
+//   light     -> one sparse scribble with bare-paper patches
 //   mid       -> the same scribble, denser
 //   dark      -> + a second direction, only in patches
-//   very dark -> second direction almost everywhere
+//   very dark -> second direction almost everywhere, heavier hand
 float sk_hatch(vec2 p, float dark, float density, float angle, float loops, float width, float pressure, float seed) {
   float vdark = smoothstep(0.85, 0.95, dark);
   float stepY = 0.84 / (density * mix(0.6, 1.5, smoothstep(0.2, 0.75, dark)) * (1.0 + 0.12 * vdark));
   float bandW = mix(0.45, 0.85, dark) + sk_hash(vec2(seed, 1.0)) * 0.25;
 
   float a = sk_scribble(p, angle, stepY, bandW, loops, width * (1.0 + 0.15 * vdark), seed);
-  a *= smoothstep(0.13, 0.17, dark * 1.1 + (sk_noise(p * 1.7 + seed) - 0.5) * 0.9);
+  a *= smoothstep(0.1, 0.2, dark * 1.1 + (sk_noise(p * 1.7 + seed) - 0.5) * 0.9);
 
   float need = mix(0.55, 0.3, vdark);
-  float cross = smoothstep(0.65, 0.70, dark) * smoothstep(need - 0.02, need + 0.02, sk_noise(p * 1.3 + seed + 11.0));
+  float cross = smoothstep(0.62, 0.75, dark) * smoothstep(need - 0.05, need + 0.05, sk_noise(p * 1.3 + seed + 11.0));
   float b = sk_scribble(p, angle + 0.8, stepY * 1.55, bandW * 0.75, loops, width, seed + 19.0) * cross;
 
-  float ink = clamp(pressure, 0.0, 1.0);
-  return 1.0 - (1.0 - a * ink) * (1.0 - b * ink);
+  // some areas pressed harder than others
+  float ink = pressure * (0.68 + 0.64 * sk_noise(p * 1.4 + seed + 2.0)) * mix(0.7, 1.0, dark) * (1.0 + 0.2 * vdark);
+  return 1.0 - (1.0 - a * ink) * (1.0 - b * ink * 0.64);
 }
 `

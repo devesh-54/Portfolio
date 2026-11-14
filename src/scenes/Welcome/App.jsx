@@ -6,8 +6,11 @@ import { Leva } from 'leva'
 import { SketchMaterial } from './sketch/SketchMaterial'
 import { SketchOutline } from './sketch/SketchOutline'
 import { RevealEffect } from './sketch/RevealEffect'
+import { ObjectGlow } from './sketch/ObjectGlow'
 import { CurvedMonitor } from './CurvedMonitor'
 import { GamingPC } from './GamingPC'
+import { Keyboard } from './Keyboard'
+import { Mouse } from './Mouse'
 import { BlockText } from './BlockText'
 import { CameraRig } from './CameraRig'
 import { Header } from './Header'
@@ -16,10 +19,8 @@ import { Loader } from './Loader'
 import { useSketchControls } from './useSketchControls'
 import cameraSettings from './camera-settings.json'
 import { welcomeLayout } from '../../config/welcomeLayout'
-import { darkTheme } from '../../config/theme'
+import { darkTheme, siteTheme } from '../../config/theme'
 import { ScreenDive } from './ScreenDive'
-import { DepthFlythrough } from '../Projects/DepthFlythrough'
-import { CardStreamBridge } from '../Projects/CardStreamBridge'
 import { FLIGHT_CONFIG } from '../Projects/flightConfig'
 import { heroProgress } from './heroProgress'
 import { navigateWithFade } from '../../ui/navigateWithFade'
@@ -53,9 +54,9 @@ export default function App({
   inHeroOverlayRef,
   creditsRef,
   scrollHintRef,
-  onThresholdChange,
-  onSelectProject,
-  isDetailOpen = false,
+  onThresholdChange: _onThresholdChange,
+  onSelectProject: _onSelectProject,
+  isDetailOpen: _isDetailOpen = false,
 } = {}) {
   const navigate = useNavigate()
   const [diveCompleted, setDiveCompleted] = useState(false)
@@ -153,44 +154,13 @@ export default function App({
       />
     )
 
-function BackgroundController({ isCorridor }) {
+function BackgroundController() {
   const { gl, scene } = useThree()
-  const colorRef = useRef(new THREE.Color(0x000000))
-  const fogRef = useRef(new THREE.Fog(0xffffff, 25, 95))
 
   useFrame(() => {
-    const p = heroProgress.get()
-    const pStart = FLIGHT_CONFIG.STREAM_START_P
-    const pHandover = FLIGHT_CONFIG.HANDOVER_P
-
-    if (p < pStart) {
-      gl.setClearColor(0x000000, 1.0)
-      scene.fog = null
-    } else if (p < pHandover) {
-      const s = (p - pStart) / (pHandover - pStart)
-      // Keep deep black void during corridor flight, then smoothly sweep to white as blocks cover screen
-      if (s < 0.88) {
-        gl.setClearColor(0x000000, 1.0)
-        scene.fog = null
-      } else {
-        const whiteT = (s - 0.88) / (1.0 - 0.88)
-        const easedWhite = whiteT * whiteT * (3 - 2 * whiteT)
-        colorRef.current.setRGB(easedWhite, easedWhite, easedWhite)
-        gl.setClearColor(colorRef.current, 1.0)
-        if (easedWhite > 0.8) {
-          scene.fog = fogRef.current
-          fogRef.current.near = 25
-          fogRef.current.far = 95
-        } else {
-          scene.fog = null
-        }
-      }
-    } else {
-      gl.setClearColor(0xffffff, 1.0)
-      scene.fog = fogRef.current
-      fogRef.current.near = 25
-      fogRef.current.far = 95
-    }
+    scene.fog = null
+    // Monitor interior stays deep dark (#03050a) for a seamless handoff into dark About Me
+    gl.setClearColor(0x03050a, 1.0)
   })
 
   return null
@@ -200,7 +170,7 @@ function BackgroundController({ isCorridor }) {
     <div
       className="welcome-root theme-dark"
       style={{
-        background: isWhiteWorld ? '#ffffff' : '#000000',
+        background: '#03050a',
         width: '100%',
         height: '100%',
         position: 'relative',
@@ -213,32 +183,30 @@ function BackgroundController({ isCorridor }) {
         gl={{ powerPreference: 'high-performance', preserveDrawingBuffer: true }}
         frameloop={frameloop}
         camera={{ position: INTRO_START.position, fov: 35 }}
-        style={{ background: isWhiteWorld ? '#ffffff' : '#000000' }}
+        style={{ background: '#03050a' }}
         onCreated={({ camera, gl }) => {
           camera.lookAt(...INTRO_START.target)
-          gl.setClearColor(isWhiteWorld ? 0xffffff : 0x000000, 1.0)
+          gl.setClearColor(0x03050a, 1.0)
           if (typeof window !== 'undefined') {
             window.__gl = gl
             window.__canvas = gl.domElement
           }
         }}
       >
-        <BackgroundController isCorridor={isCorridor} />
+        <BackgroundController />
         <directionalLight position={light.clone().multiplyScalar(8)} />
-        {!isCorridor && (
-          <RevealEffect
-            washed={washed}
-            duration={c.effectDuration}
-            easing={c.effectEasing}
-            sweep={c.effectSweep}
-            scale={c.effectScale}
-            edge={c.effectEdge}
-            wet={c.effectWet}
-            shadow={false}
-            paper={false}
-            lines={c.effectLines}
-          />
-        )}
+        <RevealEffect
+          washed={washed}
+          duration={c.effectDuration}
+          easing={c.effectEasing}
+          sweep={c.effectSweep}
+          scale={c.effectScale}
+          edge={c.effectEdge}
+          wet={c.effectWet}
+          shadow={false}
+          paper={false}
+          lines={c.effectLines}
+        />
 
         <Suspense fallback={null}>
           <group
@@ -253,12 +221,20 @@ function BackgroundController({ isCorridor }) {
             >
               <CurvedMonitor
                 screenMeshRef={screenMeshRef}
-                hideBody={diveCompleted || isCorridor}
+                hideBody={false}
                 material={material(darkTheme.hatchInk)}
                 outlineColor={darkTheme.outlineInk}
               />
               {showChrome && !diveCompleted && (
                 <>
+                  <ObjectGlow
+                    width={4.2}
+                    height={welcomeLayout.monitor.targetHeight}
+                    depth={0.8}
+                    billboardOpacity={0.18}
+                    discOpacity={0.14}
+                    hovered={hoveredObject === 'monitor'}
+                  />
                   {/* Invisible Hit Mesh */}
                   <mesh
                     position={[0, welcomeLayout.monitor.targetHeight * 0.5, 0]}
@@ -279,87 +255,127 @@ function BackgroundController({ isCorridor }) {
               )}
             </group>
 
-            {/* 2. Gaming PC Tower (Outer lines only, sleek dark body) */}
-            {!diveCompleted && (
-              <group
-                position={welcomeLayout.pcTower.position}
-                rotation={welcomeLayout.pcTower.rotation}
-              >
-                <GamingPC
-                  showInternals={c.showInternals ?? welcomeLayout.tower.showInternals ?? true}
-                  material={material(darkTheme.hatchInk)}
-                  outlineColor={darkTheme.outlineInk}
-                />
-                {/* Invisible Hit Mesh */}
-                {showChrome && (
-                  <mesh
-                    position={[0, welcomeLayout.pcTower.targetHeight * 0.5, 0]}
-                    onPointerOver={(e) => {
-                      e.stopPropagation()
-                      setHoveredObject('pc')
-                    }}
-                    onPointerOut={() => setHoveredObject(null)}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      navigateWithFade('/skills', navigate)
-                    }}
-                  >
-                    <boxGeometry args={[1.8, welcomeLayout.pcTower.targetHeight, 1.3]} />
-                    <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-                  </mesh>
-                )}
-              </group>
-            )}
+            {/* 2. Gaming PC Tower (Kept mounted inside visible={!isCorridor} to avoid outline rebuild stutter) */}
+            <group
+              position={welcomeLayout.pcTower.position}
+              rotation={welcomeLayout.pcTower.rotation}
+            >
+              <GamingPC
+                showInternals={c.showInternals ?? welcomeLayout.tower.showInternals ?? true}
+                material={material(darkTheme.hatchInk)}
+                outlineColor={darkTheme.outlineInk}
+              />
+              <ObjectGlow
+                width={2.2}
+                height={welcomeLayout.pcTower.targetHeight}
+                depth={1.4}
+                billboardOpacity={0.38}
+                discOpacity={0.20}
+                hovered={hoveredObject === 'pc'}
+              />
+              {/* Invisible Hit Mesh */}
+              {showChrome && !diveCompleted && (
+                <mesh
+                  position={[0, welcomeLayout.pcTower.targetHeight * 0.5, 0]}
+                  onPointerOver={(e) => {
+                    e.stopPropagation()
+                    setHoveredObject('pc')
+                  }}
+                  onPointerOut={() => setHoveredObject(null)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    navigateWithFade('/skills', navigate)
+                  }}
+                >
+                  <boxGeometry args={[1.8, welcomeLayout.pcTower.targetHeight, 1.3]} />
+                  <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+                </mesh>
+              )}
+            </group>
 
             {/* 3. DEVESH Block Text (Foreground right - Fig 2 dynamic angle) */}
-            {!diveCompleted && (
-              <group
-                position={welcomeLayout.text.position}
-                rotation={welcomeLayout.text.rotation}
-              >
-                <BlockText
-                  text="DEVESH"
-                  material={material(darkTheme.hatchInk)}
-                  outline={outline(darkTheme.outlineInk)}
-                  scale={welcomeLayout.text.scale}
-                />
-                {/* Invisible Hit Mesh */}
-                {showChrome && (
-                  <mesh
-                    position={[0, 0.4 * welcomeLayout.text.scale, 0]}
-                    onPointerOver={(e) => {
-                      e.stopPropagation()
-                      setHoveredObject('text')
-                    }}
-                    onPointerOut={() => setHoveredObject(null)}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      navigateWithFade('/about', navigate)
-                    }}
-                  >
-                    <boxGeometry
-                      args={[
-                        welcomeLayout.text.wordWidth * welcomeLayout.text.scale,
-                        welcomeLayout.text.letterHeight * welcomeLayout.text.scale,
-                        0.5,
-                      ]}
-                    />
-                    <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-                  </mesh>
-                )}
-              </group>
-            )}
+            <group
+              position={welcomeLayout.text.position}
+              rotation={welcomeLayout.text.rotation}
+            >
+              <BlockText
+                text="DEVESH"
+                material={material(darkTheme.hatchInk)}
+                outline={outline(darkTheme.outlineInk)}
+                scale={welcomeLayout.text.scale}
+              />
+              <ObjectGlow
+                width={4.5 * welcomeLayout.text.scale}
+                height={0.8 * welcomeLayout.text.scale}
+                depth={0.4}
+                discOpacity={0.14}
+                billboardOpacity={0.12}
+                hovered={hoveredObject === 'text'}
+              />
+              {/* Invisible Hit Mesh */}
+              {showChrome && !diveCompleted && (
+                <mesh
+                  position={[0, 0.4 * welcomeLayout.text.scale, 0]}
+                  onPointerOver={(e) => {
+                    e.stopPropagation()
+                    setHoveredObject('text')
+                  }}
+                  onPointerOut={() => setHoveredObject(null)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    navigateWithFade('/about', navigate)
+                  }}
+                >
+                  <boxGeometry
+                    args={[
+                      welcomeLayout.text.wordWidth * welcomeLayout.text.scale,
+                      welcomeLayout.text.letterHeight * welcomeLayout.text.scale,
+                      0.5,
+                    ]}
+                  />
+                  <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+                </mesh>
+              )}
+            </group>
+
+            {/* 4. Low-profile Mechanical Keyboard (Foreground left in front of monitor) */}
+            <group
+              position={welcomeLayout.keyboard.position}
+              rotation={welcomeLayout.keyboard.rotation}
+            >
+              <Keyboard
+                material={material(darkTheme.hatchInk)}
+                outlineColor={darkTheme.outlineInk}
+              />
+              <ObjectGlow
+                width={welcomeLayout.keyboard.targetWidth * 1.05}
+                height={0.35}
+                depth={0.9}
+                discOpacity={0.14}
+                billboardOpacity={0.09}
+                hovered={hoveredObject === 'keyboard'}
+              />
+            </group>
+
+            {/* 5. Gaming Mouse (To the right of keyboard in front of PC) */}
+            <group
+              position={welcomeLayout.mouse.position}
+              rotation={welcomeLayout.mouse.rotation}
+            >
+              <Mouse
+                material={material(darkTheme.hatchInk)}
+                outlineColor={darkTheme.outlineInk}
+              />
+              <ObjectGlow
+                width={welcomeLayout.mouse.targetLength * 0.78}
+                height={0.22}
+                depth={welcomeLayout.mouse.targetLength * 1.08}
+                discOpacity={0.12}
+                billboardOpacity={0.07}
+                hovered={hoveredObject === 'mouse'}
+              />
+            </group>
           </group>
-
-          {/* 3D Card Stream Transition Bridge at y = -1000 */}
-          <CardStreamBridge />
-
-          {/* Multi-plane Depth Flythrough at y = -1000 */}
-          <DepthFlythrough
-            visible={isCorridor}
-            onSelectProject={onSelectProject}
-            isDetailOpen={isDetailOpen}
-          />
 
           {externalPose && (
             <ScreenDive

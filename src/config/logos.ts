@@ -1,10 +1,10 @@
-import reactSvg from '../assets/logos/react.svg?url'
-import pythonSvg from '../assets/logos/python.svg?url'
-import flutterSvg from '../assets/logos/flutter.svg?url'
-import supabaseSvg from '../assets/logos/supabase.svg?url'
-import firebaseSvg from '../assets/logos/firebase.svg?url'
-import githubSvg from '../assets/logos/github.svg?url'
-import tailwindcssSvg from '../assets/logos/tailwindcss.svg?url'
+import reactSvg from '../assets/real-logos/react.svg?url'
+import pythonSvg from '../assets/real-logos/python.svg?url'
+import flutterSvg from '../assets/real-logos/flutter.svg?url'
+import supabaseSvg from '../assets/real-logos/supabase.svg?url'
+import firebaseSvg from '../assets/real-logos/firebase.svg?url'
+import githubSvg from '../assets/real-logos/github.svg?url'
+import tailwindcssSvg from '../assets/real-logos/tailwindcss.svg?url'
 
 export interface LogoItem {
   id: string

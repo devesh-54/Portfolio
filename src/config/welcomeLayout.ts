@@ -34,11 +34,23 @@ export const welcomeLayout = {
     position: [0.82, 0, -1.2] as [number, number, number],
     rotation: [0, (-25 * Math.PI) / 180, 0] as [number, number, number],
   },
+  // Foreground left-center in front of monitor: Compact mechanical keyboard shifted right
+  keyboard: {
+    targetWidth: 1.88,
+    position: [-1.00, 0.04, 1.56] as [number, number, number],
+    rotation: [0.16, (10 * Math.PI) / 180, 0] as [number, number, number],
+  },
+  // Right of keyboard with generous mouse-movement breathing room before DEVESH
+  mouse: {
+    targetLength: 0.54,
+    position: [0.40, 0.04, 1.42] as [number, number, number],
+    rotation: [0.22, (22 * Math.PI) / 180, 0] as [number, number, number],
+  },
   tower: {
     showInternals: true,
-    edgeAngle: 32,
-    minEdgeLenRatio: 0.015,
-    maxSegments: 5000,
+    edgeAngle: 28,
+    minEdgeLenRatio: 0.010,
+    maxSegments: 25000,
     internalInset: 0.06,
     minPartVolumeRatio: 0.005,
   },

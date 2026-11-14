@@ -8,9 +8,41 @@
   --color-ink-faint: rgba(26, 31, 156, 0.12);
   --color-border: rgba(26, 31, 156, 0.22);
 
-  --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, Monaco, monospace;
+  --font-serif: 'Nippo-Extralight', 'Nippo', Georgia, serif;
+  --font-sans: 'Nippo-Extralight', 'Nippo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'Nippo-Extralight', 'Nippo', 'SF Mono', Consolas, Monaco, monospace;
+  --font-display: 'Nippo-Extralight', 'Nippo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-body: 'Nippo-Extralight', 'Nippo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root[data-theme="dark"] {
+  --bg: #03050a;
+  --surface: #090d18;
+  --tile-bg: rgba(255, 255, 255, 0.03);
+  --text: #e8f1ff;
+  --card-title: #ffffff;
+  --muted: #8fa6d4;
+  --border: rgba(143, 196, 255, 0.14);
+  --border-dashed: rgba(143, 196, 255, 0.30);
+  --divider: rgba(143, 196, 255, 0.12);
+  --grid: rgba(143, 196, 255, 0.10);
+  --icon-chip: #e8f1ff;
+  --on-accent: #03050a;
+}
+
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --tile-bg: #ffffff;
+  --text: #101A91;
+  --card-title: #090d18;
+  --muted: #4b5598;
+  --border: rgba(16, 26, 145, 0.14);
+  --border-dashed: rgba(16, 26, 145, 0.28);
+  --divider: rgba(16, 26, 145, 0.10);
+  --grid: rgba(16, 26, 145, 0.065);
+  --icon-chip: transparent;
+  --on-accent: #ffffff;
 }
 
 * {
@@ -23,17 +55,25 @@ html {
   width: 100%;
   min-height: 100%;
   overflow-x: hidden;
+  font-family: var(--font-sans);
 }
 
 body {
   width: 100%;
   min-height: 100%;
   overflow-x: hidden;
-  background-color: #000000;
-  color: var(--color-ink);
+  background-color: var(--bg, #03050a);
+  color: var(--text, var(--color-ink));
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
 }
 
 #root {

@@ -4,9 +4,9 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: #f2f1ed;
-  color: #101a91;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
   position: relative;
   -webkit-overflow-scrolling: touch;
 }
@@ -21,10 +21,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  background: rgba(242, 241, 237, 0.88);
+  background: var(--bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(16, 26, 145, 0.12);
+  border-bottom: 1px solid var(--divider);
   z-index: 10;
 }
 
@@ -34,7 +34,7 @@
   font-weight: 600;
   letter-spacing: 0.01em;
   text-decoration: none;
-  color: #101a91;
+  color: var(--text);
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -47,14 +47,14 @@
 }
 
 .home-link:focus-visible {
-  outline: 2px solid #101a91;
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
 .home-link-sub {
   font-size: 14px;
   font-weight: 400;
-  opacity: 0.65;
+  color: var(--muted);
 }
 
 .page-content-wrap {
@@ -71,7 +71,7 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: 24px;
-  color: #101a91;
+  color: var(--text);
   line-height: 1.1;
 }
 
@@ -80,7 +80,7 @@
   font-weight: 600;
   margin-top: 32px;
   margin-bottom: 16px;
-  color: #101a91;
+  color: var(--text);
   letter-spacing: -0.01em;
 }
 

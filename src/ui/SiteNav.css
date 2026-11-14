@@ -1,4 +1,12 @@
 /* SiteNav and TopActions Styles */
+.section-order-nav,
+.header,
+#site-header,
+.scroll-hint,
+.hero-credits-wrap,
+.credits {
+  display: none !important;
+}
 .site-nav-pill-wrap {
   position: fixed;
   left: 50%;
@@ -27,12 +35,12 @@
   align-items: center;
   gap: 2px;
   padding: 4px;
-  background: rgba(242, 241, 237, 0.9);
-  border: 1.5px solid #101a91;
+  background: var(--surface);
+  border: 1.5px solid var(--border-dashed);
   border-radius: 999px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(16, 26, 145, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
 }
 
 .site-nav-compact {
@@ -40,12 +48,12 @@
   align-items: center;
   gap: 2px;
   padding: 3px;
-  background: rgba(242, 241, 237, 0.95);
-  border: 1.5px solid #101a91;
+  background: var(--surface);
+  border: 1.5px solid var(--border-dashed);
   border-radius: 999px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 4px 16px rgba(16, 26, 145, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .site-nav-item {
@@ -60,7 +68,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   text-decoration: none;
-  color: #101a91;
+  color: var(--text);
   background: transparent;
   border: none;
   border-radius: 999px;
@@ -71,23 +79,23 @@
 
 .site-nav-item:hover {
   transform: translateY(-2px);
-  background-color: rgba(16, 26, 145, 0.08);
+  background-color: var(--border);
 }
 
 .site-nav-item:focus-visible {
-  outline: 2px solid #101a91;
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
 /* Primary filled item (e.g. PROJECTS on Welcome, or current active page) */
 .site-nav-item--filled {
-  background-color: #101a91;
-  color: #f2f1ed;
+  background-color: var(--text);
+  color: var(--bg);
 }
 
 .site-nav-item--filled:hover {
-  background-color: #0c1475;
-  color: #f2f1ed;
+  opacity: 0.9;
+  color: var(--bg);
   transform: translateY(-2px);
 }
 
@@ -97,13 +105,12 @@
   font-size: 11px;
 }
 
-/* Top-right action group */
+/* Top-right action group (hidden per user instruction) */
 .top-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  pointer-events: auto;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
 }
 
 .resume-btn {
@@ -116,9 +123,9 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-decoration: none;
-  color: #101a91;
-  background: rgba(242, 241, 237, 0.85);
-  border: 1.5px solid #101a91;
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--border-dashed);
   border-radius: 999px;
   cursor: pointer;
   transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
@@ -130,11 +137,11 @@
 
 .resume-btn:hover {
   transform: translateY(-1px);
-  background-color: rgba(16, 26, 145, 0.08);
+  border-color: var(--text);
 }
 
 .resume-btn:focus-visible {
-  outline: 2px solid #101a91;
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
@@ -143,7 +150,8 @@
   place-items: center;
   width: 32px;
   height: 32px;
-  color: #ffffff;
+  color: var(--text);
+  opacity: 0.88;
   font-size: 18px;
   border-radius: 6px;
   text-decoration: none;
@@ -151,13 +159,13 @@
 }
 
 .social-icon-btn:hover {
-  color: #ffffff;
+  color: var(--text);
   opacity: 1;
   transform: translateY(-1px);
 }
 
 .social-icon-btn:focus-visible {
-  outline: 2px solid #ffffff;
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
@@ -240,5 +248,136 @@
 
   .top-actions {
     gap: 8px;
+  }
+}
+
+/* ==========================================================================
+   Top Header Section Order Nav ("Welcome -> Projects -> Skills -> Hackathons -> About -> Contact")
+   with smooth sliding active button indicator
+   ========================================================================== */
+
+.section-order-nav {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.section-order-nav--hidden {
+  opacity: 0 !important;
+  transform: translateY(-6px) !important;
+  pointer-events: none !important;
+}
+
+.section-order-track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.section-order-slider {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  height: calc(100% - 6px);
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform, width;
+  transition:
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.28s ease,
+    box-shadow 0.28s ease,
+    opacity 0.2s ease;
+}
+
+.section-order-btn {
+  position: relative;
+  z-index: 1;
+  appearance: none;
+  border: none;
+  background: transparent;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.26s ease, opacity 0.22s ease;
+}
+
+.section-order-label-short {
+  display: none;
+}
+
+.section-order-btn:focus-visible {
+  outline: 1.5px solid currentColor;
+  outline-offset: 1px;
+}
+
+@media (max-width: 1120px) {
+  .section-order-btn {
+    padding: 5px 8px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-order-nav {
+    position: fixed;
+    left: 50%;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 98;
+    max-width: calc(100vw - 16px);
+  }
+
+  .section-order-nav--hidden {
+    transform: translateX(-50%) translateY(12px) !important;
+  }
+
+  .section-order-track {
+    max-width: calc(100vw - 16px);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 3px;
+  }
+
+  .section-order-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .section-order-label-full {
+    display: none;
+  }
+
+  .section-order-label-short {
+    display: inline;
+  }
+
+  .section-order-btn {
+    padding: 6px 9px;
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-order-slider {
+    transition-duration: 0.01ms !important;
   }
 }

@@ -1,66 +1,461 @@
-/* About page styles */
-.about-bio-section {
+/* About page — Dark void editorial hero split with bottom-right monochrome portrait */
+
+.about-stage {
+  position: relative;
+  width: 100%;
+  min-height: 78svh;
+  background: #03050a;
+  color: #e8f1ff;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  border-radius: 16px;
+  --about-decor-op: 1;
+  --about-decor-tx: 0px;
+  --about-img-op: 1;
+  --about-canvas-op: 0;
+  --about-resume-line-scale: 1;
+}
+
+.about-stage--embedded {
+  --about-corner-r: clamp(18px, 2.2vw, 28px);
+  position: relative;
+  width: min(1360px, calc(100% - clamp(32px, 5vw, 84px)));
+  height: min(800px, calc(100% - clamp(32px, 4vh, 64px)));
+  max-height: calc(100svh - clamp(24px, 3vh, 48px));
+  margin: auto;
+  border-radius: var(--about-corner-r);
+  background: #03050a;
+  border: 1px solid transparent;
+  box-shadow: none;
+  transform-origin: 50% 100%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, opacity, box-shadow, border-color;
+  overflow: visible;
+}
+
+/* ─── Laser Cut Seam Lines (Subtle 1px hairline matching Achievements box border) ─── */
+
+.about-cut-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 25;
+  opacity: 0;
+  overflow: visible;
+  transition: opacity 0.12s ease;
+}
+
+.about-cut-line {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* 1. Top-Left cut: expands from center (50%) to left corner curve */
+.about-cut-line--top-left {
+  top: 0;
+  right: 50%;
+  left: var(--about-corner-r, 24px);
+  height: 1px;
+  transform-origin: 100% 50%;
+  transform: scaleX(0);
+}
+
+/* 2. Top-Right cut: expands from center (50%) to right corner curve */
+.about-cut-line--top-right {
+  top: 0;
+  left: 50%;
+  right: var(--about-corner-r, 24px);
+  height: 1px;
+  transform-origin: 0% 50%;
+  transform: scaleX(0);
+}
+
+/* 3. Left cut: expands from bottom (floor) UP to top-left corner curve */
+.about-cut-line--left {
+  bottom: 0;
+  top: var(--about-corner-r, 24px);
+  left: 0;
+  width: 1px;
+  transform-origin: 50% 100%;
+  transform: scaleY(0);
+}
+
+/* 4. Right cut: expands from bottom (floor) UP to top-right corner curve */
+.about-cut-line--right {
+  bottom: 0;
+  top: var(--about-corner-r, 24px);
+  right: 0;
+  width: 1px;
+  transform-origin: 50% 100%;
+  transform: scaleY(0);
+}
+
+/* 5. Corner curves: seamless connection at the rounded corners (1px hairline) */
+.about-cut-corner {
+  position: absolute;
+  width: var(--about-corner-r, 24px);
+  height: var(--about-corner-r, 24px);
+  opacity: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.about-cut-corner--tl {
+  top: 0;
+  left: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.45);
+  border-left: 1px solid rgba(255, 255, 255, 0.45);
+  border-top-left-radius: var(--about-corner-r, 24px);
+  border-right: none;
+  border-bottom: none;
+}
+
+.about-cut-corner--tr {
+  top: 0;
+  right: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.45);
+  border-right: 1px solid rgba(255, 255, 255, 0.45);
+  border-top-right-radius: var(--about-corner-r, 24px);
+  border-left: none;
+  border-bottom: none;
+}
+
+.about-stage--embedded .about-grid {
+  padding: clamp(14px, 2.5vh, 28px) clamp(24px, 4vw, 64px) 0;
+  height: 100%;
+}
+
+.about-stage--embedded .about-portrait-img {
+  height: 100%;
+  max-height: min(720px, calc(100vh - 140px));
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+/* Faint studio glow + diagonal streaks behind the right-side portrait */
+.about-decor {
+  display: none !important;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  opacity: var(--about-decor-op, 1);
+  transform: translate3d(var(--about-decor-tx, 0px), 0, 0);
+  will-change: opacity, transform;
+}
+
+.about-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 73% 50%,
+    rgba(47, 208, 255, 0.08) 0%,
+    rgba(24, 48, 128, 0.14) 34%,
+    rgba(3, 5, 10, 0) 68%
+  );
+}
+
+.about-streak {
+  position: absolute;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(47, 208, 255, 0.03) 0%,
+    rgba(143, 196, 255, 0.11) 100%
+  );
+  transform: rotate(-42deg);
+}
+
+.about-streak--1 {
+  width: clamp(180px, 22vw, 310px);
+  height: clamp(20px, 2.5vw, 34px);
+  right: 26%;
+  bottom: 24%;
+}
+
+.about-streak--2 {
+  width: clamp(220px, 26vw, 360px);
+  height: clamp(16px, 2vw, 28px);
+  right: 3%;
+  bottom: 42%;
+  opacity: 0.72;
+}
+
+.about-streak--3 {
+  width: clamp(160px, 18vw, 250px);
+  height: clamp(14px, 1.7vw, 24px);
+  right: -2%;
+  bottom: 16%;
+  opacity: 0.55;
+}
+
+.about-dot {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(143, 196, 255, 0.14);
+}
+
+.about-dot--1 {
+  width: 22px;
+  height: 22px;
+  right: 38%;
+  bottom: 34%;
+}
+
+/* HiDPI canvas drawing cropped tiny pieces of monochrome portrait before locking */
+.about-portrait-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  opacity: var(--about-canvas-op, 0);
+}
+
+/* Main two-column split layout */
+.about-grid {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: calc(var(--header-height, 56px) + clamp(16px, 3vh, 32px)) clamp(28px, 6vw, 88px) 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: clamp(16px, 3vw, 48px);
+  box-sizing: border-box;
+}
+
+/* Ordered tiny text fragments & character half-shards (never break words mid-word) */
+.about-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.about-part {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.about-shard-char {
+  position: relative;
+  display: inline-block;
+}
+
+.about-shard-sizer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.about-part--top,
+.about-part--bot {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.about-part--top {
+  clip-path: inset(0 0 49.4% 0);
+}
+
+.about-part--bot {
+  clip-path: inset(49.4% 0 0 0);
+}
+
+.about-copy {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 36px;
+  align-items: flex-start;
+  justify-content: center;
+  padding-bottom: clamp(28px, 6vh, 64px);
+  max-width: 540px;
 }
 
-.about-bio-p {
-  font-size: 1.05rem;
-  line-height: 1.65;
-  color: #101a91;
-  opacity: 0.9;
-  margin: 0;
+.about-greeting {
+  margin: 0 0 clamp(4px, 0.9vh, 10px);
+  font-family: var(--font-sans, inherit);
+  font-size: clamp(1.2rem, min(1.85vw, 2.8vh), 1.75rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: rgba(207, 227, 255, 0.78);
+  letter-spacing: -0.01em;
 }
 
-.about-card {
-  background: rgba(255, 255, 255, 0.45);
-  border: 1px solid rgba(16, 26, 145, 0.16);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
+.about-name {
+  margin: 0 0 clamp(6px, 1vh, 12px);
+  font-family: var(--font-display, inherit);
+  font-size: clamp(3rem, min(6vw, 8.6vh), 4.9rem);
+  font-weight: 800;
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  color: #f4f8ff;
+  -webkit-text-stroke: 1px #f4f8ff;
+  paint-order: stroke fill;
 }
 
-.about-card-title {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(16, 26, 145, 0.65);
-  margin-bottom: 8px;
+.about-role {
+  margin: 0 0 clamp(14px, 2.2vh, 22px);
+  font-family: var(--font-sans, inherit);
+  font-size: clamp(1.3rem, min(2.2vw, 3.2vh), 2rem);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: rgba(232, 241, 255, 0.92);
 }
 
-.about-card-text {
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #101a91;
-  font-weight: 500;
-  margin: 0;
+.about-bio-line {
+  margin: 0 0 clamp(10px, 1.6vh, 16px);
+  font-size: clamp(0.88rem, min(1.05vw, 1.85vh), 0.98rem);
+  line-height: 1.55;
+  color: rgba(207, 227, 255, 0.7);
+  max-width: 46ch;
 }
 
-.about-chips-wrap {
+.about-meta-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: clamp(18px, 3vh, 30px);
+  font-size: clamp(0.76rem, 0.92vw, 0.84rem);
+  font-weight: 500;
+  color: rgba(143, 196, 255, 0.92);
+  letter-spacing: 0.01em;
 }
 
-.about-chip {
+.about-meta-focus {
+  color: rgba(207, 227, 255, 0.58);
+  font-weight: 600;
+}
+
+.about-cta-wrap {
   display: inline-flex;
   align-items: center;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  background: rgba(16, 26, 145, 0.08);
-  color: #101a91;
-  border: 1px solid rgba(16, 26, 145, 0.2);
 }
 
-.about-chip--primary {
-  background: #101a91;
-  color: #f2f1ed;
-  border-color: #101a91;
+.about-resume-link {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-sans, inherit);
+  font-size: clamp(0.95rem, min(1.15vw, 2vh), 1.08rem);
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  padding-bottom: 5px;
+  transition: color 0.22s ease, transform 0.22s ease;
+}
+
+.about-resume-underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(var(--about-resume-line-scale, 1));
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.about-resume-link:hover {
+  color: #2fd0ff;
+  transform: translateY(-1px);
+}
+
+.about-resume-link:focus-visible {
+  outline: 2px solid #2fd0ff;
+  outline-offset: 4px;
+}
+
+/* Right bottom-anchored portrait visual */
+.about-visual {
+  position: relative;
+  align-self: stretch;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.about-portrait-img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: clamp(390px, 84vh, 840px);
+  max-height: calc(100svh - 24px);
+  object-fit: contain;
+  object-position: bottom center;
+  filter: contrast(1.06) brightness(0.95);
+  opacity: var(--about-img-op, 1);
+  will-change: opacity;
+}
+
+/* Mobile & narrower stacked layout */
+@media (max-width: 768px) {
+  .about-stage,
+  .about-stage--embedded {
+    min-height: auto;
+    height: auto;
+    --about-decor-op: 1;
+    --about-decor-tx: 0px;
+    --about-img-op: 1;
+    --about-canvas-op: 0;
+    --about-resume-line-scale: 1;
+  }
+
+  .about-portrait-canvas {
+    display: none;
+  }
+
+  .about-part {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    padding: calc(var(--header-height, 56px) + 28px) 22px 0;
+    gap: 18px;
+  }
+
+  .about-copy {
+    padding-bottom: 8px;
+  }
+
+  .about-name {
+    font-size: clamp(2.6rem, 11vw, 3.6rem);
+  }
+
+  .about-visual {
+    justify-content: center;
+    padding-top: 4px;
+  }
+
+  .about-portrait-img {
+    height: clamp(260px, 44vh, 380px);
+    max-height: 48svh;
+  }
+
+  .about-streak--1 {
+    right: 12%;
+    bottom: 18%;
+  }
+
+  .about-streak--2 {
+    right: -4%;
+    bottom: 32%;
+  }
 }

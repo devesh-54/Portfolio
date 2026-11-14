@@ -1,0 +1,97 @@
+/* FullscreenToggle.css — Minimal Symbol & Text (Capsule removed, First Page Only) */
+
+.fullscreen-toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(220, 235, 255, 0.75);
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+  transition: opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.2s ease,
+              transform 0.2s ease,
+              visibility 0.26s ease;
+  user-select: none;
+}
+
+/* Hidden when scrolled away from first page or on other routes */
+.fullscreen-toggle-btn.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.fullscreen-toggle-btn:hover {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.fullscreen-toggle-btn:active {
+  transform: translateY(0);
+}
+
+.fullscreen-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #2fd0ff;
+  transition: transform 0.22s ease, color 0.2s ease, filter 0.2s ease;
+  filter: drop-shadow(0 0 4px rgba(47, 208, 255, 0.45));
+}
+
+.fullscreen-toggle-btn:hover .fullscreen-toggle-icon {
+  transform: scale(1.12);
+  color: #38bdf8;
+  filter: drop-shadow(0 0 8px rgba(47, 208, 255, 0.8));
+}
+
+.fullscreen-toggle-label {
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Active (in Fullscreen) mode */
+.fullscreen-toggle-btn.is-active {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #ffffff;
+}
+
+.fullscreen-toggle-btn.is-active .fullscreen-toggle-icon {
+  color: #2fd0ff;
+  filter: drop-shadow(0 0 8px rgba(47, 208, 255, 0.9));
+}
+
+/* Mobile responsive: compact */
+@media (max-width: 640px) {
+  .fullscreen-toggle-btn {
+    top: 14px;
+    right: 14px;
+    padding: 6px;
+    gap: 0;
+  }
+
+  .fullscreen-toggle-label {
+    display: none;
+  }
+}

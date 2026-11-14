@@ -1,0 +1,204 @@
+/* Cinematic Layered Colour-Wipe Transition between About Me and Skills */
+
+.ccw-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+  background: transparent;
+  will-change: opacity, visibility;
+}
+
+/* Individual full-height vertical color panel clipped horizontally */
+.ccw-panel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  will-change: clip-path;
+}
+
+/* 1. Base dark background panel (Initial state from About Me) */
+.ccw-panel--base {
+  background: #090D18;
+  z-index: 1;
+}
+
+/* 2. Deep Navy Primary Panel */
+.ccw-panel--navy {
+  background: #101A91;
+  z-index: 2;
+  box-shadow: inset 1px 0 0 rgba(47, 208, 255, 0.4);
+}
+
+/* 3. Deep Black Contrast Panel */
+.ccw-panel--black {
+  background: #050811;
+  z-index: 3;
+}
+
+/* 4. Electric Cyan Accent Panel (Alternating Sweep) */
+.ccw-panel--cyan {
+  background: #2FD0FF;
+  z-index: 4;
+  box-shadow: inset 0 0 40px rgba(16, 26, 145, 0.18);
+}
+
+/* 5. Pure White Final Master Sweep Panel (Handoff into Skills) */
+.ccw-panel--white {
+  background: #FFFFFF;
+  z-index: 5;
+}
+
+/* Viewport-centered typography lockup rendered identically in every panel */
+.ccw-text-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0 24px;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Section Title eyebrow kicker */
+.ccw-kicker {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: clamp(10.5px, 0.95vw, 13px);
+  font-weight: 800;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  margin-bottom: clamp(6px, 1.2vh, 12px);
+  transition: opacity 0.2s ease;
+}
+
+/* Large, bold, dominant typography */
+.ccw-title {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(3.2rem, 7.5vw, 6.4rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  white-space: nowrap;
+}
+
+/* Styling & Contrast for each panel layer */
+
+/* Layer 0: Base Dark (White text on Deep Black) */
+.ccw-panel--base .ccw-kicker {
+  color: #2FD0FF;
+  text-shadow: 0 0 12px rgba(47, 208, 255, 0.6);
+}
+
+.ccw-panel--base .ccw-title {
+  color: #FFFFFF;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6), 0 0 32px rgba(47, 208, 255, 0.2);
+}
+
+/* Layer 1: Navy Panel (White text with Cyan accents on Deep Navy) */
+.ccw-panel--navy .ccw-kicker {
+  color: #2FD0FF;
+}
+
+.ccw-panel--navy .ccw-title {
+  color: #FFFFFF;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* Layer 2: Deep Black Panel (Electric Cyan text on Black) */
+.ccw-panel--black .ccw-kicker {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.ccw-panel--black .ccw-title {
+  color: #2FD0FF;
+  text-shadow: 0 0 28px rgba(47, 208, 255, 0.5);
+}
+
+/* Layer 3: Cyan Panel (Deep Navy text on Electric Cyan) */
+.ccw-panel--cyan .ccw-kicker {
+  color: rgba(16, 26, 145, 0.82);
+}
+
+.ccw-panel--cyan .ccw-title {
+  color: #101A91;
+  -webkit-text-stroke: 1.2px #101A91;
+}
+
+/* Layer 4: Final Pure White Panel (Deep Navy text on Pure White) */
+.ccw-panel--white .ccw-kicker {
+  color: rgba(16, 26, 145, 0.75);
+}
+
+.ccw-panel--white .ccw-title {
+  color: #101A91;
+  -webkit-text-stroke: 1.2px currentColor;
+  paint-order: stroke fill;
+}
+
+.ccw-panel--white .ccw-title::before,
+.ccw-panel--white .ccw-title::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: #2FD0FF;
+  border-radius: 1px;
+}
+
+/* Razor-sharp vertical divider seam lines between sliding color panels */
+.ccw-seam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2.5px;
+  pointer-events: none;
+  z-index: 8;
+  will-change: transform, left, opacity;
+}
+
+.ccw-seam--cyan {
+  background: #2FD0FF;
+  box-shadow: 0 0 16px rgba(47, 208, 255, 0.85), 0 0 4px #ffffff;
+}
+
+.ccw-seam--navy {
+  background: #101A91;
+  box-shadow: 0 0 12px rgba(16, 26, 145, 0.6);
+}
+
+.ccw-seam--white {
+  background: #FFFFFF;
+  box-shadow: -2px 0 14px rgba(47, 208, 255, 0.65), 0 0 6px #ffffff;
+}
+
+/* Thin vertical accent strip leading the initial reveal */
+.ccw-lead-strip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14px;
+  background: linear-gradient(90deg, #101A91 0%, #2FD0FF 100%);
+  z-index: 7;
+  pointer-events: none;
+  box-shadow: 0 0 20px rgba(47, 208, 255, 0.75);
+  will-change: left, opacity;
+}
+

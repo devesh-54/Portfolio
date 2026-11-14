@@ -1,14 +1,19 @@
 import { TopActions } from '../../ui/SiteNav'
+import { SectionOrderNav } from '../../ui/SectionOrderNav'
 
-export function Header({ actionsVisible = true, theme = 'dark' } = {}) {
-  return (
-    <header className="header" id="site-header" data-theme={theme} style={{ zIndex: 100 }}>
-      <span className="header-name">
-        Devesh <span className="header-author">· AI & Full-Stack Developer</span>
-      </span>
-      <TopActions visible={actionsVisible} />
-    </header>
-  )
+/**
+ * @param {{
+ *   actionsVisible?: boolean
+ *   theme?: 'dark' | 'light'
+ *   activeSection?: import('../../ui/SectionOrderNav').SectionId
+ *   onSelectSection?: (id: import('../../ui/SectionOrderNav').SectionId) => void
+ * }} [props]
+ */
+/**
+ * Header disabled per user request: section navigation bar removed from all sections.
+ */
+export function Header() {
+  return null
 }
 
 export default Header

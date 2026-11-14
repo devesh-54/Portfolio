@@ -16,11 +16,11 @@ export const site: SiteConfig = {
   name: "Devesh",
   role: "AI & Full-Stack Developer",
   education: "B.Tech Artificial Intelligence & Data Science, Rajalakshmi Institute of Technology (RIT), Chennai",
-  location: "India", // TODO owner: refine
-  email: "your.email@example.com", // TODO owner: replace
+  location: "India",
+  email: "deveshdhanush73@gmail.com",
   github: "https://github.com/devesh-54",
   linkedin: "https://www.linkedin.com/in/devesh-s-6097a6370",
-  resumeUrl: "/resume.pdf", // TODO owner: put the PDF in /public
+  resumeUrl: "/Resume___.pdf",
   languages: ["English", "Tamil", "Telugu"],
   focus: ["AI & Deep Learning", "Full-Stack Web", "Mobile Apps"],
   bio: [

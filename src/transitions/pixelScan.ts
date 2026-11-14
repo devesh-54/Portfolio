@@ -9,7 +9,7 @@
  * 5. Zero-allocation per-frame execution reusing shared arrays and ImageData buffers.
  */
 
-import { PIXEL_SCAN_CONFIG, computeCellSize } from '../config/pixelScan'
+import { PIXEL_SCAN_CONFIG, computeCellSize, type PixelScanPalette } from '../config/pixelScan'
 
 export function hash3(a: number, b: number, c: number): number {
   let h = (Math.imul(a, 374761393) + Math.imul(b, 668265263) + Math.imul(c, 2147483647)) | 0
@@ -47,7 +47,8 @@ export function packABGR(r: number, g: number, b: number, a: number): number {
 }
 
 // Pre-parse palettes into RGB for zero-parsing runtime
-const PARSED_PALETTES: Record<string, RGB[]> = {
+const PARSED_PALETTES: Record<PixelScanPalette, RGB[]> = {
+  darkToDark: PIXEL_SCAN_CONFIG.palettes.darkToDark.map(parseHex),
   darkToLight: PIXEL_SCAN_CONFIG.palettes.darkToLight.map(parseHex),
   lightToLight: PIXEL_SCAN_CONFIG.palettes.lightToLight.map(parseHex),
 }
@@ -157,12 +158,12 @@ export class PixelScanEngine {
   computeScan(
     pRaw: number,
     dir: 1 | -1 = 1,
-    paletteName: 'darkToLight' | 'lightToLight' = 'darkToLight'
+    paletteName: PixelScanPalette = 'darkToDark'
   ): EngineResult {
     const p = Math.max(0, Math.min(1, pRaw))
     const { cell, W, H, cols, rows } = this
     const { bandCells, jitterCells, sparkCells, flickerSteps } = PIXEL_SCAN_CONFIG
-    const palette = PARSED_PALETTES[paletteName] || PARSED_PALETTES.darkToLight
+    const palette = PARSED_PALETTES[paletteName] || PARSED_PALETTES.darkToDark
     const white = palette[0]
 
     // Clear previous pixels buffer
@@ -289,12 +290,12 @@ export class PixelScanEngine {
    */
   computeBurst(
     pRaw: number,
-    paletteName: 'darkToLight' | 'lightToLight' = 'lightToLight'
+    paletteName: PixelScanPalette = 'darkToDark'
   ): EngineResult {
     const p = Math.max(0, Math.min(1, pRaw))
     const { cell, W, H, cols, rows } = this
     const { bandCells, sparkCells, flickerSteps } = PIXEL_SCAN_CONFIG
-    const palette = PARSED_PALETTES[paletteName] || PARSED_PALETTES.lightToLight
+    const palette = PARSED_PALETTES[paletteName] || PARSED_PALETTES.darkToDark
     const white = palette[0]
 
     this.pixels32.fill(0)
