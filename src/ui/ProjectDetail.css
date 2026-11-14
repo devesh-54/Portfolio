@@ -40,7 +40,7 @@
   max-height: calc(100svh - clamp(20px, 3.5vh, 48px));
   margin: auto;
   display: grid;
-  grid-template-columns: minmax(360px, 42%) minmax(420px, 58%);
+  grid-template-columns: minmax(290px, 34%) minmax(460px, 66%);
   gap: clamp(24px, 3.2vw, 48px);
   align-items: center;
   box-sizing: border-box;
@@ -62,14 +62,15 @@
   box-sizing: border-box;
 }
 
-/* 1A. Smartphone Mockup (Realistic iPhone Design) */
+/* 1A. Smartphone Mockup (Realistic Slender iPhone Design) */
 .smartphone-mockup {
   position: relative;
-  width: min(100%, 390px);
+  width: auto;
+  max-width: min(100%, 318px);
   height: calc(100% - 38px);
-  max-height: clamp(560px, 85vh, 820px);
-  aspect-ratio: 9 / 18.2;
-  border-radius: 46px;
+  max-height: clamp(540px, 84vh, 760px);
+  aspect-ratio: 9 / 19.5;
+  border-radius: 42px;
   background: #090a0f;
   border: 3.5px solid #22252e;
   box-shadow:
@@ -92,36 +93,36 @@
 
 .smartphone-button--action {
   left: -6.5px;
-  top: 76px;
+  top: 72px;
   width: 3.5px;
-  height: 18px;
+  height: 16px;
   border-radius: 2px 0 0 2px;
   border-right: none;
 }
 
 .smartphone-button--vol-up {
   left: -6.5px;
-  top: 108px;
+  top: 102px;
   width: 3.5px;
-  height: 38px;
+  height: 34px;
   border-radius: 2px 0 0 2px;
   border-right: none;
 }
 
 .smartphone-button--vol-down {
   left: -6.5px;
-  top: 156px;
+  top: 146px;
   width: 3.5px;
-  height: 38px;
+  height: 34px;
   border-radius: 2px 0 0 2px;
   border-right: none;
 }
 
 .smartphone-button--power {
   right: -6.5px;
-  top: 114px;
+  top: 108px;
   width: 3.5px;
-  height: 54px;
+  height: 48px;
   border-radius: 0 2px 2px 0;
   border-left: none;
 }
@@ -130,7 +131,7 @@
 .smartphone-screen {
   position: absolute;
   inset: 0;
-  border-radius: 42px;
+  border-radius: 38px;
   overflow: hidden;
   background: #000000;
   z-index: 1;
@@ -142,11 +143,11 @@
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 108px;
-  height: 23px;
+  width: 96px;
+  height: 22px;
   background: #000000;
-  border-bottom-left-radius: 14px;
-  border-bottom-right-radius: 14px;
+  border-bottom-left-radius: 13px;
+  border-bottom-right-radius: 13px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -157,21 +158,21 @@
 
 .smartphone-speaker {
   position: absolute;
-  top: 5px;
+  top: 4.5px;
   left: 50%;
   transform: translateX(-50%);
-  width: 36px;
-  height: 3.5px;
+  width: 32px;
+  height: 3px;
   background: #181920;
   border-radius: 2px;
 }
 
 .smartphone-camera-lens {
   position: absolute;
-  top: 5px;
-  right: 18px;
-  width: 10px;
-  height: 10px;
+  top: 4.5px;
+  right: 15px;
+  width: 9px;
+  height: 9px;
   background: radial-gradient(circle at 35% 35%, #2a3c5a, #08090f 70%);
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -183,19 +184,19 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 26px;
+  height: 25px;
   z-index: 18;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 22px;
+  padding: 0 16px;
   pointer-events: none;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
   color: #111827; /* Dark status bar icons matching the iPhone screenshot */
 }
 
 .smartphone-time {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1;
@@ -230,10 +231,10 @@
   bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
-  width: 124px;
-  height: 4.5px;
+  width: 104px;
+  height: 4px;
   background: #111827;
-  border-radius: 3px;
+  border-radius: 2.5px;
   z-index: 20;
   pointer-events: none;
   box-shadow: 0 1px 2px rgba(255, 255, 255, 0.25);
@@ -922,10 +923,11 @@
   }
 
   .smartphone-mockup {
-    width: min(100%, 370px);
+    width: auto;
+    max-width: min(100%, 295px);
     height: calc(100% - 32px);
-    max-height: min(86vh, 680px);
-    border-radius: 44px;
+    max-height: min(86vh, 640px);
+    border-radius: 40px;
   }
 
   .browser-mockup {
@@ -1014,8 +1016,8 @@
 
   .smartphone-mockup {
     height: 52vh;
-    max-width: 320px;
-    border-radius: 40px;
+    max-width: 270px;
+    border-radius: 38px;
   }
 
   .browser-mockup {
