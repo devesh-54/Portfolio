@@ -381,6 +381,10 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
     ? repoLink.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
     : `${displayProj?.id || 'project'}.app`
 
+  const overviewText = displayProj?.aboutDetails?.overview || descriptionParagraphs[0] || displayProj?.summary
+  const purposeText = displayProj?.aboutDetails?.purpose || (descriptionParagraphs.length > 1 ? descriptionParagraphs[1] : '')
+  const targetUsersText = displayProj?.aboutDetails?.targetUsers
+
   return createPortal(
     <div
       id="project-detail-dialog"
@@ -605,7 +609,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
             {/* 3. PROJECT TITLE */}
             <h2 className="detail-title">{displayProj?.title}</h2>
 
-            {/* 4. SUMMARY */}
+            {/* 4. SUMMARY KICKER */}
             <p className="detail-summary">{displayProj?.summary}</p>
 
             {/* 5. TECH STACK BADGES */}
@@ -657,63 +661,77 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
             {/* 7. SUBTLE DIVIDER */}
             <div className="detail-divider" />
 
-            {/* 8. 2-COLUMN BENTO SHOWCASE (KEY CAPABILITIES & SYSTEM / IMPACT) */}
-            <div className="detail-bento-grid">
-              {/* BENTO CARD 1: Key Capabilities */}
-              <div className="detail-bento-card detail-bento-card--features">
-                <div className="bento-card-header">
-                  <span className="bento-kicker">KEY CAPABILITIES</span>
-                  <h3 className="bento-headline">Core App Features</h3>
+            {/* ========================================================= */}
+            {/* 8. EXPANDED SECTIONS: OVERVIEW & PURPOSE + TECHNICAL SPECS */}
+            {/* (Key Capabilities merged under Technical Details)        */}
+            {/* ========================================================= */}
+            <div className="detail-sections-container">
+              {/* SECTION A: OVERVIEW & PURPOSE (Enlarged font, rich paragraphs) */}
+              <div className="detail-section-card detail-section-card--overview">
+                <div className="detail-card-header">
+                  <span className="detail-section-kicker">OVERVIEW & PURPOSE</span>
+                  <h3 className="detail-section-headline">Project Scope & Real-World Impact</h3>
                 </div>
-                <div className="bento-features-list">
-                  {featureColumns.map((col, idx) => (
-                    <div key={idx} className="bento-feature-item">
-                      <div className="bento-feature-kicker">{col.label}</div>
-                      <p className="bento-feature-desc">{col.description}</p>
+
+                <div className="detail-overview-content">
+                  {overviewText && <p className="detail-overview-text">{overviewText}</p>}
+                  {purposeText && purposeText !== overviewText && (
+                    <p className="detail-overview-text">{purposeText}</p>
+                  )}
+
+                  {targetUsersText && (
+                    <div className="detail-target-users-box">
+                      <span className="detail-target-users-label">TARGET USERS / BENEFICIARIES:</span>
+                      <p className="detail-target-users-val">{targetUsersText}</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
 
-              {/* BENTO CARD 2: Purpose & Architecture */}
-              <div className="detail-bento-card detail-bento-card--specs">
-                <div className="bento-card-header">
-                  <span className="bento-kicker">SYSTEM & IMPACT</span>
-                  <h3 className="bento-headline">Purpose & Architecture</h3>
+              {/* SECTION B: TECHNICAL SPECIFICATIONS & CAPABILITIES */}
+              <div className="detail-section-card detail-section-card--technical">
+                <div className="detail-card-header">
+                  <span className="detail-section-kicker">TECHNICAL DETAILS</span>
+                  <h3 className="detail-section-headline">Architecture, Capabilities & Challenges</h3>
                 </div>
 
-                <div className="bento-specs-flow">
-                  {/* Problem & Impact */}
-                  <div className="bento-spec-section">
-                    <div className="bento-spec-kicker">PROBLEM & IMPACT</div>
-                    <p className="bento-spec-body">
-                      {displayProj?.aboutDetails?.purpose || descriptionParagraphs[0]}
-                    </p>
-                  </div>
-
-                  {/* Target Users */}
-                  {displayProj?.aboutDetails?.targetUsers && (
-                    <div className="bento-spec-section">
-                      <div className="bento-spec-kicker">TARGET USERS</div>
-                      <p className="bento-spec-body bento-spec-body--users">
-                        {displayProj.aboutDetails.targetUsers}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* System Architecture */}
+                <div className="detail-technical-content">
+                  {/* 1. System Architecture */}
                   {technicalDetails?.architecture && (
-                    <div className="bento-spec-section">
-                      <div className="bento-spec-kicker">SYSTEM ARCHITECTURE</div>
-                      <p className="bento-spec-body">{technicalDetails.architecture}</p>
+                    <div className="detail-spec-block">
+                      <div className="detail-spec-kicker">SYSTEM ARCHITECTURE</div>
+                      <p className="detail-spec-body">{technicalDetails.architecture}</p>
                     </div>
                   )}
 
-                  {/* Technical Challenge */}
+                  {/* 2. Key Capabilities (Relocated here from standalone card) */}
+                  {featureColumns.length > 0 && (
+                    <div className="detail-spec-block">
+                      <div className="detail-spec-kicker">KEY CAPABILITIES & HIGHLIGHTS</div>
+                      <div className="detail-capabilities-grid">
+                        {featureColumns.map((col, idx) => (
+                          <div key={idx} className="detail-capability-tile">
+                            <span className="detail-capability-num">{col.label}</span>
+                            <p className="detail-capability-desc">{col.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 3. Technical Challenge */}
                   {technicalDetails?.challenges && (
-                    <div className="bento-spec-section">
-                      <div className="bento-spec-kicker">TECHNICAL CHALLENGE</div>
-                      <p className="bento-spec-body">{technicalDetails.challenges}</p>
+                    <div className="detail-spec-block">
+                      <div className="detail-spec-kicker">TECHNICAL CHALLENGE</div>
+                      <p className="detail-spec-body">{technicalDetails.challenges}</p>
+                    </div>
+                  )}
+
+                  {/* 4. Core Technologies */}
+                  {technicalDetails?.technologies && (
+                    <div className="detail-spec-block">
+                      <div className="detail-spec-kicker">CORE TECHNOLOGIES & RUNTIME</div>
+                      <p className="detail-spec-body">{technicalDetails.technologies}</p>
                     </div>
                   )}
                 </div>

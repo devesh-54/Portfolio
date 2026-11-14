@@ -2,7 +2,7 @@
    ProjectDetail.css
    Unified Project Detail Modal (100svh Viewport Fit)
    Shared 2-column frame: Media Showcase on Left | Scrollable Details on Right
-   Strict typography scale & high contrast on dark OLED background
+   Enlarged typography for Overview & Technical Specifications
    ========================================================================== */
 
 #project-detail-dialog {
@@ -328,8 +328,8 @@
   overflow-x: hidden;
   box-sizing: border-box;
   /* Soft fade gradient at the bottom */
-  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 38px), transparent 100%);
-  mask-image: linear-gradient(to bottom, black calc(100% - 38px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 42px), transparent 100%);
+  mask-image: linear-gradient(to bottom, black calc(100% - 42px), transparent 100%);
 }
 
 /* Smooth sleek scrollbar inside details column */
@@ -348,8 +348,8 @@
 }
 
 .detail-info-inner {
-  padding-right: 12px;
-  padding-bottom: 48px; /* Room for soft fade */
+  padding-right: 14px;
+  padding-bottom: 52px; /* Room for soft fade */
   box-sizing: border-box;
 }
 
@@ -515,10 +515,10 @@
   border-radius: 4px;
 }
 
-/* 2C. Project Title & Summary */
+/* 2C. Project Title & Summary (Enlarged) */
 .detail-title {
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
-  font-size: clamp(24px, 2.5vw, 34px);
+  font-size: clamp(26px, 2.7vw, 38px);
   font-weight: 700;
   color: #ffffff;
   margin: 0 0 10px 0;
@@ -527,10 +527,10 @@
 }
 
 .detail-summary {
-  font-size: 15px;
-  line-height: 1.55;
-  color: rgba(255, 255, 255, 0.90);
-  margin: 0 0 14px 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.94);
+  margin: 0 0 16px 0;
 }
 
 /* 2D. Technology Stack Badges */
@@ -564,7 +564,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .detail-btn {
@@ -629,112 +629,162 @@
   height: 1px;
   width: 100%;
   background: linear-gradient(90deg, rgba(0, 240, 255, 0.3) 0%, rgba(255, 255, 255, 0.08) 60%, transparent 100%);
-  margin: 0 0 20px 0;
+  margin: 0 0 22px 0;
 }
 
-/* 2G. Bento Grid (Key Capabilities + System & Impact) */
-.detail-bento-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+/* ==========================================================================
+   2G. EXPANDED SECTIONS: OVERVIEW & PURPOSE + TECHNICAL SPECIFICATIONS
+   Spacious full-width cards with enlarged typography
+   ========================================================================== */
+.detail-sections-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.detail-bento-card {
-  background: rgba(10, 16, 28, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.detail-section-card {
+  background: rgba(10, 16, 28, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 12px;
-  padding: 18px 20px;
+  padding: 22px 24px;
   box-sizing: border-box;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.6);
 }
 
-.bento-card-header {
-  margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+.detail-card-header {
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Small cyan label: unified across entire app */
-.bento-kicker {
+.detail-section-kicker {
   display: block;
   font-family: var(--font-mono, monospace);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #00f0ff;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
-.bento-headline {
+.detail-section-headline {
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 600;
   color: #ffffff;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
-/* Features List */
-.bento-features-list {
+/* Overview Content (Enlarged to 16px, line-height 1.65) */
+.detail-overview-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.bento-feature-item {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.bento-feature-kicker {
-  font-family: var(--font-mono, monospace);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: #38bdf8;
-}
-
-.bento-feature-desc {
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.88);
+.detail-overview-text {
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.94);
   margin: 0;
 }
 
-/* Specs Flow */
-.bento-specs-flow {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
+.detail-target-users-box {
+  background: rgba(0, 240, 255, 0.04);
+  border: 1px solid rgba(0, 240, 255, 0.18);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 6px;
 }
 
-.bento-spec-section {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.bento-spec-kicker {
+.detail-target-users-label {
+  display: block;
   font-family: var(--font-mono, monospace);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #00f0ff;
+  margin-bottom: 4px;
 }
 
-.bento-spec-body {
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.88);
+.detail-target-users-val {
+  font-size: 15px;
+  line-height: 1.55;
+  color: #ffffff;
   margin: 0;
 }
 
-.bento-spec-body--users {
-  color: #e2e8f0;
+/* Technical Details Content (Enlarged to 15.5px - 16px) */
+.detail-technical-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.detail-spec-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-spec-kicker {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #00f0ff;
+}
+
+.detail-spec-body {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.90);
+  margin: 0;
+}
+
+/* Key Capabilities Sub-Grid (Relocated under Technical Details) */
+.detail-capabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.detail-capability-tile {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(0, 240, 255, 0.16);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.detail-capability-tile:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  background: rgba(0, 240, 255, 0.05);
+}
+
+.detail-capability-num {
+  display: block;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #38bdf8;
+  margin-bottom: 4px;
+}
+
+.detail-capability-desc {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -768,14 +818,14 @@
   }
 
   .detail-title {
-    font-size: clamp(20px, 2.2vw, 26px);
+    font-size: clamp(22px, 2.3vw, 30px);
     margin-bottom: 6px;
   }
 
   .detail-summary {
-    font-size: 14px;
+    font-size: 15px;
     margin-bottom: 10px;
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
   .detail-tech-tags {
@@ -791,25 +841,31 @@
     margin-bottom: 14px;
   }
 
-  .detail-bento-grid {
-    gap: 12px;
+  .detail-sections-container {
+    gap: 14px;
   }
 
-  .detail-bento-card {
-    padding: 14px 16px;
+  .detail-section-card {
+    padding: 16px 18px;
   }
 
-  .bento-card-header {
+  .detail-card-header {
     margin-bottom: 10px;
     padding-bottom: 6px;
   }
 
-  .bento-features-list {
-    gap: 10px;
+  .detail-overview-text {
+    font-size: 15px;
+    line-height: 1.55;
   }
 
-  .bento-specs-flow {
-    gap: 10px;
+  .detail-spec-body {
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  .detail-capability-desc {
+    font-size: 14px;
   }
 }
 
@@ -859,7 +915,15 @@
     padding-bottom: 0;
   }
 
-  .detail-bento-grid {
+  .detail-sections-container {
+    gap: 16px;
+  }
+
+  .detail-section-card {
+    padding: 16px 18px;
+  }
+
+  .detail-capabilities-grid {
     grid-template-columns: 1fr;
   }
 
