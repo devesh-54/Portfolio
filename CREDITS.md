@@ -1,17 +1,23 @@
 # Asset & Architecture Credits
 
 ## 3D Models & Assets
-- Curved Monitor by Arnau Rocher Alcayde [[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)], modified (simplified)
+- **Curved Monitor** by Arnau Rocher Alcayde [[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)], modified (simplified & optimized to `curved_monitor.opt.glb`)
   - Author: **Arnau Rocher Alcayde**
   - Source: Sketchfab (`curved_monitor.glb`)
   - License: [Creative Commons Attribution (CC-BY 4.0)](https://creativecommons.org/licenses/by/4.0/)
 
-- Gaming computer by Marcseus [[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)], modified (simplified)
+- **Gaming Computer** by Marcseus [[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)], modified (simplified & optimized to `gaming_computer.opt.glb`)
   - Author: **Marcseus**
   - Source: Sketchfab (`gaming_computer.glb`)
   - License: [Creative Commons Attribution (CC-BY 4.0)](https://creativecommons.org/licenses/by/4.0/)
 
-- **Sketch Material Template**:
+- **Mechanical Keyboard** (`public/models/keyboard.opt.glb`), modified (simplified & optimized)
+  - <!-- TODO: add original author name, source link and license for keyboard 3D model -->
+
+- **Gaming Mouse** (`public/models/mouse.opt.glb`), modified (simplified & optimized)
+  - <!-- TODO: add original author name, source link and license for mouse 3D model -->
+
+- **Sketch Material Architecture**:
   - Source: [R3FSketchMaterial](https://github.com/abhishekmill/R3FSketchMaterial) by **Abhishek Verma**
   - License: MIT License
 
@@ -40,11 +46,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Software Tool Logos (Page 2: /projects)
-The logos for React, Python, Flutter, Supabase, Firebase, GitHub, and Tailwind CSS are registered trademarks of their respective owners and organizations. They are utilized in this portfolio solely to represent the developer's experience with these tools and technologies.
+## Software Tool Logos & Trademarks
+The logos for React, Python, Flutter, Supabase, Firebase, GitHub, Tailwind CSS, PyTorch, TensorFlow, Three.js, Kotlin, and other technologies are registered trademarks of their respective owners and organizations. They are utilized in this portfolio solely to represent the developer's technical skillset and experience with these tools and technologies.
 
-## Project Screenshots & Inspiration
-- **Placeholder Images**: Temporary random photos from Lorem Picsum. Replace each file with real screenshots, keeping the same filename.
-- **Scroll3DGrid and Infinite Scroll Transitions**: Concept and animation structure inspired by Codrops articles / demos by Mary Lou and Codrops team. Re-implemented natively in React + GSAP without copying assets.
-- **Pixel Scan Transition**: Pixel scan transition inspired by Smertimba Graphics' After Effects tutorial 'Pixel Scan Logo Animation' (a style inspiration; no assets used).
-
+## Motion & Transition Inspiration
+- **Scroll Transitions & Spatial Grid**: Architectural concept and animation structure inspired by Codrops articles / demos by Mary Lou and the Codrops team. Re-implemented natively in React + GSAP.
+- **Pixel Scan Transitions**: Stylistic inspiration from Smertimba Graphics' After Effects tutorial 'Pixel Scan Logo Animation' (procedurally generated in TypeScript / HTML Canvas; no external assets used).
