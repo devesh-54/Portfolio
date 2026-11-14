@@ -43,3 +43,16 @@
 - [x] Phase 2 - Dark `#050509` 4-Quadrant Storytelling Section (`src/pages/Hackathons.tsx`, `src/pages/Hackathons.css`)
 - [x] Phase 3 - Scroll-Driven Line -> Circle -> Crosshair Entry & Exact Reverse Exit into `#about` (`src/sections/PixelStage.tsx`, `src/sections/PixelStage.css`, `src/pages/Home.tsx`, `src/pages/Home.css`)
 - [x] Phase 4 - Interactive Hover/Click Expansion, Center Hub Reset, Scoped Keyboard Shortcuts, Dynamic Header Contrast & Cross-Viewport QA
+
+# Progress: Comprehensive Project Audit & Cleanup
+
+- [x] Phase 1 - Inventory
+- [ ] Phase 2 - Unused Files, Exports and Dependencies
+- [ ] Phase 3 - Asset Audit
+- [ ] Phase 4 - Required Files and Content Checklist
+- [ ] Phase 5 - Code Quality and Security
+- [ ] Phase 6 - Build, Runtime and Performance
+- [ ] Phase 7 - The Report and the Approval List
+- [ ] Phase 8 - Cleanup (only after approval)
+- [ ] Phase 9 - Final Report
+
