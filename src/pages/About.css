@@ -394,8 +394,8 @@
   display: block;
   width: auto;
   max-width: 100%;
-  height: clamp(390px, 84vh, 840px);
-  max-height: calc(100svh - 24px);
+  height: clamp(350px, 72vh, 720px);
+  max-height: calc(100svh - 40px);
   object-fit: contain;
   object-position: bottom center;
   filter: contrast(1.06) brightness(0.95);
