@@ -27,6 +27,7 @@ scratch/
 *.njsproj
 *.sln
 *.sw?
+.git_backup/
 
 # Raw unoptimized 3D models (only .opt.glb should be committed)
 public/models/gaming_computer.glb
