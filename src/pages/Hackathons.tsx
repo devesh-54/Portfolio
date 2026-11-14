@@ -320,7 +320,6 @@ export function Hackathons({
 
       {/* Header metadata bar subtle top tag (below fixed site-header height) */}
       <div className="hack-top-caption">
-        <span className="hack-top-caption-count">04 EVENTS · 2026</span>
         <h2 className="hack-top-caption-title">HACKATHON ARCHIVE</h2>
       </div>
 
