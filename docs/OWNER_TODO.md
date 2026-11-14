@@ -23,5 +23,8 @@ This checklist tracks personal assets, real content, and decisions that require 
 - [ ] **Portrait Photo**: Confirm if `src/assets/about-portrait.png` is your final preferred portrait photo for the About section.
 - [ ] **Social Preview Image**: Provide or approve a `1200x630` social card preview image for Twitter/LinkedIn unfurls.
 
-### 4. Legacy Architecture Decision
-- [ ] **Standalone `/projects` Route**: Decide whether to delete or archive the legacy unlinked 3D logo space scene (`/projects`), keeping only the current unified `PixelStage` projects section.
+### 4. Production Domain & SEO
+- [ ] **Production Domain URL**: Replace `TODO_CANONICAL_URL`, `TODO_OG_URL`, `TODO_OG_IMAGE_URL`, and `TODO_TWITTER_IMAGE_URL` in `index.html` with your live custom domain (e.g. `https://devesh.dev`).
+- [ ] **Sitemap URL**: Replace `TODO_SITEMAP_URL` in `public/robots.txt` once deployed.
+
+
