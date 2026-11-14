@@ -7,6 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Environment
+.env*
+!.env.example
+
 node_modules
 dist
 dist-ssr
@@ -23,3 +27,11 @@ scratch/
 *.njsproj
 *.sln
 *.sw?
+
+# Raw unoptimized 3D models (only .opt.glb should be committed)
+public/models/gaming_computer.glb
+public/models/curved_monitor.glb
+public/models/laptop.glb
+public/models/smartphone.glb
+public/car.glb
+

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap (TODO: replace with production sitemap URL)
+# Sitemap: TODO_SITEMAP_URL
