@@ -4,7 +4,6 @@ import { FullscreenToggle } from './ui/FullscreenToggle'
 import './styles/global.css'
 
 const Home = lazy(() => import('./pages/Home'))
-const Projects = lazy(() => import('./pages/Projects'))
 
 export function App() {
   return (
@@ -23,8 +22,7 @@ export function App() {
       >
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* Keep existing /projects logo-scene route working but UNLINKED */}
-          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects" element={<Navigate to="/#projects" replace />} />
           <Route path="/about" element={<Navigate to="/#about" replace />} />
           <Route path="/skills" element={<Navigate to="/#skills" replace />} />
           <Route path="/hackathons" element={<Navigate to="/#hackathons" replace />} />
