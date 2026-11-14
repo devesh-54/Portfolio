@@ -209,3 +209,4 @@
 6. **Add `robots.txt` and `typecheck` script** in `package.json`.
 7. **Optimize oversized images** (`about-portrait.png`, `hireconnect-1.png`, `cashpilot-1.png`) to WebP to boost Lighthouse Performance.
 8. **Add missing credits** in `CREDITS.md` for keyboard and mouse CC-BY models.
+
