@@ -6,16 +6,19 @@
  */
 
 export const FLIGHT_CONFIG = {
-  // Pinned scroll distances (in vh)
-  DIVE_SCROLL_VH: 70,      // Phase A: dive into monitor (70vh)
-  STREAM_SCROLL_VH: 68,    // Transition: 3D streaming cards bridge (calibrated speed: 68vh)
-  FLIGHT_SCROLL_VH: 380,   // Phase B: card flight (380vh for golden-angle tunnel)
-  TOTAL_SCROLL_VH: 518,    // Total pinned hero scroll (518vh)
+  // Pinned scroll distances (in vh) — Monitor Dive hands cleanly into About Me (White)
+  DIVE_SCROLL_VH: 78,      // Phase A: dive into curved monitor OLED (78vh)
+  STREAM_SCROLL_VH: 24,    // Smooth monitor OLED black -> white handoff beat
+  FLIGHT_SCROLL_VH: 0,     // Legacy tunnel retired from hero (moved after Hackathons in #stage)
+  TOTAL_SCROLL_VH: 102,    // Total pinned hero scroll (>= 100vh so #stage rests completely off-screen at y=0)
 
   // Derived progress milestones
-  DIVE_END_P: 70 / 518,     // 0.1351
-  STREAM_START_P: 0.133,   // Trigger moment matching dive close-up
-  HANDOVER_P: 138 / 518,   // 0.2664 - White covers full screen, Projects scene starts
+  DIVE_END_P: 78 / 102,    // 0.7647 - Camera fills monitor OLED screen
+  STREAM_START_P: 78 / 102,// 0.7647 - Begin clean black -> white monitor interior handoff
+  HANDOVER_P: 1.0,         // Pure white screen hands seamlessly over to #stage (About Me)
+  CORRIDOR_WHITE_START_S: 0.14,
+  CORRIDOR_WHITE_END_S: 0.86,
+  WHITE_WORLD_P: 0.88,     // Flip header theme dark -> light as screen brightens into About Me
 
   // Camera & Perspective: 100px = 1.0 Three.js unit
   PERSPECTIVE_DISTANCE: 15.0, // 1500px -> 15.0 units
@@ -42,12 +45,12 @@ export const FLIGHT_CONFIG = {
   // Hero Targets (evenly spaced p_i from 0.44 to 0.92, alternating sides)
   HERO_TARGETS: [
     { p: 0.44, side: 'L' as const, nx: -0.38, ny:  0.08 }, // JeevaLink
-    { p: 0.52, side: 'R' as const, nx:  0.42, ny: -0.10 }, // ChitGuard
-    { p: 0.60, side: 'L' as const, nx: -0.44, ny:  0.10 }, // DR Detection
-    { p: 0.68, side: 'R' as const, nx:  0.38, ny: -0.06 }, // CashPilot
-    { p: 0.76, side: 'L' as const, nx: -0.40, ny:  0.06 }, // MediGuard AI
-    { p: 0.84, side: 'R' as const, nx:  0.44, ny: -0.10 }, // HireConnect
-    { p: 0.92, side: 'L' as const, nx: -0.40, ny:  0.05 }, // Campus IMS
+    { p: 0.52, side: 'R' as const, nx:  0.42, ny: -0.10 }, // SafeChit
+    { p: 0.60, side: 'L' as const, nx: -0.44, ny:  0.10 }, // HireConnect
+    { p: 0.68, side: 'R' as const, nx:  0.38, ny: -0.06 }, // Campus-IMS
+    { p: 0.76, side: 'L' as const, nx: -0.40, ny:  0.06 }, // DR Detection
+    { p: 0.84, side: 'R' as const, nx:  0.44, ny: -0.10 }, // CashPilot
+    { p: 0.92, side: 'L' as const, nx: -0.40, ny:  0.05 }, // MediGuard AI
   ],
 
   // Near-lens projected width dissolve (start fading at 45%, fully gone at 70%)

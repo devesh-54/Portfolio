@@ -4,6 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { heroProgress } from './heroProgress'
 import settings from './camera-settings.json'
 import { FLIGHT_CONFIG } from '../Projects/flightConfig'
+import { siteTheme } from '../../config/theme'
 
 function easeInOutCubic(x: number): number {
   return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
@@ -172,21 +173,18 @@ export function ScreenDive({
     (p: number, delta: number, pointer?: { x: number; y: number }) => {
       const streamStart = FLIGHT_CONFIG.STREAM_START_P
       const handover = FLIGHT_CONFIG.HANDOVER_P
+      const whiteWorldP = FLIGHT_CONFIG.WHITE_WORLD_P
       const isCorridor = p >= streamStart
-      const isWhiteWorld = p >= handover
+      const isWhiteWorld = p >= whiteWorldP && siteTheme === 'light'
 
-      // Threshold crossing for Handover / Corridor
+      // Threshold crossing into monitor interior -> pure white handoff
       if (isCorridor !== isCorridorRef.current) {
         isCorridorRef.current = isCorridor
         onHandoverChange?.(isCorridor)
         onDiveCompleteChange?.(isCorridor)
-        if (camera instanceof THREE.PerspectiveCamera) {
-          camera.fov = isCorridor ? 60 : 35
-          camera.updateProjectionMatrix()
-        }
       }
 
-      // Threshold crossing for White Projects World
+      // Threshold crossing for White About Me World
       if (isWhiteWorld !== isWhiteWorldRef.current) {
         isWhiteWorldRef.current = isWhiteWorld
         onWhiteWorldChange?.(isWhiteWorld)
@@ -198,7 +196,7 @@ export function ScreenDive({
           computePoseAndCurve()
         }
 
-        const u = Math.min(1, Math.max(0, p / streamStart))
+        const u = Math.min(1, Math.max(0, p / Math.max(0.001, streamStart)))
         const e = easeInOutCubic(u)
 
         if (curveRef.current) {
@@ -230,35 +228,11 @@ export function ScreenDive({
         externalPose.current.position.copy(tempPos)
         externalPose.current.target.copy(tempTarget)
         externalPose.current.e = e
-      } else if (p < handover) {
-        // --- PHASE A->B: 3D Streaming Cards Bridge (p in [streamStart, handover]) ---
-        // Smooth cinematic camera forward glide down the corridor towards Z = 8.0 (video-like tracking shot)
-        const s = Math.max(0, Math.min(1.0, (p - streamStart) / (handover - streamStart)))
-        const sEase = s * s * (3 - 2 * s)
-        const camZ = 8.8 - sEase * 0.8
-        const camY = Math.sin(sEase * Math.PI) * 0.08
-
-        tempPos.set(0, FLIGHT_CONFIG.CAMERA_Y + camY, camZ)
-        tempTarget.set(0, FLIGHT_CONFIG.CAMERA_Y, camZ - 25.0)
-
-        externalPose.current.active = true
-        externalPose.current.position.copy(tempPos)
-        externalPose.current.target.copy(tempTarget)
-        externalPose.current.e = 1.0
       } else {
-        // --- PHASE B: Selected Work Depth Flythrough (calibrated to end cleanly after last project) ---
-        const DEPTH = FLIGHT_CONFIG.DEPTH || 126.0
-        const flightP = Math.max(0, Math.min(1.0, (p - handover) / (1 - handover)))
-        const camZ = 8.0 - flightP * (DEPTH + 10.0)
-        const camX = Math.sin(flightP * 6.0) * 0.6
-        const camY = Math.sin(flightP * 4.0) * 0.3
-
-        tempPos.set(camX, FLIGHT_CONFIG.CAMERA_Y + camY, camZ)
-        tempTarget.set(camX * 0.5, FLIGHT_CONFIG.CAMERA_Y + camY * 0.5, camZ - 20.0)
-
+        // --- PHASE A->B: Hold inside Monitor OLED while opening cleanly into White About Me ---
         externalPose.current.active = true
-        externalPose.current.position.copy(tempPos)
-        externalPose.current.target.copy(tempTarget)
+        externalPose.current.position.copy(finalPosition)
+        externalPose.current.target.copy(finalTarget)
         externalPose.current.e = 1.0
       }
 
@@ -276,7 +250,7 @@ export function ScreenDive({
       const rawProgress = heroProgress.get()
       if (scrollHintRef?.current) {
         const showHint = rawProgress < 0.04 && introEnded
-        scrollHintRef.current.style.opacity = showHint ? '1' : '0'
+        scrollHintRef.current.style.opacity = showHint ? '0.9' : '0'
         scrollHintRef.current.style.transform = `translateX(-50%) translateY(${showHint ? '0px' : '8px'})`
       }
 
@@ -289,8 +263,8 @@ export function ScreenDive({
       // Dev debug telemetry
       heroProgress.debug.rawProgress = rawProgress
       heroProgress.debug.smoothedP = p
-      heroProgress.debug.flightP = isCorridor ? (p - handover) / (1 - handover) : 0
-      heroProgress.debug.e = !isCorridor ? p / handover : 1
+      heroProgress.debug.flightP = isCorridor ? 1 : 0
+      heroProgress.debug.e = !isCorridor ? p / Math.max(0.001, handover) : 1
       heroProgress.debug.externalPoseActive = externalPose.current.active
       heroProgress.debug.cameraPos = [
         +camera.position.x.toFixed(3),
@@ -307,6 +281,7 @@ export function ScreenDive({
       computePoseAndCurve,
       onDiveCompleteChange,
       onHandoverChange,
+      onWhiteWorldChange,
       externalPose,
       inHeroOverlayRef,
       creditsRef,

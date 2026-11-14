@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#040814" />
+      <stop offset="55%" stop-color="#071124" />
+      <stop offset="100%" stop-color="#03050a" />
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(640 240) scale(460 320)">
+      <stop offset="0%" stop-color="#2fd0ff" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#2fd0ff" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(640 620) scale(420 260)">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.14" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+    </radialGradient>
+    <pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse">
+      <path d="M 56 0 L 0 0 0 56" stroke="#8fc4ff" stroke-opacity="0.06" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <rect width="1280" height="800" fill="url(#bg)" />
+  <rect width="1280" height="800" fill="url(#grid)" />
+  <rect width="1280" height="800" fill="url(#glowA)" />
+  <rect width="1280" height="800" fill="url(#glowB)" />
+
+  <rect x="44" y="44" width="1192" height="712" rx="22" stroke="#2fd0ff" stroke-opacity="0.18" stroke-width="1.5" />
+
+  <!-- Centered core band stays completely unclipped in both 16:10 3D cards and portrait left panels -->
+  <rect x="478" y="88" width="324" height="34" rx="17" fill="#2fd0ff" fill-opacity="0.12" stroke="#2fd0ff" stroke-opacity="0.38" />
+  <circle cx="502" cy="105" r="4.5" fill="#2fd0ff" />
+  <text x="648" y="110" text-anchor="middle" fill="#9fe7ff" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" letter-spacing="1.4">GLOBAL AI HACKATHON 2026</text>
+
+  <text x="640" y="196" text-anchor="middle" fill="#e8f1ff" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="48" font-weight="700" letter-spacing="-1">Career Compass Flow</text>
+  <text x="640" y="236" text-anchor="middle" fill="#a8c7f0" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="20" font-weight="400">AI career intelligence · ATS &amp; live salary radar</text>
+
+  <g>
+    <rect x="410" y="282" width="460" height="110" rx="14" fill="#081326" fill-opacity="0.90" stroke="#2fd0ff" stroke-opacity="0.28" />
+    <text x="442" y="320" fill="#2fd0ff" font-family="ui-monospace, monospace" font-size="13" font-weight="600" letter-spacing="1.4">01 // ANALYZE</text>
+    <text x="442" y="352" fill="#e8f1ff" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="22" font-weight="600">ATS Resume Score</text>
+    <text x="442" y="376" fill="#8fb3df" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="15">PDF &amp; DOCX checks against ATS rules</text>
+  </g>
+
+  <g>
+    <rect x="410" y="410" width="460" height="110" rx="14" fill="#081326" fill-opacity="0.90" stroke="#2fd0ff" stroke-opacity="0.28" />
+    <text x="442" y="448" fill="#2fd0ff" font-family="ui-monospace, monospace" font-size="13" font-weight="600" letter-spacing="1.4">02 // BENCHMARK</text>
+    <text x="442" y="480" fill="#e8f1ff" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="22" font-weight="600">Skill-Gap Radar</text>
+    <text x="442" y="504" fill="#8fb3df" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="15">Degree match to live job &amp; salary data</text>
+  </g>
+
+  <g>
+    <rect x="410" y="538" width="460" height="110" rx="14" fill="#081326" fill-opacity="0.90" stroke="#2fd0ff" stroke-opacity="0.28" />
+    <text x="442" y="576" fill="#2fd0ff" font-family="ui-monospace, monospace" font-size="13" font-weight="600" letter-spacing="1.4">03 // PLAN</text>
+    <text x="442" y="608" fill="#e8f1ff" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="22" font-weight="600">Phased Learning Roadmap</text>
+    <text x="442" y="632" fill="#8fb3df" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="15">Structured skill progression to target roles</text>
+  </g>
+
+  <text x="640" y="704" text-anchor="middle" fill="#2fd0ff" font-family="ui-monospace, monospace" font-size="15" font-weight="600" letter-spacing="1.4">CAREER-COMPASS-FLOW.VERCEL.APP</text>
+</svg>

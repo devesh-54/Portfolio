@@ -1,7 +1,5 @@
 import React from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
-import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa6'
-import { site } from '../config/site'
 import { navigateWithFade } from './navigateWithFade'
 import './SiteNav.css'
 
@@ -67,49 +65,9 @@ export interface TopActionsProps {
   visible?: boolean
 }
 
-export function TopActions({ visible = true }: TopActionsProps) {
-  return (
-    <div className={`top-actions ${!visible ? 'top-actions--hidden' : ''}`} aria-label="Social and Resume Links">
-      <a
-        href={site.resumeUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="resume-btn"
-        aria-label="View Resume (PDF opens in a new tab)"
-      >
-        <span className="resume-btn-text">Resume</span>
-        <span className="resume-btn-short">CV</span>
-      </a>
-      <a
-        href={site.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-btn"
-        aria-label="Devesh GitHub Profile"
-        title="GitHub"
-      >
-        <FaGithub aria-hidden="true" />
-      </a>
-      <a
-        href={site.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-btn"
-        aria-label="Devesh LinkedIn Profile"
-        title="LinkedIn"
-      >
-        <FaLinkedin aria-hidden="true" />
-      </a>
-      <a
-        href={`mailto:${site.email}`}
-        className="social-icon-btn"
-        aria-label={`Send Email to ${site.email}`}
-        title="Email"
-      >
-        <FaEnvelope aria-hidden="true" />
-      </a>
-    </div>
-  )
+export function TopActions(_props?: TopActionsProps) {
+  // Top right actions (Resume & social icons) removed per user request
+  return null
 }
 
 export default SiteNav

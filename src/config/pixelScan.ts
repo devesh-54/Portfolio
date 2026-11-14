@@ -3,6 +3,8 @@
  * All tunable parameters for grid resolution, scan/burst behavior, sequence timeline and color palettes.
  */
 
+export type PixelScanPalette = 'darkToDark' | 'darkToLight' | 'lightToLight'
+
 export interface TransitionStep {
   type: 'transition'
   from: 'void' | 'about' | 'skills' | 'contact'
@@ -10,7 +12,7 @@ export interface TransitionStep {
   mode: 'scan' | 'burst'
   dir?: 1 | -1 // 1: left-to-right, -1: right-to-left
   vh: number
-  palette: 'darkToLight' | 'lightToLight'
+  palette: PixelScanPalette
 }
 
 export interface HoldStep {
@@ -39,19 +41,20 @@ export const PIXEL_SCAN_CONFIG = {
   glowBlurPx: 10,
   glowBrightness: 1.4,
 
-  // Staged scroll sequence across the white sections
+  // Staged scroll sequence across the stage sections (starting seamlessly from Projects end)
   sequence: [
-    { type: 'transition', from: 'void', to: 'about', mode: 'scan', dir: 1, vh: 100, palette: 'darkToLight' },
+    { type: 'hold', screen: 'skills', vh: 110 },
+    { type: 'transition', from: 'skills', to: 'about', mode: 'scan', dir: 1, vh: 90, palette: 'darkToDark' },
     { type: 'hold', screen: 'about', vh: 70 },
-    { type: 'transition', from: 'about', to: 'skills', mode: 'burst', vh: 100, palette: 'lightToLight' },
-    { type: 'hold', screen: 'skills', vh: 70 },
-    { type: 'transition', from: 'skills', to: 'contact', mode: 'scan', dir: -1, vh: 100, palette: 'lightToLight' },
+    { type: 'transition', from: 'about', to: 'contact', mode: 'scan', dir: -1, vh: 90, palette: 'darkToDark' },
     { type: 'hold', screen: 'contact', vh: 70 },
   ] as SequenceStep[],
 
   // Color palettes:
   // white (#ffffff) first = the hot core; green and yellow are sparse accents (<10% frequency)
+  // Keep darkToLight and lightToLight in file for light siteTheme switching.
   palettes: {
+    darkToDark: ['#ffffff', '#2fd0ff', '#8fc4ff', '#4d73d9', '#8bff9a', '#ffe45c'],
     darkToLight: ['#ffffff', '#2fd0ff', '#8fc4ff', '#4d73d9', '#8bff9a', '#ffe45c'],
     lightToLight: ['#ffffff', '#2fd0ff', '#101A91', '#4d73d9', '#ffe45c'],
   },

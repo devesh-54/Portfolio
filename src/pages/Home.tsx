@@ -6,14 +6,17 @@ import Lenis from 'lenis'
 import { invalidate } from '@react-three/fiber'
 
 import WelcomeApp from '../scenes/Welcome/App.jsx'
-import { Header } from '../scenes/Welcome/Header'
-import { Credits } from '../scenes/Welcome/Credits'
 import { About } from './About'
 import { Skills } from './Skills'
+import { Hackathons } from './Hackathons'
+import { ProjectsEditorial } from './ProjectsEditorial'
+import { Achievements } from './Achievements'
 import { Contact } from './Contact'
 import ProjectDetail from '../ui/ProjectDetail'
 import { PixelStage, STAGE_HOLD_PROGRESS } from '../sections/PixelStage'
-import type { ProjectItem } from '../config/projects'
+import type { SectionId } from '../ui/SectionOrderNav'
+import { projects, type ProjectItem } from '../config/projects'
+import { siteTheme } from '../config/theme'
 
 import { heroProgress } from '../scenes/Welcome/heroProgress'
 import type { ExternalPose } from '../scenes/Welcome/ScreenDive'
@@ -25,11 +28,6 @@ import './Home.css'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
-
-function smoothstep(min: number, max: number, value: number): number {
-  const x = Math.max(0, Math.min(1, (value - min) / (max - min)))
-  return x * x * (3 - 2 * x)
-}
 
 function DevDebugBox({
   isCanvasPaused,
@@ -89,9 +87,40 @@ function DevDebugBox({
   )
 }
 
+const ENABLE_PROJECT_DETAIL_OVERLAY = true
+
 export function Home() {
   const isDev = typeof window !== 'undefined' && window.location.search.includes('dev=1')
-  const [headerTheme, setHeaderTheme] = useState<'dark' | 'light'>('dark')
+  const [, setHeaderTheme] = useState<'dark' | 'light'>('dark')
+  const headerThemeRef = useRef<'dark' | 'light'>('dark')
+  const updateHeaderTheme = useCallback((next: 'dark' | 'light') => {
+    const headerEl = document.getElementById('site-header')
+    if (headerEl && headerEl.getAttribute('data-theme') !== next) {
+      headerEl.setAttribute('data-theme', next)
+    }
+    if (headerThemeRef.current !== next) {
+      headerThemeRef.current = next
+      setHeaderTheme(next)
+    }
+  }, [])
+  const [activeSection, setActiveSection] = useState<SectionId>(() => {
+    if (typeof window === 'undefined') return 'welcome'
+    const h = window.location.hash
+    if (h === '#about') return 'about'
+    if (h === '#skills') return 'skills'
+    if (h === '#hackathons') return 'hackathons'
+    if (h === '#projects') return 'projects'
+    if (h === '#achievements') return 'achievements'
+    if (h === '#contact') return 'contact'
+    return 'welcome'
+  })
+  const activeSectionRef = useRef<SectionId>(activeSection)
+  const updateActiveSection = useCallback((next: SectionId) => {
+    if (activeSectionRef.current !== next) {
+      activeSectionRef.current = next
+      setActiveSection(next)
+    }
+  }, [])
   const [isCanvasPaused, setIsCanvasPaused] = useState(false)
   const [introEnded, setIntroEnded] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -117,9 +146,6 @@ export function Home() {
   const inHeroOverlayRef = useRef<HTMLDivElement | null>(null)
   const creditsRef = useRef<HTMLDivElement | null>(null)
   const scrollHintRef = useRef<HTMLDivElement | null>(null)
-  const flightTitleRef = useRef<HTMLDivElement | null>(null)
-  const flightHintRef = useRef<HTMLDivElement | null>(null)
-  const projectLabelRef = useRef<HTMLDivElement | null>(null)
   const heroTriggerRef = useRef<ScrollTrigger | null>(null)
   const stageTriggerRef = useRef<ScrollTrigger | null>(null)
 
@@ -191,6 +217,31 @@ export function Home() {
     }
   }, [])
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !ENABLE_PROJECT_DETAIL_OVERLAY) return
+    ;(window as unknown as {
+      openProject?: (id: string, sourceEl?: HTMLElement | null) => void
+    }).openProject = (id: string, sourceEl?: HTMLElement | null) => {
+      const project = projects.find((p) => p.id === id)
+      if (!project) return
+      const rect = sourceEl?.getBoundingClientRect?.()
+      handleSelectProject(
+        project,
+        rect
+          ? {
+              left: rect.left,
+              top: rect.top,
+              width: rect.width,
+              height: rect.height,
+            }
+          : undefined
+      )
+    }
+    return () => {
+      delete (window as unknown as { openProject?: unknown }).openProject
+    }
+  }, [handleSelectProject])
+
   const reducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -202,7 +253,13 @@ export function Home() {
     }
   }, [isCanvasPaused])
 
-  // Handle intro finish to unlock scrolling
+  const handleStageTriggerCreated = useCallback((trigger: ScrollTrigger) => {
+    stageTriggerRef.current = trigger
+  }, [])
+  const handleStageActiveChange = useCallback((active: boolean) => {
+    setIsCanvasPaused(active)
+    if (!active) invalidate()
+  }, [])
   const handleIntroEnd = useCallback(() => {
     setIntroEnded(true)
     sessionStorage.setItem('welcomeIntroPlayed', 'true')
@@ -221,15 +278,28 @@ export function Home() {
       window.scrollTo(0, 0)
     }
     ;(window as any).__setHeroProgress = (pHero: number) => {
-      heroProgress.set(pHero)
+      const clampedHero = Math.max(0, Math.min(1, pHero))
+      heroProgress.set(clampedHero)
+      setIsCanvasPaused(false)
+      if (clampedHero < FLIGHT_CONFIG.WHITE_WORLD_P) {
+        updateHeaderTheme('dark')
+        updateActiveSection('welcome')
+        document.getElementById('site-header')?.removeAttribute('data-bw')
+      } else {
+        updateHeaderTheme('dark')
+        updateActiveSection('about')
+        document.getElementById('site-header')?.removeAttribute('data-bw')
+      }
       if (heroTriggerRef.current) {
         const start = heroTriggerRef.current.start
         const end = heroTriggerRef.current.end
-        const targetScroll = start + pHero * (end - start)
+        const targetScroll = start + clampedHero * (end - start)
         window.scrollTo(0, targetScroll)
         if (lenisRef.current) {
           lenisRef.current.scrollTo(targetScroll, { immediate: true })
         }
+        heroTriggerRef.current.scroll(targetScroll)
+        ScrollTrigger.update()
       }
       invalidate()
     }
@@ -265,7 +335,7 @@ export function Home() {
         { name: 'p_0.10_lift_arc', p: 0.10, title: 'p = 0.10 (Lift & Fan Out Arc)' },
         { name: 'p_0.25_fanning', p: 0.25, title: 'p = 0.25 (Fanning Outward)' },
         { name: 'p_0.40_jeevalink', p: 0.40, title: 'p = 0.40 (JeevaLink Focus - Left Side)' },
-        { name: 'p_0.48_chitguard', p: 0.48, title: 'p = 0.48 (ChitGuard Focus - Right Side)' },
+        { name: 'p_0.48_safechit', p: 0.48, title: 'p = 0.48 (SafeChit Focus - Right Side)' },
         { name: 'p_0.50_midflight', p: 0.50, title: 'p = 0.50 (Mid-Flight Arc)' },
         { name: 'p_0.56_dr_detection', p: 0.56, title: 'p = 0.56 (DR Detection Focus - Left Side)' },
         { name: 'p_0.64_cashpilot', p: 0.64, title: 'p = 0.64 (CashPilot Focus - Right Side)' },
@@ -315,10 +385,6 @@ export function Home() {
 
     const tickerCb = (time: number) => {
       lenis.raf(time * 1000)
-      if (projectLabelRef.current) {
-        projectLabelRef.current.innerText = heroProgress.activeProjectTitle
-        projectLabelRef.current.style.opacity = heroProgress.activeProjectOpacity.toFixed(3)
-      }
     }
     gsap.ticker.add(tickerCb)
     gsap.ticker.lagSmoothing(0)
@@ -330,7 +396,7 @@ export function Home() {
       lenis.start()
     }
 
-    // Hero pin and dive + flight ScrollTrigger
+    // Hero pin and dive ScrollTrigger (Welcome -> Monitor Dive -> About Me white handoff)
     if (!reducedMotion) {
       heroTriggerRef.current = ScrollTrigger.create({
         trigger: '#hero',
@@ -339,63 +405,57 @@ export function Home() {
         pin: true,
         anticipatePin: 1,
         scrub: true,
+        refreshPriority: 10,
         onLeave: () => {
           setIsCanvasPaused(true)
         },
-        onEnterBack: () => {
+        onEnterBack: (self) => {
           setIsCanvasPaused(false)
           invalidate()
+          const p = self.progress
+          heroProgress.set(p)
+          const whiteWorldP = FLIGHT_CONFIG.WHITE_WORLD_P
+          updateHeaderTheme('dark')
+          updateActiveSection(p >= whiteWorldP ? 'about' : 'welcome')
+          document.getElementById('site-header')?.removeAttribute('data-bw')
         },
         onUpdate: (self) => {
           const p = self.progress
           heroProgress.set(p)
 
-          const handover = FLIGHT_CONFIG.HANDOVER_P
-          const flightP = p >= handover ? (p - handover) / (1 - handover) : 0
-
-          // Switch header theme: dark during Welcome (p < handover), light during Projects (p >= handover on white background)
-          const nextTheme = p >= handover ? 'light' : 'dark'
+          const whiteWorldP = FLIGHT_CONFIG.WHITE_WORLD_P
+          updateHeaderTheme('dark')
           const headerEl = document.getElementById('site-header')
-          if (headerEl && headerEl.getAttribute('data-theme') !== nextTheme) {
-            headerEl.setAttribute('data-theme', nextTheme)
+          if (headerEl) {
+            headerEl.removeAttribute('data-bw')
           }
 
-          // Fade "Selected work" and hint out between flightP = 0.04 and 0.12 (config HEADING_FADE)
-          let headingOp = 0
-          if (p >= handover && flightP < 0.98) {
-            headingOp =
-              1.0 -
-              smoothstep(
-                FLIGHT_CONFIG.HEADING_FADE.start,
-                FLIGHT_CONFIG.HEADING_FADE.end,
-                flightP
-              )
-          }
-
-          if (flightTitleRef.current) {
-            flightTitleRef.current.style.opacity = headingOp.toFixed(4)
-            flightTitleRef.current.style.pointerEvents = headingOp > 0.05 ? 'auto' : 'none'
-          }
-          if (flightHintRef.current) {
-            flightHintRef.current.style.opacity = (headingOp * 0.95).toFixed(4)
-            flightHintRef.current.style.transform = `translateY(${headingOp > 0.05 ? '0px' : '6px'})`
-            flightHintRef.current.style.pointerEvents = headingOp > 0.05 ? 'auto' : 'none'
+          if (!(stageTriggerRef.current?.isActive && (stageTriggerRef.current.start || 0) > 20)) {
+            updateActiveSection(p >= whiteWorldP ? 'about' : 'welcome')
           }
         },
       })
     }
 
     // Header theme ScrollTrigger per section (used in fallback mode)
-    const sectionIds = ['#hero', '#projects', '#about', '#skills', '#contact']
+    const sectionIds = [
+      '#hero',
+      '#about',
+      '#skills',
+      '#hackathons',
+      '#projects',
+      '#achievements',
+      '#contact',
+    ]
     const themeTriggers: ScrollTrigger[] = []
     const reveals: gsap.core.Tween[] = []
 
     if (isFallback) {
-      // Pause canvas only when white About section covers the screen
-      const aboutEl = document.getElementById('about')
-      if (aboutEl) {
-        const aboutTrigger = ScrollTrigger.create({
-          trigger: aboutEl,
+      // Pause canvas once white About section covers the screen
+      const aboutElFallback = document.getElementById('about')
+      if (aboutElFallback) {
+        const pauseTrigger = ScrollTrigger.create({
+          trigger: aboutElFallback,
           start: 'top top',
           onEnter: () => setIsCanvasPaused(true),
           onLeaveBack: () => {
@@ -403,7 +463,7 @@ export function Home() {
             invalidate()
           },
         })
-        themeTriggers.push(aboutTrigger)
+        themeTriggers.push(pauseTrigger)
       }
 
       sectionIds.forEach((id) => {
@@ -416,11 +476,16 @@ export function Home() {
           end: 'bottom 64px',
           onToggle: (self) => {
             if (self.isActive) {
+              const rawId = id.replace('#', '')
+              const secId: SectionId = rawId === 'hero' ? 'welcome' : (rawId as SectionId)
+              updateActiveSection(secId)
               const nextTheme = isDark ? 'dark' : 'light'
               setHeaderTheme(nextTheme)
               const headerEl = document.getElementById('site-header')
               if (headerEl) {
                 headerEl.setAttribute('data-theme', nextTheme)
+                if (id === '#hackathons') headerEl.setAttribute('data-bw', 'true')
+                else headerEl.removeAttribute('data-bw')
               }
             }
           },
@@ -428,7 +493,7 @@ export function Home() {
         themeTriggers.push(trigger)
       })
 
-      // Reveal animations for white sections in fallback mode
+      // Reveal animations for sections in fallback mode
       gsap.utils.toArray<HTMLElement>('.section-reveal').forEach((el) => {
         const tween = gsap.fromTo(
           el,
@@ -449,7 +514,7 @@ export function Home() {
       })
     }
 
-    // Deep link handling (e.g. /#about, /#skills, /#contact)
+    // Deep link handling (e.g. /#about, /#skills, /#hackathons, /#projects, /#achievements, /#contact)
     const handleDeepLink = () => {
       const hash = window.location.hash
       if (!hash) return
@@ -460,17 +525,35 @@ export function Home() {
         let targetP: number | null = null
         if (hash === '#about') targetP = STAGE_HOLD_PROGRESS.about
         else if (hash === '#skills') targetP = STAGE_HOLD_PROGRESS.skills
+        else if (hash === '#hackathons') targetP = STAGE_HOLD_PROGRESS.hackathons
+        else if (hash === '#projects') targetP = STAGE_HOLD_PROGRESS.projects
+        else if (hash === '#achievements') targetP = STAGE_HOLD_PROGRESS.achievements
         else if (hash === '#contact') targetP = STAGE_HOLD_PROGRESS.contact
 
         if (targetP !== null) {
+          updateActiveSection(hash.slice(1) as SectionId)
           setIsCanvasPaused(true)
           heroProgress.set(1)
+          if (creditsRef.current) {
+            creditsRef.current.style.opacity = '0'
+            creditsRef.current.style.pointerEvents = 'none'
+          }
+          if (scrollHintRef.current) {
+            scrollHintRef.current.style.opacity = '0'
+          }
           const targetScroll = st.start + targetP * (st.end - st.start)
+          window.scrollTo(0, targetScroll)
           lenis.scrollTo(targetScroll, { immediate: true })
-          setHeaderTheme('light')
+          st.scroll(targetScroll)
+          ;(window as any).__applyStage?.(targetP, hash === '#about' ? 1 : undefined)
+          ScrollTrigger.update()
+          const targetStageTheme =
+            hash === '#about' || hash === '#hackathons' || hash === '#achievements' ? 'dark' : siteTheme
+          updateHeaderTheme(targetStageTheme)
           const headerEl = document.getElementById('site-header')
           if (headerEl) {
-            headerEl.setAttribute('data-theme', 'light')
+            if (hash === '#hackathons') headerEl.setAttribute('data-bw', 'true')
+            else headerEl.removeAttribute('data-bw')
           }
           return
         }
@@ -480,12 +563,35 @@ export function Home() {
       if (targetEl) {
         setIsCanvasPaused(true)
         heroProgress.set(1)
-        lenis.scrollTo(hash, { immediate: true })
+        if (creditsRef.current) {
+          creditsRef.current.style.opacity = '0'
+          creditsRef.current.style.pointerEvents = 'none'
+        }
+        if (scrollHintRef.current) {
+          scrollHintRef.current.style.opacity = '0'
+        }
+        const scrollFallbackToTarget = () => {
+          ScrollTrigger.refresh()
+          lenis.resize()
+          const targetTop = targetEl.getBoundingClientRect().top + window.scrollY
+          window.scrollTo(0, targetTop)
+          lenis.scrollTo(targetTop, { immediate: true, force: true })
+          reveals.forEach((t) => {
+            const trig = t.scrollTrigger?.trigger as HTMLElement | undefined
+            if (trig && (trig === targetEl || targetEl.contains(trig))) {
+              t.progress(1)
+            }
+          })
+          ScrollTrigger.update()
+        }
+        scrollFallbackToTarget()
+        requestAnimationFrame(scrollFallbackToTarget)
         const targetTheme = targetEl.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'
-        setHeaderTheme(targetTheme)
+        updateHeaderTheme(targetTheme)
         const headerEl = document.getElementById('site-header')
         if (headerEl) {
-          headerEl.setAttribute('data-theme', targetTheme)
+          if (hash === '#hackathons') headerEl.setAttribute('data-bw', 'true')
+          else headerEl.removeAttribute('data-bw')
         }
       }
     }
@@ -493,6 +599,12 @@ export function Home() {
     // Sort triggers by DOM order so #hero pin spacing correctly offsets #stage
     ScrollTrigger.sort()
     ScrollTrigger.refresh()
+
+    if (!window.location.hash && (!heroTriggerRef.current || heroTriggerRef.current.progress < FLIGHT_CONFIG.WHITE_WORLD_P)) {
+      updateHeaderTheme('dark')
+      updateActiveSection('welcome')
+      document.getElementById('site-header')?.removeAttribute('data-bw')
+    }
 
     handleDeepLink()
     window.addEventListener('hashchange', handleDeepLink)
@@ -526,10 +638,10 @@ export function Home() {
     }
     setTimeout(() => {
       if (lenisRef.current) {
-        lenisRef.current.scrollTo('#projects', { immediate: true })
+        lenisRef.current.scrollTo('#about', { immediate: true })
       } else {
-        const proj = document.getElementById('projects')
-        proj?.scrollIntoView()
+        const aboutEl = document.getElementById('about')
+        aboutEl?.scrollIntoView()
       }
       setIsCanvasPaused(true)
     }, 400)
@@ -538,8 +650,6 @@ export function Home() {
   return (
     <div className="home-root">
       {isDev && <DevDebugBox isCanvasPaused={isCanvasPaused} inHeroOverlayRef={inHeroOverlayRef} />}
-      {/* Fixed Header shared across entire page */}
-      <Header actionsVisible={introEnded} theme={headerTheme} />
 
       {/* Fixed 3D Canvas across Hero and Projects */}
       <div
@@ -568,55 +678,6 @@ export function Home() {
         id="hero"
         data-theme="dark"
       >
-        {/* Scroll Hint */}
-        <div
-          ref={scrollHintRef}
-          className="scroll-hint"
-          style={{
-            opacity: introEnded && !isCanvasPaused ? 1 : 0,
-          }}
-        >
-          <span>Scroll</span>
-          <svg
-            className="scroll-hint-arrow"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </div>
-
-        {/* Hero Credits */}
-        <div ref={creditsRef} className="hero-credits-wrap">
-          <Credits />
-        </div>
-
-        {/* Flight Title (bottom-left) */}
-        <div ref={flightTitleRef} className="flight-title" aria-hidden="true">
-          <h2>Projects</h2>
-          <div className="flight-subtitle">AI &middot; Web &middot; Mobile</div>
-        </div>
-
-        {/* Flight Hint (fixed bottom-right) */}
-        <div ref={flightHintRef} className="flight-hint">
-          Click a project to open
-        </div>
-
-        {/* Active Project Label (bottom-center, fading in and out per project as in demo) */}
-        <div
-          ref={projectLabelRef}
-          id="project-focus-label"
-          className="project-focus-label"
-          aria-live="polite"
-        />
-
         {/* In-hero match-cut overlay */}
         <div
           ref={inHeroOverlayRef}
@@ -624,7 +685,7 @@ export function Home() {
           style={{
             position: 'absolute',
             inset: 0,
-            background: '#000000',
+            background: 'var(--bg, #03050a)',
             opacity: 0,
             pointerEvents: 'none',
             zIndex: 10,
@@ -639,7 +700,7 @@ export function Home() {
               onClick={handleReducedMotionContinue}
               className="continue-btn"
             >
-              Continue to Projects &darr;
+              Continue to About &darr;
             </button>
           </div>
         )}
@@ -647,37 +708,49 @@ export function Home() {
 
       {/* Main Sections */}
       <main style={{ marginTop: !isFallback ? '-100vh' : '0' }}>
-        {/* Projects section anchor */}
-        <section id="projects" data-theme="dark" style={{ position: 'relative', height: 0, overflow: 'hidden' }} />
-
         {!isFallback ? (
           <PixelStage
-            onStageTriggerCreated={(trigger) => {
-              stageTriggerRef.current = trigger
-            }}
+            onStageTriggerCreated={handleStageTriggerCreated}
+            onStageActiveChange={handleStageActiveChange}
+            onActiveSectionChange={updateActiveSection}
+            onHeaderThemeChange={updateHeaderTheme}
+            onSelectProject={ENABLE_PROJECT_DETAIL_OVERLAY ? handleSelectProject : undefined}
           />
         ) : (
           <>
-            {/* Light About Section */}
-            <section id="about" data-theme="light" className="page-section section-light">
+            {/* About Section */}
+            <section id="about" data-theme="dark" className="page-section" style={{ padding: 0, background: '#03050a' }}>
+              <About embedded />
+            </section>
+
+            {/* Skills Section */}
+            <section id="skills" data-theme={siteTheme} className="page-section section-light">
               <div className="section-inner section-reveal">
-                <h2 className="section-heading">About</h2>
-                <About embedded />
+                <Skills embedded active instantComplete showHeading />
               </div>
             </section>
 
-            {/* Light Skills Section */}
-            <section id="skills" data-theme="light" className="page-section section-light">
-              <div className="section-inner section-reveal">
-                <h2 className="section-heading">Skills</h2>
-                <Skills embedded />
-              </div>
+            {/* Hackathons Section */}
+            <section id="hackathons" data-theme="dark" className="page-section section-hackathons-fallback">
+              <Hackathons embedded instantComplete />
             </section>
 
-            {/* Light Contact Section */}
-            <section id="contact" data-theme="light" className="page-section section-light">
+            {/* Projects Section (Text-Only Index) */}
+            <section id="projects" data-theme={siteTheme} className="page-section section-light" style={{ padding: 0 }}>
+              <ProjectsEditorial
+                embedded
+                onSelectProject={ENABLE_PROJECT_DETAIL_OVERLAY ? handleSelectProject : undefined}
+              />
+            </section>
+
+            {/* Achievements Section */}
+            <section id="achievements" data-theme="dark" className="page-section" style={{ padding: 0, background: '#03050a' }}>
+              <Achievements embedded revealProgress={1} />
+            </section>
+
+            {/* Contact Section */}
+            <section id="contact" data-theme={siteTheme} className="page-section section-light" style={{ padding: 0 }}>
               <div className="section-inner section-reveal">
-                <h2 className="section-heading">Contact</h2>
                 <Contact embedded />
               </div>
             </section>
@@ -686,14 +759,17 @@ export function Home() {
       </main>
 
       {/* Project Detail Overlay */}
-      <ProjectDetail
-        project={activeProject}
-        isOpen={isDetailOpen}
-        onClose={handleCloseProject}
-        startRect={selectedCardRect}
-        dialogRef={dialogRef}
-        backBtnRef={backBtnRef}
-      />
+      {ENABLE_PROJECT_DETAIL_OVERLAY ? (
+        <ProjectDetail
+          project={activeProject}
+          isOpen={isDetailOpen}
+          onClose={handleCloseProject}
+          startRect={selectedCardRect}
+          dialogRef={dialogRef}
+          backBtnRef={backBtnRef}
+          onSelectProject={setActiveProject}
+        />
+      ) : null}
     </div>
   )
 }

@@ -1,0 +1,881 @@
+/* Hackathons Page — 4-Quadrant Crosshair Storytelling Showcase (#050509 Dark Canvas) */
+
+@property --cx {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 50%;
+}
+
+@property --cy {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 50%;
+}
+
+.ps-screen.ps-screen--hackathons,
+#hackathons.page-section {
+  background: transparent;
+  color: #ffffff;
+}
+
+.hack-stage {
+  --cx: 50%;
+  --cy: 50%;
+  --hub-r: clamp(36px, 3.4vw, 46px);
+  --hub-gap: calc(var(--hub-r) + 6px);
+  --hack-bg-alpha: 1;
+  --hack-circle-scale: 1;
+  --hack-circle-opacity: 1;
+  --hack-circle-fill: 1;
+  --hack-ring-border-alpha: 1;
+  --hack-horiz-offset: 100;
+  --hack-horiz-opacity: 0;
+  --hack-arc-offset: 0;
+  --hack-arc-opacity: 0;
+  --hack-cross-spread: 1;
+  --hack-ui-opacity: 1;
+  --hack-ui-lift: 0px;
+  --hack-seam-opacity: 0;
+  --hack-seam-top: 0%;
+  --hack-seam-height: 0%;
+  --hack-seam-light-blend: 0;
+  --hack-line-color: rgba(255, 255, 255, 0.34);
+  --hack-accent: #ffffff;
+  --hack-green: rgba(255, 255, 255, 0.78);
+
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  height: 100vh;
+  overflow: hidden;
+  color: #ffffff;
+  font-family: var(--font-body);
+  user-select: none;
+  transition:
+    --cx 580ms cubic-bezier(0.22, 1, 0.36, 1),
+    --cy 580ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hack-stage:focus-visible {
+  outline: none;
+}
+
+/* Pure monochrome Black & White backdrop faded smoothly via scroll variables (opaque base prevents light stage bleed-through) */
+.hack-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #000000;
+  background-image:
+    radial-gradient(
+      circle at var(--cx) var(--cy),
+      rgba(255, 255, 255, 0.11) 0%,
+      rgba(255, 255, 255, 0.04) 24%,
+      rgba(255, 255, 255, 0.012) 48%,
+      rgba(0, 0, 0, 1) 76%
+    );
+  opacity: var(--hack-bg-alpha);
+  pointer-events: none;
+}
+
+/* Scroll-driven vertical seam beam for Entry (top -> center) and Exit (center -> bottom) */
+.hack-seam-line {
+  position: absolute;
+  left: 50%;
+  top: var(--hack-seam-top);
+  height: var(--hack-seam-height);
+  width: 1.5px;
+  transform: translateX(-50%);
+  z-index: 9;
+  pointer-events: none;
+  opacity: var(--hack-seam-opacity);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    color-mix(
+      in srgb,
+      #ffffff calc((1 - var(--hack-seam-light-blend)) * 100%),
+      #000000 calc(var(--hack-seam-light-blend) * 100%)
+    ) 55%,
+    color-mix(
+      in srgb,
+      #ffffff calc((1 - var(--hack-seam-light-blend)) * 100%),
+      #18181b calc(var(--hack-seam-light-blend) * 100%)
+    ) 100%
+  );
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.42),
+    0 0 2px rgba(0, 0, 0, 0.75);
+}
+
+/* Prominent section title above quadrants, positioned cleanly under fixed header */
+.hack-top-caption {
+  position: absolute;
+  top: calc(var(--header-height, 56px) + clamp(6px, 1.1vh, 12px));
+  left: 50%;
+  transform: translateX(-50%) translateY(var(--hack-ui-lift));
+  z-index: 6;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+  padding: 8px 34px 10px;
+  border-radius: 999px;
+  background: radial-gradient(
+    ellipse 58% 54% at 50% 50%,
+    rgba(0, 0, 0, 0.98) 62%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: var(--hack-ui-opacity);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.hack-top-caption-count {
+  font-family: var(--font-body);
+  font-size: clamp(9.5px, 0.78vw, 11px);
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.hack-top-caption-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, min(2.9vw, 4.4vh), 2.55rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+  -webkit-text-stroke: 0.9px #ffffff;
+  paint-order: stroke fill;
+}
+
+/* ==========================================================================
+   Connected Four-Quadrant Canvas
+   ========================================================================== */
+
+.hack-quads-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: var(--hack-ui-opacity);
+  transform: translateY(var(--hack-ui-lift));
+}
+
+.hack-quad {
+  position: absolute;
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  outline: none;
+  transition: background-color 420ms ease;
+}
+
+.hack-quad--top-left {
+  left: 0;
+  top: 0;
+  width: var(--cx);
+  height: var(--cy);
+  align-items: flex-start;
+  justify-content: flex-end;
+  text-align: left;
+  padding: calc(var(--header-height, 56px) + clamp(16px, 2.4vh, 28px))
+    clamp(58px, 6.5vw, 108px)
+    clamp(28px, 4.4vh, 54px)
+    clamp(28px, 4.2vw, 68px);
+}
+
+.hack-quad--top-right {
+  right: 0;
+  top: 0;
+  width: calc(100% - var(--cx));
+  height: var(--cy);
+  align-items: flex-end;
+  justify-content: flex-end;
+  text-align: right;
+  padding: calc(var(--header-height, 56px) + clamp(16px, 2.4vh, 28px))
+    clamp(28px, 4.2vw, 68px)
+    clamp(28px, 4.4vh, 54px)
+    clamp(58px, 6.5vw, 108px);
+}
+
+.hack-quad--bottom-left {
+  left: 0;
+  bottom: 0;
+  width: var(--cx);
+  height: calc(100% - var(--cy));
+  align-items: flex-start;
+  justify-content: flex-end;
+  text-align: left;
+  padding: clamp(28px, 4.4vh, 54px)
+    clamp(58px, 6.5vw, 108px)
+    clamp(36px, 5.2vh, 66px)
+    clamp(28px, 4.2vw, 68px);
+}
+
+.hack-quad--bottom-right {
+  right: 0;
+  bottom: 0;
+  width: calc(100% - var(--cx));
+  height: calc(100% - var(--cy));
+  align-items: flex-end;
+  justify-content: flex-end;
+  text-align: right;
+  padding: clamp(28px, 4.4vh, 54px)
+    clamp(28px, 4.2vw, 68px)
+    clamp(36px, 5.2vh, 66px)
+    clamp(58px, 6.5vw, 108px);
+}
+
+/* When a top quadrant expands, anchor content cleanly below header + centered section title */
+.hack-quad--top-left.is-expanded,
+.hack-quad--top-right.is-expanded {
+  justify-content: flex-start;
+  padding-top: calc(var(--header-height, 56px) + clamp(78px, 10.6vh, 96px));
+  padding-bottom: clamp(16px, 2.2vh, 26px);
+}
+
+.hack-quad--bottom-left.is-expanded,
+.hack-quad--bottom-right.is-expanded {
+  justify-content: center;
+  padding-top: clamp(32px, 5vh, 64px);
+  padding-bottom: clamp(44px, 6vh, 76px);
+}
+
+.hack-quad:focus-visible::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  pointer-events: none;
+}
+
+/* Subtle monochrome white ambient light inside hovered/active quadrant */
+.hack-quad-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 86% 78% at 50% 50%,
+    rgba(255, 255, 255, 0.095) 0%,
+    rgba(255, 255, 255, 0.03) 46%,
+    transparent 82%
+  );
+  transition: opacity 420ms ease;
+}
+
+.hack-quad.is-expanded .hack-quad-glow {
+  opacity: 1;
+}
+
+.hack-quad.is-muted {
+  background-color: rgba(0, 0, 0, 0.52);
+}
+
+.hack-quad-inner {
+  position: relative;
+  z-index: 2;
+  max-width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  transition: opacity 380ms ease, transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hack-quad.is-muted .hack-quad-inner {
+  opacity: 0.48;
+}
+
+.hack-quad:hover.is-muted .hack-quad-inner {
+  opacity: 0.74;
+}
+
+.hack-quad-meta-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: clamp(6px, 1vh, 10px);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.hack-quad--top-right .hack-quad-meta-top,
+.hack-quad--bottom-right .hack-quad-meta-top {
+  flex-direction: row-reverse;
+}
+
+.hack-quad-index {
+  color: #ffffff;
+  opacity: 0.92;
+}
+
+.hack-quad-badge {
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.hack-quad-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, min(2.85vw, 4.4vh), 2.85rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  transition:
+    font-size 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 300ms ease,
+    transform 420ms ease;
+}
+
+.hack-quad.is-muted .hack-quad-title {
+  font-size: clamp(1.22rem, min(2vw, 3.1vh), 1.95rem);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hack-quad-cue {
+  margin-top: clamp(8px, 1.2vh, 12px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.52);
+  transition: color 240ms ease, opacity 240ms ease;
+}
+
+.hack-quad--top-right .hack-quad-cue,
+.hack-quad--bottom-right .hack-quad-cue {
+  flex-direction: row-reverse;
+}
+
+.hack-quad-cue-arrow {
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.hack-quad.is-expanded .hack-quad-cue {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.hack-quad.is-muted .hack-quad-cue {
+  opacity: 0.45;
+}
+
+/* Expanded Story Content inside Active Quadrant */
+.hack-quad-details {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  gap: clamp(8px, 1.15vh, 13px);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition:
+    max-height 480ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 360ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin-top 360ms ease;
+}
+
+.hack-quad.is-expanded .hack-quad-details {
+  max-height: 360px;
+  margin-top: clamp(10px, 1.4vh, 16px);
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.hack-quad-divider {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, #ffffff, rgba(255, 255, 255, 0.2));
+}
+
+.hack-quad--top-right .hack-quad-divider,
+.hack-quad--bottom-right .hack-quad-divider {
+  background: linear-gradient(270deg, #ffffff, rgba(255, 255, 255, 0.2));
+}
+
+.hack-quad-status {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.hack-quad-headline {
+  margin: 0;
+  max-width: 44ch;
+  text-wrap: balance;
+  font-size: clamp(0.88rem, min(1.08vw, 1.95vh), 1.04rem);
+  font-weight: 500;
+  line-height: 1.45;
+  color: #ffffff;
+}
+
+.hack-quad-paragraphs {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  gap: 6px;
+}
+
+.hack-quad-paragraph {
+  margin: 0;
+  max-width: 48ch;
+  text-wrap: pretty;
+  font-size: clamp(0.78rem, min(0.92vw, 1.68vh), 0.88rem);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hack-quad-specs {
+  margin-top: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: inherit;
+  gap: 7px 10px;
+}
+
+.hack-spec-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.hack-spec-pill.is-accent {
+  border-color: rgba(255, 255, 255, 0.56);
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.hack-spec-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.54);
+}
+
+.hack-spec-value {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.hack-spec-pill.is-accent .hack-spec-value {
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Crosshair Rays Extending Symmetrically From Central Circle
+   ========================================================================== */
+
+.hack-crosshair-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.hack-ray {
+  position: absolute;
+  background: var(--hack-line-color);
+  transition: background-color 320ms ease;
+}
+
+.hack-stage.has-active .hack-ray {
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.hack-ray--left {
+  top: var(--cy);
+  right: calc(100% - var(--cx) + var(--hub-gap));
+  width: calc(max(0px, var(--cx) - var(--hub-gap)) * var(--hack-cross-spread));
+  height: 1px;
+  transform: translateY(-0.5px);
+}
+
+.hack-ray--right {
+  top: var(--cy);
+  left: calc(var(--cx) + var(--hub-gap));
+  width: calc(max(0px, (100% - var(--cx)) - var(--hub-gap)) * var(--hack-cross-spread));
+  height: 1px;
+  transform: translateY(-0.5px);
+}
+
+.hack-ray--top {
+  left: var(--cx);
+  bottom: calc(100% - var(--cy) + var(--hub-gap));
+  height: calc(max(0px, var(--cy) - var(--hub-gap)) * var(--hack-cross-spread));
+  width: 1px;
+  transform: translateX(-0.5px);
+}
+
+.hack-ray--bottom {
+  left: var(--cx);
+  top: calc(var(--cy) + var(--hub-gap));
+  height: calc(max(0px, (100% - var(--cy)) - var(--hub-gap)) * var(--hack-cross-spread));
+  width: 1px;
+  transform: translateX(-0.5px);
+}
+
+/* ==========================================================================
+   Central Intersection Circle Hub + Reticle Brackets
+   ========================================================================== */
+
+@keyframes hack-orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hack-center-hub {
+  position: absolute;
+  left: var(--cx);
+  top: var(--cy);
+  width: calc(var(--hub-r) * 2 + 28px);
+  height: calc(var(--hub-r) * 2 + 28px);
+  transform: translate(-50%, -50%) scale(var(--hack-circle-scale));
+  opacity: var(--hack-circle-opacity);
+  z-index: 6;
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+}
+
+.hack-center-hub:focus-visible {
+  outline: 1.5px solid #ffffff;
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+.hack-hub-orbit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.42);
+  opacity: calc(var(--hack-circle-fill) * 0.9);
+  pointer-events: none;
+  animation: hack-orbit-spin 28s linear infinite;
+}
+
+.hack-hub-ring {
+  position: relative;
+  width: calc(var(--hub-r) * 2);
+  height: calc(var(--hub-r) * 2);
+  border-radius: 999px;
+  border: 1.25px solid rgba(255, 255, 255, calc(0.62 * var(--hack-ring-border-alpha)));
+  background: rgba(0, 0, 0, calc(0.92 * var(--hack-circle-fill)));
+  box-shadow: 0 0 28px rgba(0, 0, 0, calc(0.8 * var(--hack-circle-fill)));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 280ms ease, box-shadow 280ms ease;
+}
+
+.hack-hub-formation-svg {
+  position: absolute;
+  inset: -1.5px;
+  width: calc(100% + 3px);
+  height: calc(100% + 3px);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hack-hub-horiz-line {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-dasharray: 100 200;
+  stroke-dashoffset: var(--hack-horiz-offset);
+  opacity: var(--hack-horiz-opacity);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.72));
+}
+
+.hack-hub-arc-line {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.88);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 100 200;
+  stroke-dashoffset: var(--hack-arc-offset);
+  opacity: var(--hack-arc-opacity);
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.45));
+}
+
+.hack-stage.has-active .hack-hub-ring,
+.hack-center-hub:hover .hack-hub-ring {
+  border-color: rgba(255, 255, 255, var(--hack-ring-border-alpha));
+  box-shadow: 0 0 26px rgba(255, 255, 255, calc(0.16 * var(--hack-ring-border-alpha)));
+}
+
+.hack-hub-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  opacity: var(--hack-circle-fill);
+}
+
+.hack-hub-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.85);
+}
+
+.hack-hub-code {
+  font-family: var(--font-display);
+  font-size: clamp(0.88rem, 1vw, 1.02rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.hack-hub-sub {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1;
+}
+
+/* 4 Fine L-Shaped Technical Brackets Outside Center Ring (visible after UI reveal) */
+.hack-bracket {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-color: rgba(255, 255, 255, 0.52);
+  border-style: solid;
+  opacity: var(--hack-ui-opacity);
+  pointer-events: none;
+  transition: border-color 260ms ease, transform 260ms ease;
+}
+
+.hack-stage.has-active .hack-bracket {
+  border-color: #ffffff;
+}
+
+.hack-bracket--tl {
+  top: 4px;
+  left: 4px;
+  border-width: 1px 0 0 1px;
+}
+
+.hack-bracket--tr {
+  top: 4px;
+  right: 4px;
+  border-width: 1px 1px 0 0;
+}
+
+.hack-bracket--bl {
+  bottom: 4px;
+  left: 4px;
+  border-width: 0 0 1px 1px;
+}
+
+.hack-bracket--br {
+  bottom: 4px;
+  right: 4px;
+  border-width: 0 1px 1px 0;
+}
+
+/* Subtle Scroll Indicator Near Bottom Center */
+@keyframes hack-scroll-pulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translateY(4px);
+    opacity: 1;
+  }
+}
+
+.hack-scroll-indicator {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(10px, 1.8vh, 20px);
+  transform: translateX(-50%) translateY(var(--hack-ui-lift));
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.96);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.58);
+  opacity: var(--hack-ui-opacity);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.hack-scroll-arrow {
+  display: inline-block;
+  color: #ffffff;
+  font-size: 11px;
+  animation: hack-scroll-pulse 2.1s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Mobile & Fallback Stacked Connected Layout (<= 768px)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .hack-stage {
+    height: auto;
+    min-height: 100svh;
+    padding: calc(var(--header-height, 56px) + 22px) 16px 40px;
+    background: #000000;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow: visible;
+  }
+
+  .hack-seam-line,
+  .hack-crosshair-layer,
+  .hack-scroll-indicator {
+    display: none;
+  }
+
+  .hack-top-caption {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    justify-content: center;
+    padding: 2px 12px 6px;
+  }
+
+  .hack-top-caption-title {
+    font-size: clamp(1.5rem, 6.2vw, 2.05rem);
+  }
+
+  .hack-center-hub {
+    position: relative;
+    left: auto;
+    top: auto;
+    align-self: center;
+    transform: none;
+    order: 0;
+    margin: 2px auto 6px;
+  }
+
+  .hack-quads-layer {
+    position: relative;
+    inset: auto;
+    order: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    transform: none;
+  }
+
+  .hack-quad {
+    position: relative;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    padding: 20px 18px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .hack-quad:last-child {
+    border-bottom: none;
+  }
+
+  .hack-quad--top-right .hack-quad-meta-top,
+  .hack-quad--bottom-right .hack-quad-meta-top,
+  .hack-quad--top-right .hack-quad-cue,
+  .hack-quad--bottom-right .hack-quad-cue {
+    flex-direction: row;
+  }
+
+  .hack-quad--top-right .hack-quad-divider,
+  .hack-quad--bottom-right .hack-quad-divider {
+    background: linear-gradient(90deg, #ffffff, rgba(255, 255, 255, 0.22));
+  }
+
+  .hack-quad-details {
+    max-height: 0;
+  }
+
+  .hack-quad.is-expanded .hack-quad-details {
+    max-height: 460px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .hack-stage,
+  .hack-quad,
+  .hack-quad-glow,
+  .hack-quad-inner,
+  .hack-quad-title,
+  .hack-quad-cue,
+  .hack-quad-details,
+  .hack-hub-ring,
+  .hack-bracket {
+    transition-duration: 0.01ms !important;
+  }
+
+  .hack-hub-orbit,
+  .hack-scroll-arrow {
+    animation: none !important;
+  }
+}

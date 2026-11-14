@@ -1,0 +1,611 @@
+/* ProjectsEditorial — Center Vertical Timeline Spine + Continuous Scroll Stream with Max 3 Projects on Screen */
+
+.pe-stage {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  min-height: 100vh;
+  background: #ffffff;
+  color: #090d18;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: clamp(12px, 1.8vh, 20px) clamp(18px, 3.6vw, 44px) clamp(32px, 5vh, 60px);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.pe-stage--embedded {
+  height: 100svh;
+  height: 100vh;
+}
+
+.pe-container {
+  width: 100%;
+  max-width: 1140px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.4vh, 16px);
+}
+
+.pe-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: clamp(6px, 0.9vh, 10px);
+  border-bottom: none;
+  flex-shrink: 0;
+}
+
+.pe-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transform: translate(0, 0);
+}
+
+@media (max-width: 1024px) {
+  .pe-header-left {
+    transform: translate(0, 0);
+  }
+}
+
+
+.pe-eyebrow {
+  font-family: var(--font-sans);
+  font-size: clamp(12px, 1.05vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.72);
+}
+
+.pe-title {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(2.2rem, 3.8vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+  color: #000000;
+}
+
+.pe-header-hint {
+  display: none !important;
+}
+
+/* Center spine track container ending comfortably above viewport bottom */
+.pe-timeline {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 520px;
+  width: 100%;
+}
+
+.pe-spine-fill {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  border-radius: 1px;
+  background: #000000;
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: top center;
+  will-change: transform, top, height, opacity;
+  box-shadow: none;
+  z-index: 1;
+}
+
+@keyframes pe-spine-stream {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+/* Autonomous Courier Bot docked at bottom & collecting boxes */
+.pe-bot {
+  position: absolute;
+  left: 50%;
+  top: 85%;
+  width: 42px;
+  height: 42px;
+  transform: translate3d(-50%, -50%, 0);
+  z-index: 6;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
+  will-change: top, transform, opacity;
+}
+
+.pe-bot-svg {
+  width: 40px;
+  height: 40px;
+  display: block;
+}
+
+.pe-bot[data-collecting='true'] .pe-bot-svg {
+  filter: drop-shadow(0 0 14px rgba(47, 208, 255, 0.95)) drop-shadow(0 0 24px rgba(0, 0, 0, 0.7));
+  animation: pe-bot-pulse 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes pe-bot-pulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
+.pe-bot-count {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translate(6px, -50%);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Individual project station along center spine */
+.pe-station {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 2;
+  will-change: top, opacity;
+}
+
+.pe-node {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 2.2px solid #000000;
+  box-shadow: 0 0 0 2px #ffffff;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  will-change: transform, opacity;
+}
+
+.pe-arm {
+  position: absolute;
+  top: 0;
+  height: 2px;
+  width: 38px;
+  background: #000000;
+  z-index: 2;
+  will-change: transform, opacity;
+}
+
+.pe-station--left .pe-arm {
+  right: 50%;
+  transform-origin: right center;
+  transform: translateY(-50%);
+}
+
+.pe-station--right .pe-arm {
+  left: 50%;
+  transform-origin: left center;
+  transform: translateY(-50%);
+}
+
+/* Fluid SVG Pipe Circuit: Guided water-like line motion along card borders, arm & spine */
+.pe-pipe-svg {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.pe-pipe-track {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.35);
+  stroke-width: 1.8;
+  stroke-dasharray: 4 4;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.pe-pipe-pulse {
+  fill: none;
+  stroke: #000000;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.4));
+  will-change: stroke-dashoffset, opacity;
+  pointer-events: none;
+}
+
+
+/* Rich Project Card matching the uploaded cyber box design */
+.pe-card {
+  position: absolute;
+  top: 0;
+  width: min(540px, 45vw);
+  background: linear-gradient(135deg, rgba(8, 18, 42, 0.96) 0%, rgba(4, 10, 26, 0.98) 100%);
+  border: 1px solid rgba(47, 208, 255, 0.5);
+  border-radius: 14px;
+  padding: 10px 14px 10px 10px;
+  box-shadow: 0 0 20px rgba(39, 0, 255, 0.3), 0 0 8px rgba(47, 208, 255, 0.22), inset 0 0 14px rgba(47, 208, 255, 0.06);
+  box-sizing: border-box;
+  cursor: pointer;
+  z-index: 3;
+  display: block;
+  will-change: transform, opacity;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 18px),
+    calc(100% - 18px) 100%,
+    0 100%
+  );
+}
+
+/* Card inner body containing media, text, tags, and actions */
+.pe-card-body {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  will-change: transform, opacity;
+}
+
+/* Kinetic lines removed in favor of guided pipe retreat flow */
+.pe-card-lines,
+.pe-kline {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Subtle short accent line under tags from reference box */
+.pe-card-accent-line {
+  width: clamp(140px, 16vw, 200px);
+  height: 1px;
+  margin-top: 6px;
+  background: linear-gradient(90deg, rgba(47, 208, 255, 0.45) 0%, rgba(39, 0, 255, 0.15) 75%, transparent 100%);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+.pe-station--left .pe-card {
+  right: calc(50% + 38px);
+  transform-origin: right center;
+  margin-top: -55px;
+}
+
+.pe-station--right .pe-card {
+  left: calc(50% + 38px);
+  transform-origin: left center;
+  margin-top: -55px;
+}
+
+.pe-card:hover {
+  border-color: #2fd0ff;
+  box-shadow: 0 0 28px rgba(39, 0, 255, 0.48), 0 0 14px rgba(47, 208, 255, 0.55), inset 0 0 18px rgba(47, 208, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.pe-card:focus-visible {
+  outline: 2px solid #2fd0ff;
+  outline-offset: 3px;
+}
+
+/* Bottom-right angled notch accent border */
+.pe-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 26px;
+  height: 26px;
+  border-bottom: 2px solid #2fd0ff;
+  border-right: 2px solid #2fd0ff;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px #2fd0ff);
+  opacity: var(--pe-notch-opacity, 1);
+  transition: opacity 0.15s ease;
+}
+
+/* Picture of app / website with diagonal cut & ribbon */
+.pe-card-media-wrap {
+  position: relative;
+  width: clamp(120px, 12vw, 142px);
+  height: clamp(84px, 10vh, 100px);
+  flex-shrink: 0;
+  border-radius: 10px 0 0 10px;
+  overflow: hidden;
+}
+
+.pe-card-media {
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(0 0, 100% 0, 78% 100%, 0 100%);
+  overflow: hidden;
+  background: #0d1a38;
+}
+
+.pe-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.95) contrast(1.08);
+  transition: transform 0.25s ease;
+}
+
+.pe-card:hover .pe-card-img {
+  transform: scale(1.05);
+}
+
+/* Blue ribbon badge with "01", "02"... */
+.pe-ribbon-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(135deg, #2b7fff 0%, #1757e8 100%);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 3px 14px 3px 8px;
+  clip-path: polygon(0 0, 100% 0, 75% 100%, 0 100%);
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(23, 87, 232, 0.5);
+}
+
+/* Middle Content: Title, Description, Tech Stack */
+.pe-card-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pe-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pe-name {
+  margin: 0;
+  font-size: clamp(1.02rem, 1.25vw, 1.18rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.pe-external-icon {
+  width: 13px;
+  height: 13px;
+  color: rgba(47, 208, 255, 0.9);
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.pe-card:hover .pe-external-icon {
+  transform: translate(2px, -2px);
+}
+
+.pe-card-desc {
+  margin: 0;
+  font-size: clamp(0.78rem, 0.88vw, 0.84rem);
+  line-height: 1.35;
+  color: #8fa3c7;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Tech Stack chips */
+.pe-stack {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.pe-chip {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #b5d5ff;
+  background: rgba(30, 80, 160, 0.35);
+  border: 1px solid rgba(47, 208, 255, 0.3);
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+/* Right Actions Column (GitHub + Live Demo icons) */
+.pe-card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(47, 208, 255, 0.18);
+  flex-shrink: 0;
+}
+
+.pe-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(10, 24, 56, 0.85);
+  border: 1px solid rgba(47, 208, 255, 0.4);
+  color: #e2eeff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  padding: 0;
+}
+
+.pe-action-btn:hover {
+  border-color: #2fd0ff;
+  background: rgba(47, 208, 255, 0.25);
+  box-shadow: 0 0 10px rgba(47, 208, 255, 0.5);
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.pe-action-btn--disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+.pe-action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pe-view-more-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 3px 6px;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #101A91;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+
+.pe-view-more-btn:hover {
+  color: #2440c8;
+  transform: translateX(2px);
+}
+
+.pe-arrow {
+  font-size: 13px;
+  font-weight: 700;
+  color: currentColor;
+}
+
+@media (max-width: 960px) {
+  .pe-arm {
+    width: 28px;
+  }
+  .pe-station--left .pe-card {
+    right: calc(50% + 28px);
+  }
+  .pe-station--right .pe-card {
+    left: calc(50% + 28px);
+  }
+  .pe-card {
+    width: calc(50% - 32px);
+  }
+}
+
+/* Mobile fallback stacked timeline */
+@media (max-width: 768px) {
+  .pe-stage,
+  .pe-stage--embedded {
+    min-height: auto;
+    height: auto;
+    padding: 40px 18px 56px;
+  }
+
+  .pe-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .pe-timeline {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-left: 20px;
+  }
+
+  .pe-spine-fill {
+    left: 6px;
+    transform: none !important;
+  }
+
+  .pe-bot,
+  .pe-crate {
+    display: none;
+  }
+
+  .pe-station {
+    position: relative;
+    top: auto !important;
+    height: auto;
+    opacity: 1 !important;
+  }
+
+  .pe-node {
+    left: -14px;
+    top: 24px;
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  .pe-arm {
+    left: -10px !important;
+    right: auto !important;
+    width: 10px;
+    top: 24px;
+    opacity: 1 !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .pe-card {
+    position: relative;
+    left: auto !important;
+    right: auto !important;
+    width: 100%;
+    max-width: none;
+    margin-top: 0 !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+}

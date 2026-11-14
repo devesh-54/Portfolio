@@ -10,7 +10,7 @@ const DRACO_PATH = '/draco/'
 export function CurvedMonitor({
   material,
   outline,
-  outlineColor = '#ffffff',
+  outlineColor = '#8fc4ff',
   screenMeshRef,
   hideBody = false,
   ...props
@@ -117,7 +117,6 @@ export function CurvedMonitor({
           <MergedSketchOutline
             geometry={bodyGeometry}
             color={outlineColor}
-            opacity={1.0}
             thresholdAngle={32}
             maxSegments={6000}
             jitter={0.018}

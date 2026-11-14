@@ -1,263 +1,1154 @@
-/* Project Detail Overlay Styles */
+/* ==========================================================================
+   ProjectDetail.css
+   Refined Project Dashboard Modal
+   Single continuous dark background with subtle dividers & cyan accents
+   58% Screenshot Preview | 42% Quick Info | 100% Bottom 3-Section Details
+   ========================================================================== */
 
 #project-detail-dialog {
   position: fixed;
   inset: 0;
-  z-index: 90;
-  background: var(--void-bg, #03050a);
-  display: flex;
+  z-index: 200; /* Covers site header (z-index 100) */
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
-  overflow: hidden;
-  color: #cfe3ff;
-  user-select: text;
+  background: #000000;
+  box-shadow: inset 0 0 140px rgba(255, 255, 255, 0.05), 0 0 80px rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 2.5vh, 28px) clamp(56px, 5.5vw, 84px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 #project-detail-dialog.is-open {
   visibility: visible;
-  opacity: 1;
   pointer-events: auto;
 }
 
-.detail-left-panel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 42vw;
-  height: 100svh;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: #03050a;
-  z-index: 95;
-  will-change: transform, left, top, width, height, border-radius;
+/* Custom sleek scrollbar for modal if needed on smaller viewports */
+#project-detail-dialog::-webkit-scrollbar {
+  width: 6px;
+}
+#project-detail-dialog::-webkit-scrollbar-track {
+  background: #000000;
+}
+#project-detail-dialog::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+#project-detail-dialog::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.35);
 }
 
-.detail-left-panel img {
+/* --------------------------------------------------------------------------
+   Dashboard Canvas Container
+   -------------------------------------------------------------------------- */
+.detail-canvas {
+  width: 100%;
+  max-width: 1360px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   Row 1: Top Row (42% Quick Info on Left | 58% Screenshot on Right)
+   -------------------------------------------------------------------------- */
+.detail-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(24px, 3.2vw, 44px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Right — Project Preview (58% Width) */
+.detail-preview-section {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.detail-media-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b111e;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.65), 0 0 24px -6px rgba(0, 240, 255, 0.08);
+  box-sizing: border-box;
+}
+
+.detail-media-frame--web {
+  aspect-ratio: 16 / 9;
+  max-height: clamp(240px, 35vh, 380px);
+}
+
+.detail-media-frame--mobile {
+  width: auto;
+  height: clamp(250px, 36vh, 390px);
+  aspect-ratio: 9 / 18.5;
+  margin: 0 auto;
+}
+
+.detail-carousel-track {
+  display: flex;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
-  transform-origin: center center;
+  transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
-.detail-right-column {
-  margin-left: 42vw;
-  width: 58vw;
-  height: 100svh;
-  padding: clamp(2rem, 5vw, 5rem);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-sizing: border-box;
-  overflow-y: auto;
+.detail-carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
   position: relative;
-  z-index: 92;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #070b13;
 }
 
-.detail-header-row {
+.detail-slide-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #070b13;
+  user-select: none;
+  display: block;
+}
+
+/* Image navigation dots immediately underneath */
+.detail-carousel-controls {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.detail-carousel-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.detail-carousel-btn:hover {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.35);
+  color: #00f0ff;
+}
+
+.detail-carousel-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.22);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.detail-carousel-dot.is-active {
+  width: 18px;
+  background: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+
+/* 1. Left — Quick Project Information (42% Width) */
+.detail-quick-info {
+  flex: 0 0 42%;
+  width: 42%;
+  max-width: 44%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.detail-quick-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
-  width: 100%;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
+/* Header Prev / Next project switcher */
+.detail-project-nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.detail-proj-btn {
+  font-family: var(--font-mono, monospace);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.detail-proj-btn:hover {
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.08);
+}
+
+.detail-proj-counter {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #64748b;
+  padding: 0 4px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .detail-back-btn {
-  background: transparent;
-  border: 0;
-  color: #8fc4ff;
-  font-family: monospace;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 8px 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  letter-spacing: 0.06em;
-  transition: color 0.2s ease, transform 0.2s ease;
-  outline: none;
-}
-
-.detail-back-btn:hover,
-.detail-back-btn:focus-visible {
-  color: #ffffff;
-  transform: translateX(-4px);
-}
-
-.detail-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: monospace;
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  letter-spacing: 0.05em;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  color: #94a3b8;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.detail-status-badge.status-completed {
-  color: #4ade80;
-  background: rgba(74, 222, 128, 0.1);
-  border: 1px solid rgba(74, 222, 128, 0.3);
+.detail-back-btn:hover {
+  color: #00f0ff;
+  transform: translateX(-2px);
 }
 
-.detail-status-badge.status-in-progress {
+.detail-quick-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-year-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.detail-status-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.detail-status-pill--completed {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.detail-status-pill--progress {
   color: #38bdf8;
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
 }
 
-.status-dot {
-  width: 6px;
-  height: 6px;
+.detail-status-dot {
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: 0 0 8px currentColor;
 }
 
+/* Project Name in Large Typography */
 .detail-title {
-  font-size: clamp(2.2rem, 4.5vw, 4.5rem);
+  font-family: var(--font-display, monospace);
+  font-size: clamp(26px, 2.8vw, 38px);
   font-weight: 700;
-  color: #e8f1ff;
-  line-height: 1.1;
-  text-align: left;
-  margin: 0 0 1rem 0;
+  color: #ffffff;
   letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 6px 0;
 }
 
-.detail-summary {
-  font-size: clamp(1rem, 1.25vw, 1.2rem);
-  line-height: 1.55;
-  color: rgba(232, 241, 255, 0.88);
-  margin-bottom: 1.75rem;
-  max-width: 60ch;
-}
-
-.detail-highlights {
-  margin-bottom: 1.75rem;
-  max-width: 62ch;
-}
-
-.highlights-heading {
-  font-size: 12px;
-  font-family: monospace;
+/* Developer Role */
+.detail-role-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #8fc4ff;
-  margin: 0 0 0.75rem 0;
+  letter-spacing: 0.14em;
+  color: #00f0ff;
+  margin-bottom: 12px;
 }
 
-.highlights-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
+/* Short Introduction */
+.detail-summary-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #cbd5e1;
+  margin: 0 0 14px 0;
 }
 
-.highlights-list li {
-  position: relative;
-  padding-left: 1.25rem;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: rgba(207, 227, 255, 0.75);
-}
-
-.highlights-list li::before {
-  content: '▸';
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: #2fd0ff;
-}
-
-.detail-stack {
+/* Technology Tags */
+.detail-tech-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 2rem;
+  gap: 6px;
+  margin-bottom: 16px;
 }
 
-.stack-tag {
-  font-family: monospace;
-  font-size: 12px;
-  color: #93c5fd;
-  background: rgba(30, 58, 110, 0.35);
-  border: 1px solid rgba(147, 197, 253, 0.2);
+.detail-tech-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
   padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+}
+
+.detail-tech-pill:hover {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.25);
+  color: #00f0ff;
+}
+
+/* Action Buttons */
+.detail-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.detail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.detail-btn--repo {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.detail-btn--repo:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.detail-btn--demo {
+  color: #040810;
+  background: #00f0ff;
+  border: 1px solid #00f0ff;
+  box-shadow: 0 0 16px -2px rgba(0, 240, 255, 0.4);
+}
+
+.detail-btn--demo:hover {
+  background: #38bdf8;
+  border-color: #38bdf8;
+  box-shadow: 0 0 22px rgba(0, 240, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   Subtle Horizontal Divider Line
+   -------------------------------------------------------------------------- */
+.detail-divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 55%, transparent 100%);
+  margin: clamp(18px, 2.4vh, 26px) 0;
+}
+
+/* --------------------------------------------------------------------------
+   Row 2: Bottom Details (100% Full Width)
+   Divided into three sections: About, Highlights, Technical Details
+   -------------------------------------------------------------------------- */
+.detail-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1.35fr 1.1fr;
+  gap: clamp(20px, 2.5vw, 34px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.detail-bottom-card {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Subtle vertical divider lines between columns */
+.detail-card--highlights,
+.detail-card--technical {
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+  padding-left: clamp(18px, 2.2vw, 30px);
+}
+
+.detail-section-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #00f0ff;
+  margin-bottom: 4px;
+}
+
+.detail-section-title {
+  font-family: var(--font-display, monospace);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px 0;
+}
+
+/* Section 1: About Content */
+.detail-section-content {
+  color: #94a3b8;
+  font-size: 12.5px;
+  line-height: 1.62;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-section-content p {
+  margin: 0;
+}
+
+/* Section 2: Highlights (Important Features in Two Columns) */
+.detail-features-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.detail-feature-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.detail-feature-item:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(0, 240, 255, 0.18);
+}
+
+.detail-feature-num {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #00f0ff;
+}
+
+.detail-feature-desc {
+  color: #94a3b8;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+/* Section 3: Technical Details (Architecture, Technologies & Challenges) */
+.detail-tech-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.detail-tech-spec-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.detail-tech-spec-row .spec-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+}
+
+.detail-tech-spec-row .spec-value {
+  font-size: 11.8px;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Breakpoints
+   -------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  #project-detail-dialog {
+    padding: 20px 16px;
+    align-items: flex-start;
+  }
+
+  .detail-top-row {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .detail-preview-section {
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .detail-quick-info {
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .detail-bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .detail-card--highlights,
+  .detail-card--technical {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    padding-left: 0;
+    padding-top: 20px;
+  }
+
+  .detail-features-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-side-nav {
+    display: none; /* Rely on header Prev/Next on smaller mobile screens */
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Floating Left and Right Side Navigation Chevrons
+   -------------------------------------------------------------------------- */
+.detail-side-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 220;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(9, 15, 28, 0.88);
+  border: 1px solid rgba(0, 240, 255, 0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.65), 0 0 16px -2px rgba(0, 240, 255, 0.2);
+}
+
+.detail-side-nav--prev {
+  left: clamp(12px, 1.8vw, 32px);
+}
+
+.detail-side-nav--next {
+  right: clamp(12px, 1.8vw, 32px);
+}
+
+.detail-side-nav:hover {
+  background: rgba(0, 240, 255, 0.16);
+  border-color: #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.65);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.detail-side-nav:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.detail-side-nav-tooltip {
+  display: none;
+}
+
+/* ==========================================================================
+   MOBILE APPLICATION SHOWCASE (2 Columns)
+   Left (35–38%): Smartphone Mockup ONLY (vertically centered, full height)
+   Right (62–65%): Project Info + Divider + 3 Bottom Columns (ABOUT | HIGHLIGHTS | TECHNICAL)
+   ========================================================================== */
+
+.mobile-showcase-layout {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(40px, 4.5vw, 64px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* LEFT COLUMN: Smartphone Mockup Only (35–38% width) */
+.mobile-showcase-left {
+  flex: 0 0 36%;
+  width: 36%;
+  max-width: 38%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Realistic Smartphone Frame (250–300px wide, natural portrait proportions) */
+.smartphone-mockup {
+  position: relative;
+  width: clamp(250px, 19vw, 295px);
+  aspect-ratio: 9 / 19.2;
+  border-radius: 42px;
+  background: #080c14;
+  padding: 10px 10px 12px 10px;
+  box-sizing: border-box;
+  /* Premium metallic bezel + deep drop shadow + restrained cyan ambient glow */
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.95),
+    0 24px 60px -12px rgba(0, 0, 0, 0.85),
+    0 0 32px -4px rgba(0, 240, 255, 0.14),
+    inset 0 1px 2px rgba(255, 255, 255, 0.35);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.smartphone-mockup:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.95),
+    0 28px 70px -14px rgba(0, 0, 0, 0.9),
+    0 0 38px -2px rgba(0, 240, 255, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* Top Dynamic Island / speaker ear-piece pill */
+.smartphone-island {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 76px;
+  height: 18px;
+  background: #000000;
+  border-radius: 999px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.smartphone-camera-lens {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #0d172e;
+  border: 1px solid rgba(0, 240, 255, 0.25);
+}
+
+/* Smartphone Screen Viewport */
+.smartphone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 34px;
+  overflow: hidden;
+  background: #020408;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.smartphone-carousel-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.smartphone-carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #020408;
+}
+
+/* Actual mobile application screenshot inside the phone */
+.smartphone-screenshot {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Preserves original screenshot aspect ratio without stretch or distortion */
+  object-position: top center;
+  background: #020408;
+  user-select: none;
+  display: block;
+}
+
+/* Bottom Home Indicator */
+.smartphone-home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.4);
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Screenshot navigation controls directly below phone */
+.detail-carousel-controls--mobile {
+  margin-top: 14px;
+}
+
+/* RIGHT COLUMN: All Project Content + 3 Info Columns (62–65% width) */
+.mobile-showcase-right {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+/* 1. Header Navigation Row */
+.mobile-info-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+/* 2. Project Number & Completion Status */
+.mobile-info-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.mobile-proj-tag {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.22);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* 3. Large Project Title */
+.mobile-info-title {
+  font-family: var(--font-display, monospace);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 6px 0;
+}
+
+/* 4. Application Category & Developer Role */
+.mobile-info-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+
+.mobile-cat-pill {
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  padding: 2px 7px;
   border-radius: 4px;
 }
 
-.detail-links {
+.mobile-cat-bullet {
+  color: #475569;
+}
+
+.mobile-role-label {
+  color: #94a3b8;
+}
+
+/* 5. Short Project Introduction */
+.mobile-info-summary {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin: 0 0 12px 0;
+  max-width: 720px;
+}
+
+/* 6. Technology Stack Badges */
+.mobile-tech-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
 }
 
-.detail-link-btn {
+/* 7. GitHub and Demo Buttons */
+.mobile-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mobile-demo-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: #e8f1ff;
-  font-size: 0.95rem;
+  gap: 6px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
   font-weight: 500;
-  text-decoration: none;
-  border: 1px solid rgba(47, 208, 255, 0.4);
-  padding: 8px 20px;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  padding: 7px 14px;
   border-radius: 6px;
-  background: rgba(47, 208, 255, 0.12);
-  transition: all 0.2s ease;
-  outline: none;
 }
 
-.detail-link-btn:hover,
-.detail-link-btn:focus-visible {
-  background: rgba(47, 208, 255, 0.25);
-  border-color: #2fd0ff;
-  transform: translateY(-1px);
-  box-shadow: 0 0 12px rgba(47, 208, 255, 0.2);
+.mobile-demo-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #38bdf8;
+  opacity: 0.7;
 }
 
-.detail-empty-links {
-  color: rgba(207, 227, 255, 0.45);
-  font-size: 0.9rem;
-  font-style: italic;
-  font-family: monospace;
+/* Hero block inside right column */
+.mobile-hero-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-/* Mobile responsive overlay */
-@media (max-width: 768px) {
-  #project-detail-dialog {
-    flex-direction: column;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+.mobile-title-role-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.mobile-title-role-row .mobile-info-title {
+  margin: 0;
+}
+
+.mobile-tags-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* Horizontal Divider inside Right Column */
+.mobile-right-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 14px 0 16px 0;
+}
+
+/* 2-Column Spacious Bento Showcase (50% / 50%) */
+.mobile-details-bento {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Bento Card Style */
+.mobile-bento-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-bento-card:hover {
+  border-color: rgba(0, 240, 255, 0.24);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 240, 255, 0.05);
+}
+
+.mobile-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 6px;
+}
+
+.mobile-card-kicker {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #00f0ff;
+}
+
+.mobile-card-headline {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+/* Feature Rows Flow */
+.mobile-features-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobile-feature-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.mobile-feature-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #00f0ff;
+}
+
+.mobile-feature-text {
+  font-size: 12px;
+  line-height: 1.48;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+/* Spec sections */
+.mobile-spec-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-spec-section--arch {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 8px;
+  gap: 8px;
+}
+
+.mobile-spec-title {
+  font-family: var(--font-mono, monospace);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.mobile-spec-body {
+  font-size: 12px;
+  line-height: 1.48;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.mobile-user-tag-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.mobile-user-label {
+  font-family: var(--font-mono, monospace);
+  color: #00f0ff;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.mobile-user-value {
+  color: #94a3b8;
+}
+
+/* RESPONSIVE ADAPTATIONS */
+@media (max-width: 1024px) {
+  .mobile-showcase-layout {
+    gap: 28px;
   }
-
-  .detail-left-panel {
-    width: 100vw;
-    height: 38svh;
-    flex-shrink: 0;
+  .mobile-showcase-left {
+    flex: 0 0 35%;
+    width: 35%;
   }
-
-  .detail-right-column {
-    margin-left: 0;
-    margin-top: 38svh;
+  .smartphone-mockup {
+    width: clamp(220px, 20vw, 260px);
+  }
+  .mobile-showcase-right {
+    flex: 1 1 0;
+    min-width: 0;
     width: 100%;
-    height: auto;
-    padding: 2rem 1.25rem 4rem;
-    overflow-y: visible;
-  }
-
-  .detail-title {
-    font-size: clamp(1.8rem, 7vw, 2.8rem);
-  }
-
-  .detail-summary {
-    font-size: 0.95rem;
   }
 }
+
+@media (max-width: 900px) {
+  .mobile-details-bento {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 720px) {
+  .mobile-showcase-layout {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .mobile-showcase-left {
+    flex: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+  .smartphone-mockup {
+    width: 220px;
+    height: 440px;
+    max-height: 55vh;
+  }
+  .mobile-showcase-right {
+    flex: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+

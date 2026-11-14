@@ -4,14 +4,14 @@ import { extend, useThree } from '@react-three/fiber'
 import { sketchGLSL } from './glsl'
 import { revealGLSL, revealUniforms } from './reveal'
 
-export const INK = '#ffffff'
-export const PAPER = '#000000'
+export const INK = '#4d73d9'
+export const PAPER = '#090d18'
 // default light: 138° around, high in front and to the left
 export const LIGHT = new THREE.Vector3(-0.63, 1, 0.57).normalize()
 
 const SketchMaterialImpl = shaderMaterial(
   { uInk: new THREE.Color(INK), uPaper: new THREE.Color(PAPER), uLight: LIGHT.clone(),
-    uDensity: 22, uPressure: 1.0, uLoops: 0.55, uWidth: 1, uTooth: 0.0, uAngle: 0.6, uDpr: 1, uSeed: 1,
+    uDensity: 22, uPressure: 0.7, uLoops: 0.55, uWidth: 1, uTooth: 0.25, uAngle: 0.6, uDpr: 1, uSeed: 1,
     ...Object.fromEntries(Object.entries(revealUniforms).map(([k, u]) => [k, u.value])) },
   /* vertex */ `
     varying vec3 vObj; varying vec3 vN; varying vec3 vWN; varying vec3 vWorld;
@@ -53,8 +53,8 @@ extend({ SketchMaterialImpl })
 // swap in the shared effect uniforms so one animation drives every instance
 const shareReveal = (m) => m && Object.assign(m.uniforms, revealUniforms)
 
-export function SketchMaterial({ color = INK, paper = PAPER, light = LIGHT, density = 22, pressure = 1.0, loops = 0.55,
-                                width = 1, tooth = 0.0, angle = 0.6, seed = 1, ...props }) {
+export function SketchMaterial({ color = INK, paper = PAPER, light = LIGHT, density = 22, pressure = 0.7, loops = 0.55,
+                                width = 1, tooth = 0.25, angle = 0.6, seed = 1, ...props }) {
   const dpr = useThree((s) => s.viewport.dpr)
   return (
     <sketchMaterialImpl
