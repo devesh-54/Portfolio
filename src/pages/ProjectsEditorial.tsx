@@ -10,8 +10,8 @@ export interface ProjectsEditorialProps {
   ) => void
 }
 
-// Strict 5 featured ("Selected Projects") builds
-const SELECTED_PROJECTS: ProjectItem[] = projects.filter((p) => p.featured).slice(0, 5)
+// All featured ("Selected Projects") builds
+const SELECTED_PROJECTS: ProjectItem[] = projects.filter((p) => p.featured)
 
 // Spacing & Stations along center spine:
 // Distance between stations is 0.32, bottom station at 0.74, robot docked at 0.85

@@ -1,26 +1,26 @@
 /* ==========================================================================
    ProjectDetail.css
-   Refined Project Dashboard Modal
-   Single continuous dark background with subtle dividers & cyan accents
-   58% Screenshot Preview | 42% Quick Info | 100% Bottom 3-Section Details
+   Unified Project Detail Modal (100svh Viewport Fit)
+   Shared 2-column frame: Media Showcase on Left | Scrollable Details on Right
+   Strict typography scale & high contrast on dark OLED background
    ========================================================================== */
 
 #project-detail-dialog {
   position: fixed;
   inset: 0;
-  z-index: 200; /* Covers site header (z-index 100) */
+  z-index: 10000; /* Covers site header and floating UI controls */
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
-  background: #000000;
-  box-shadow: inset 0 0 140px rgba(255, 255, 255, 0.05), 0 0 80px rgba(255, 255, 255, 0.08);
+  background: radial-gradient(circle at 50% 50%, #070d18 0%, #000000 85%);
   color: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(16px, 2.5vh, 28px) clamp(56px, 5.5vw, 84px);
-  overflow-y: auto;
-  overflow-x: hidden;
+  padding: clamp(14px, 2.5vh, 28px) clamp(20px, 3.5vw, 48px);
+  height: 100svh;
+  max-height: 100svh;
+  overflow: hidden; /* Desktop/laptop viewport never overflows */
   box-sizing: border-box;
 }
 
@@ -29,84 +29,203 @@
   pointer-events: auto;
 }
 
-/* Custom sleek scrollbar for modal if needed on smaller viewports */
-#project-detail-dialog::-webkit-scrollbar {
-  width: 6px;
-}
-#project-detail-dialog::-webkit-scrollbar-track {
-  background: #000000;
-}
-#project-detail-dialog::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
-}
-#project-detail-dialog::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 240, 255, 0.35);
-}
-
 /* --------------------------------------------------------------------------
-   Dashboard Canvas Container
+   Canvas Container (Unified 2-Column Desktop Grid)
    -------------------------------------------------------------------------- */
 .detail-canvas {
   width: 100%;
-  max-width: 1360px;
+  max-width: 1380px;
+  height: 100%;
+  max-height: calc(100svh - clamp(28px, 5vh, 56px));
   margin: auto;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(320px, 38%) minmax(420px, 62%);
+  gap: clamp(24px, 3.2vw, 48px);
+  align-items: center;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* --------------------------------------------------------------------------
-   Row 1: Top Row (42% Quick Info on Left | 58% Screenshot on Right)
+   COLUMN 1: Media Showcase (Pinned on Left, capped at 70vh)
    -------------------------------------------------------------------------- */
-.detail-top-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: clamp(24px, 3.2vw, 44px);
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Right — Project Preview (58% Width) */
-.detail-preview-section {
-  flex: 1 1 0;
-  min-width: 0;
-  width: 100%;
+.detail-media-column {
+  height: 100%;
+  max-height: 70vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
   box-sizing: border-box;
 }
 
-.detail-media-frame {
+/* 1A. Smartphone Mockup (for mobile apps) */
+.smartphone-mockup {
+  position: relative;
+  width: min(100%, 280px);
+  height: clamp(340px, 66vh, 560px);
+  aspect-ratio: 9 / 18.5;
+  border-radius: 40px;
+  background: #000000;
+  border: 3.5px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 24px 60px -15px rgba(0, 0, 0, 0.9),
+    0 0 35px rgba(0, 240, 255, 0.12),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.95);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.smartphone-island {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 20px;
+  background: #000000;
+  border-radius: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.smartphone-speaker {
+  width: 24px;
+  height: 3px;
+  background: #1a1a1a;
+  border-radius: 2px;
+}
+
+.smartphone-camera-lens {
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle at 35% 35%, #1e293b, #030712);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.smartphone-screen {
+  position: absolute;
+  inset: 0;
+  border-radius: 36px;
+  overflow: hidden;
+  background: #050811;
+}
+
+.smartphone-home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 3px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* 1B. Desktop Web Browser Frame (for web apps) */
+.browser-mockup {
   position: relative;
   width: 100%;
+  max-width: 520px;
+  height: clamp(260px, 58vh, 440px);
+  aspect-ratio: 16 / 10;
   border-radius: 12px;
+  background: #060a12;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 24px 60px -15px rgba(0, 0, 0, 0.85),
+    0 0 30px rgba(0, 240, 255, 0.08);
   overflow: hidden;
-  background: #0b111e;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.65), 0 0 24px -6px rgba(0, 240, 255, 0.08);
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
 }
 
-.detail-media-frame--web {
-  aspect-ratio: 16 / 9;
-  max-height: clamp(240px, 35vh, 380px);
+.browser-topbar {
+  height: 34px;
+  background: rgba(255, 255, 255, 0.035);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 14px;
+  flex-shrink: 0;
 }
 
-.detail-media-frame--mobile {
-  width: auto;
-  height: clamp(250px, 36vh, 390px);
-  aspect-ratio: 9 / 18.5;
-  margin: 0 auto;
+.browser-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
+.browser-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.browser-dot--close {
+  background: #ff5f56;
+}
+
+.browser-dot--min {
+  background: #ffbd2e;
+}
+
+.browser-dot--max {
+  background: #27c93f;
+}
+
+.browser-url-bar {
+  flex: 1;
+  max-width: 320px;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+}
+
+.browser-lock-icon {
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.browser-url-text {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.browser-screen {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #050811;
+}
+
+/* 1C. Carousel Track & Slide Image Handling */
 .detail-carousel-track {
   display: flex;
   width: 100%;
   height: 100%;
-  transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
@@ -119,46 +238,56 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #070b13;
+  background: #050811;
 }
 
 .detail-slide-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background: #070b13;
-  user-select: none;
   display: block;
+  user-select: none;
 }
 
-/* Image navigation dots immediately underneath */
+.detail-slide-img--mobile {
+  object-fit: cover;
+  object-position: center top;
+}
+
+.detail-slide-img--web {
+  object-fit: contain;
+  object-position: center;
+  background: #050811;
+}
+
+/* 1D. Carousel Controls (Under Device / Browser) */
 .detail-carousel-controls {
-  margin-top: 10px;
+  margin-top: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .detail-carousel-btn {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 50%;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   transition: all 0.2s ease;
   padding: 0;
 }
 
 .detail-carousel-btn:hover {
-  background: rgba(0, 240, 255, 0.12);
-  border-color: rgba(0, 240, 255, 0.35);
+  background: rgba(0, 240, 255, 0.15);
+  border-color: #00f0ff;
   color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
 .detail-carousel-dots {
@@ -170,985 +299,591 @@
 .detail-carousel-dot {
   width: 6px;
   height: 6px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
   border: none;
-  cursor: pointer;
   padding: 0;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.detail-carousel-dot:hover {
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .detail-carousel-dot.is-active {
   width: 18px;
+  border-radius: 4px;
   background: #00f0ff;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
 }
 
-/* 1. Left — Quick Project Information (42% Width) */
-.detail-quick-info {
-  flex: 0 0 42%;
-  width: 42%;
-  max-width: 44%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+/* --------------------------------------------------------------------------
+   COLUMN 2: Project Details (Scrolls internally with soft bottom fade mask)
+   -------------------------------------------------------------------------- */
+.detail-info-column {
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  /* Soft fade gradient at the bottom */
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 38px), transparent 100%);
+  mask-image: linear-gradient(to bottom, black calc(100% - 38px), transparent 100%);
+}
+
+/* Smooth sleek scrollbar inside details column */
+.detail-info-column::-webkit-scrollbar {
+  width: 5px;
+}
+.detail-info-column::-webkit-scrollbar-track {
+  background: transparent;
+}
+.detail-info-column::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+.detail-info-column::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.45);
+}
+
+.detail-info-inner {
+  padding-right: 12px;
+  padding-bottom: 48px; /* Room for soft fade */
   box-sizing: border-box;
 }
 
-.detail-quick-header {
+/* 2A. Navigation Row: Back Button (Left) & Prev/Next Pill (Right) */
+.detail-nav-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
-  gap: 12px;
+  gap: 16px;
+  margin-bottom: clamp(14px, 2vh, 18px);
 }
 
-/* Header Prev / Next project switcher */
+.detail-back-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.detail-back-btn:hover {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.25);
+}
+
 .detail-project-nav-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 2px 6px;
-  border-radius: 999px;
+  background: rgba(10, 16, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 30px;
+  padding: 3px 6px;
+  gap: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .detail-proj-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
   font-family: var(--font-mono, monospace);
-  font-size: 10.5px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.85);
   background: transparent;
   border: none;
+  padding: 4px 8px;
+  border-radius: 20px;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 6px;
-  border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .detail-proj-btn:hover {
+  background: rgba(0, 240, 255, 0.14);
   color: #00f0ff;
-  background: rgba(0, 240, 255, 0.08);
 }
 
 .detail-proj-counter {
   font-family: var(--font-mono, monospace);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  color: #64748b;
-  padding: 0 4px;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.detail-back-btn {
-  font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #94a3b8;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.detail-back-btn:hover {
+  font-size: 12px;
+  font-weight: 700;
   color: #00f0ff;
-  transform: translateX(-2px);
+  letter-spacing: 0.08em;
+  padding: 0 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.detail-quick-badges {
+/* 2B. Meta Badges Row */
+.detail-meta-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
+  margin-bottom: 10px;
+}
+
+.detail-proj-tag {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.32);
+  padding: 3px 10px;
+  border-radius: 4px;
 }
 
 .detail-year-pill {
   font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px 9px;
+  border-radius: 4px;
 }
 
 .detail-status-pill {
   font-family: var(--font-mono, monospace);
-  font-size: 10.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 2px 10px;
-  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-weight: 500;
-}
-
-.detail-status-pill--completed {
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .detail-status-pill--progress {
   color: #38bdf8;
-  background: rgba(56, 189, 248, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.detail-status-pill--completed {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
 .detail-status-dot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: currentColor;
+  box-shadow: 0 0 8px currentColor;
 }
 
-/* Project Name in Large Typography */
+.detail-category-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px 9px;
+  border-radius: 4px;
+}
+
+.detail-role-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 3px 9px;
+  border-radius: 4px;
+}
+
+/* 2C. Project Title & Summary */
 .detail-title {
-  font-family: var(--font-display, monospace);
-  font-size: clamp(26px, 2.8vw, 38px);
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: clamp(24px, 2.5vw, 34px);
   font-weight: 700;
   color: #ffffff;
+  margin: 0 0 10px 0;
+  line-height: 1.15;
   letter-spacing: -0.02em;
-  line-height: 1.1;
-  margin: 0 0 6px 0;
 }
 
-/* Developer Role */
-.detail-role-label {
-  font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: #00f0ff;
-  margin-bottom: 12px;
-}
-
-/* Short Introduction */
-.detail-summary-text {
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: #cbd5e1;
+.detail-summary {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.90);
   margin: 0 0 14px 0;
 }
 
-/* Technology Tags */
+/* 2D. Technology Stack Badges */
 .detail-tech-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 7px;
   margin-bottom: 16px;
 }
 
 .detail-tech-pill {
   font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px 9px;
+  border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .detail-tech-pill:hover {
+  border-color: #00f0ff;
+  color: #ffffff;
   background: rgba(0, 240, 255, 0.08);
-  border-color: rgba(0, 240, 255, 0.25);
-  color: #00f0ff;
 }
 
-/* Action Buttons */
+/* 2E. Action Buttons (GitHub & Demo) */
 .detail-action-buttons {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
-  margin-top: auto;
+  margin-bottom: 20px;
 }
 
 .detail-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-mono, monospace);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  padding: 8px 18px;
-  border-radius: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
   text-decoration: none;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-sizing: border-box;
-}
-
-.detail-btn--repo {
-  color: #f1f5f9;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-.detail-btn--repo:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.28);
-  transform: translateY(-1px);
-}
-
-.detail-btn--demo {
-  color: #040810;
-  background: #00f0ff;
-  border: 1px solid #00f0ff;
-  box-shadow: 0 0 16px -2px rgba(0, 240, 255, 0.4);
-}
-
-.detail-btn--demo:hover {
-  background: #38bdf8;
-  border-color: #38bdf8;
-  box-shadow: 0 0 22px rgba(0, 240, 255, 0.6);
-  transform: translateY(-1px);
-}
-
-/* --------------------------------------------------------------------------
-   Subtle Horizontal Divider Line
-   -------------------------------------------------------------------------- */
-.detail-divider {
-  height: 1px;
-  width: 100%;
-  background: linear-gradient(90deg, rgba(0, 240, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 55%, transparent 100%);
-  margin: clamp(18px, 2.4vh, 26px) 0;
-}
-
-/* --------------------------------------------------------------------------
-   Row 2: Bottom Details (100% Full Width)
-   Divided into three sections: About, Highlights, Technical Details
-   -------------------------------------------------------------------------- */
-.detail-bottom-grid {
-  display: grid;
-  grid-template-columns: 1.15fr 1.35fr 1.1fr;
-  gap: clamp(20px, 2.5vw, 34px);
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.detail-bottom-card {
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-/* Subtle vertical divider lines between columns */
-.detail-card--highlights,
-.detail-card--technical {
-  border-left: 1px solid rgba(255, 255, 255, 0.07);
-  padding-left: clamp(18px, 2.2vw, 30px);
-}
-
-.detail-section-label {
-  font-family: var(--font-mono, monospace);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #00f0ff;
-  margin-bottom: 4px;
-}
-
-.detail-section-title {
-  font-family: var(--font-display, monospace);
-  font-size: 14.5px;
-  font-weight: 600;
-  color: #ffffff;
-  letter-spacing: -0.01em;
-  margin: 0 0 10px 0;
-}
-
-/* Section 1: About Content */
-.detail-section-content {
-  color: #94a3b8;
-  font-size: 12.5px;
-  line-height: 1.62;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.detail-section-content p {
-  margin: 0;
-}
-
-/* Section 2: Highlights (Important Features in Two Columns) */
-.detail-features-two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.detail-feature-item {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
   transition: all 0.2s ease;
 }
 
-.detail-feature-item:hover {
-  background: rgba(255, 255, 255, 0.035);
-  border-color: rgba(0, 240, 255, 0.18);
-}
-
-.detail-feature-num {
-  font-family: var(--font-mono, monospace);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #00f0ff;
-}
-
-.detail-feature-desc {
-  color: #94a3b8;
-  font-size: 11.5px;
-  line-height: 1.5;
-}
-
-/* Section 3: Technical Details (Architecture, Technologies & Challenges) */
-.detail-tech-specs {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-
-.detail-tech-spec-row {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.detail-tech-spec-row .spec-label {
-  font-family: var(--font-mono, monospace);
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+.detail-btn--repo {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   color: #ffffff;
 }
 
-.detail-tech-spec-row .spec-value {
-  font-size: 11.8px;
-  line-height: 1.5;
-  color: #94a3b8;
+.detail-btn--repo:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #ffffff;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
 }
 
-/* --------------------------------------------------------------------------
-   Responsive Breakpoints
-   -------------------------------------------------------------------------- */
-@media (max-width: 960px) {
-  #project-detail-dialog {
-    padding: 20px 16px;
-    align-items: flex-start;
-  }
-
-  .detail-top-row {
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .detail-preview-section {
-    flex: 0 0 100%;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .detail-quick-info {
-    flex: 0 0 100%;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .detail-bottom-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .detail-card--highlights,
-  .detail-card--technical {
-    border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-    padding-left: 0;
-    padding-top: 20px;
-  }
-
-  .detail-features-two-col {
-    grid-template-columns: 1fr;
-  }
-
-  .detail-side-nav {
-    display: none; /* Rely on header Prev/Next on smaller mobile screens */
-  }
-}
-
-/* --------------------------------------------------------------------------
-   Floating Left and Right Side Navigation Chevrons
-   -------------------------------------------------------------------------- */
-.detail-side-nav {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 220;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(9, 15, 28, 0.88);
-  border: 1px solid rgba(0, 240, 255, 0.32);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.65), 0 0 16px -2px rgba(0, 240, 255, 0.2);
-}
-
-.detail-side-nav--prev {
-  left: clamp(12px, 1.8vw, 32px);
-}
-
-.detail-side-nav--next {
-  right: clamp(12px, 1.8vw, 32px);
-}
-
-.detail-side-nav:hover {
-  background: rgba(0, 240, 255, 0.16);
-  border-color: #00f0ff;
+.detail-btn--demo {
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.4);
   color: #00f0ff;
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.65);
-  transform: translateY(-50%) scale(1.1);
 }
 
-.detail-side-nav:active {
-  transform: translateY(-50%) scale(0.95);
+.detail-btn--demo:hover {
+  background: #00f0ff;
+  color: #000000;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.45);
 }
 
-.detail-side-nav-tooltip {
-  display: none;
-}
-
-/* ==========================================================================
-   MOBILE APPLICATION SHOWCASE (2 Columns)
-   Left (35–38%): Smartphone Mockup ONLY (vertically centered, full height)
-   Right (62–65%): Project Info + Divider + 3 Bottom Columns (ABOUT | HIGHLIGHTS | TECHNICAL)
-   ========================================================================== */
-
-.mobile-showcase-layout {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: clamp(40px, 4.5vw, 64px);
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* LEFT COLUMN: Smartphone Mockup Only (35–38% width) */
-.mobile-showcase-left {
-  flex: 0 0 36%;
-  width: 36%;
-  max-width: 38%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-/* Realistic Smartphone Frame (250–300px wide, natural portrait proportions) */
-.smartphone-mockup {
-  position: relative;
-  width: clamp(250px, 19vw, 295px);
-  aspect-ratio: 9 / 19.2;
-  border-radius: 42px;
-  background: #080c14;
-  padding: 10px 10px 12px 10px;
-  box-sizing: border-box;
-  /* Premium metallic bezel + deep drop shadow + restrained cyan ambient glow */
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.95),
-    0 24px 60px -12px rgba(0, 0, 0, 0.85),
-    0 0 32px -4px rgba(0, 240, 255, 0.14),
-    inset 0 1px 2px rgba(255, 255, 255, 0.35);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.smartphone-mockup:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.95),
-    0 28px 70px -14px rgba(0, 0, 0, 0.9),
-    0 0 38px -2px rgba(0, 240, 255, 0.2),
-    inset 0 1px 2px rgba(255, 255, 255, 0.4);
-}
-
-/* Top Dynamic Island / speaker ear-piece pill */
-.smartphone-island {
-  position: absolute;
-  top: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 76px;
-  height: 18px;
-  background: #000000;
-  border-radius: 999px;
-  z-index: 15;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 10px;
-  pointer-events: none;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
-}
-
-.smartphone-camera-lens {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #0d172e;
-  border: 1px solid rgba(0, 240, 255, 0.25);
-}
-
-/* Smartphone Screen Viewport */
-.smartphone-screen {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: 34px;
-  overflow: hidden;
-  background: #020408;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.smartphone-carousel-track {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-
-.smartphone-carousel-slide {
-  flex: 0 0 100%;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #020408;
-}
-
-/* Actual mobile application screenshot inside the phone */
-.smartphone-screenshot {
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* Preserves original screenshot aspect ratio without stretch or distortion */
-  object-position: top center;
-  background: #020408;
-  user-select: none;
-  display: block;
-}
-
-/* Bottom Home Indicator */
-.smartphone-home-indicator {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 88px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.4);
-  z-index: 15;
-  pointer-events: none;
-}
-
-/* Screenshot navigation controls directly below phone */
-.detail-carousel-controls--mobile {
-  margin-top: 14px;
-}
-
-/* RIGHT COLUMN: All Project Content + 3 Info Columns (62–65% width) */
-.mobile-showcase-right {
-  flex: 1 1 0;
-  min-width: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  box-sizing: border-box;
-}
-
-/* 1. Header Navigation Row */
-.mobile-info-nav-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 8px;
-  gap: 12px;
-}
-
-/* 2. Project Number & Completion Status */
-.mobile-info-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.mobile-proj-tag {
-  font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: #00f0ff;
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.22);
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-
-/* 3. Large Project Title */
-.mobile-info-title {
-  font-family: var(--font-display, monospace);
-  font-size: clamp(28px, 3vw, 40px);
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  margin: 0 0 6px 0;
-}
-
-/* 4. Application Category & Developer Role */
-.mobile-info-category {
+.detail-demo-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 10px;
-}
-
-.mobile-cat-pill {
-  color: #00f0ff;
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  padding: 2px 7px;
-  border-radius: 4px;
-}
-
-.mobile-cat-bullet {
-  color: #475569;
-}
-
-.mobile-role-label {
-  color: #94a3b8;
-}
-
-/* 5. Short Project Introduction */
-.mobile-info-summary {
-  font-size: 13px;
-  line-height: 1.55;
-  color: #cbd5e1;
-  margin: 0 0 12px 0;
-  max-width: 720px;
-}
-
-/* 6. Technology Stack Badges */
-.mobile-tech-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 14px;
-}
-
-/* 7. GitHub and Demo Buttons */
-.mobile-action-buttons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.mobile-demo-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: #64748b;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
   background: rgba(255, 255, 255, 0.03);
-  border: 1px dashed rgba(255, 255, 255, 0.14);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
   padding: 7px 14px;
   border-radius: 6px;
 }
 
-.mobile-demo-dot {
-  width: 5px;
-  height: 5px;
+.detail-demo-dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #38bdf8;
-  opacity: 0.7;
+  box-shadow: 0 0 6px #38bdf8;
 }
 
-/* Hero block inside right column */
-.mobile-hero-block {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.mobile-title-role-row {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 6px;
-}
-
-.mobile-title-role-row .mobile-info-title {
-  margin: 0;
-}
-
-.mobile-tags-actions-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  width: 100%;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-
-/* Horizontal Divider inside Right Column */
-.mobile-right-divider {
-  width: 100%;
+/* 2F. Subtle Divider */
+.detail-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 14px 0 16px 0;
-}
-
-/* 2-Column Spacious Bento Showcase (50% / 50%) */
-.mobile-details-bento {
-  display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 16px;
   width: 100%;
-  box-sizing: border-box;
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.3) 0%, rgba(255, 255, 255, 0.08) 60%, transparent 100%);
+  margin: 0 0 20px 0;
 }
 
-/* Bento Card Style */
-.mobile-bento-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+/* 2G. Bento Grid (Key Capabilities + System & Impact) */
+.detail-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.detail-bento-card {
+  background: rgba(10, 16, 28, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 14px 16px;
+  padding: 18px 20px;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
 }
 
-.mobile-bento-card:hover {
-  border-color: rgba(0, 240, 255, 0.24);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 240, 255, 0.05);
-}
-
-.mobile-card-header {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.bento-card-header {
+  margin-bottom: 14px;
+  padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 6px;
 }
 
-.mobile-card-kicker {
+/* Small cyan label: unified across entire app */
+.bento-kicker {
+  display: block;
   font-family: var(--font-mono, monospace);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #00f0ff;
+  margin-bottom: 3px;
 }
 
-.mobile-card-headline {
-  font-family: var(--font-sans);
-  font-size: 13.5px;
+.bento-headline {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 15px;
   font-weight: 600;
   color: #ffffff;
-  letter-spacing: -0.01em;
+  margin: 0;
 }
 
-/* Feature Rows Flow */
-.mobile-features-flow {
+/* Features List */
+.bento-features-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
-.mobile-feature-row {
+.bento-feature-item {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  padding: 7px 10px;
-  border-radius: 7px;
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.mobile-feature-badge {
+.bento-feature-kicker {
   font-family: var(--font-mono, monospace);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #00f0ff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #38bdf8;
 }
 
-.mobile-feature-text {
-  font-size: 12px;
-  line-height: 1.48;
-  color: #cbd5e1;
+.bento-feature-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.88);
   margin: 0;
 }
 
-/* Spec sections */
-.mobile-spec-section {
+/* Specs Flow */
+.bento-specs-flow {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 13px;
 }
 
-.mobile-spec-section--arch {
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 8px;
-  gap: 8px;
+.bento-spec-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.mobile-spec-title {
+.bento-spec-kicker {
   font-family: var(--font-mono, monospace);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: #00f0ff;
 }
 
-.mobile-spec-body {
-  font-size: 12px;
-  line-height: 1.48;
-  color: #cbd5e1;
+.bento-spec-body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.88);
   margin: 0;
 }
 
-.mobile-user-tag-row {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  font-size: 11px;
-  line-height: 1.4;
-  margin-top: 2px;
+.bento-spec-body--users {
+  color: #e2e8f0;
 }
 
-.mobile-user-label {
-  font-family: var(--font-mono, monospace);
-  color: #00f0ff;
-  font-size: 10px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.mobile-user-value {
-  color: #94a3b8;
-}
-
-/* RESPONSIVE ADAPTATIONS */
-@media (max-width: 1024px) {
-  .mobile-showcase-layout {
-    gap: 28px;
+/* --------------------------------------------------------------------------
+   COMPACT MODE: Screen Heights <= 800px (Laptops, short displays)
+   -------------------------------------------------------------------------- */
+@media (max-height: 800px) {
+  #project-detail-dialog {
+    padding: 12px 24px;
   }
-  .mobile-showcase-left {
-    flex: 0 0 35%;
-    width: 35%;
+
+  .detail-canvas {
+    max-height: calc(100svh - 24px);
+    gap: 22px;
   }
+
+  .detail-media-column {
+    max-height: 66vh;
+  }
+
   .smartphone-mockup {
-    width: clamp(220px, 20vw, 260px);
+    height: min(65vh, 480px);
+    border-radius: 34px;
   }
-  .mobile-showcase-right {
-    flex: 1 1 0;
-    min-width: 0;
-    width: 100%;
+
+  .browser-mockup {
+    height: min(65vh, 370px);
+  }
+
+  .detail-nav-row {
+    margin-bottom: 12px;
+  }
+
+  .detail-title {
+    font-size: clamp(20px, 2.2vw, 26px);
+    margin-bottom: 6px;
+  }
+
+  .detail-summary {
+    font-size: 14px;
+    margin-bottom: 10px;
+    line-height: 1.45;
+  }
+
+  .detail-tech-tags {
+    margin-bottom: 12px;
+    gap: 6px;
+  }
+
+  .detail-action-buttons {
+    margin-bottom: 14px;
+  }
+
+  .detail-divider {
+    margin-bottom: 14px;
+  }
+
+  .detail-bento-grid {
+    gap: 12px;
+  }
+
+  .detail-bento-card {
+    padding: 14px 16px;
+  }
+
+  .bento-card-header {
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+  }
+
+  .bento-features-list {
+    gap: 10px;
+  }
+
+  .bento-specs-flow {
+    gap: 10px;
   }
 }
 
-@media (max-width: 900px) {
-  .mobile-details-bento {
+/* --------------------------------------------------------------------------
+   SMALL SCREENS / TABLETS / MOBILE: Below 1024px (Stack Media on Top)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  #project-detail-dialog {
+    padding: 16px;
+    align-items: flex-start;
+    overflow-y: auto; /* Allow full page scroll on small mobile screens */
+  }
+
+  .detail-canvas {
     grid-template-columns: 1fr;
-    gap: 14px;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    gap: 20px;
+    padding-bottom: 40px;
   }
-}
 
-@media (max-width: 720px) {
-  .mobile-showcase-layout {
-    flex-direction: column;
-    align-items: center;
-    gap: 24px;
-  }
-  .mobile-showcase-left {
-    flex: auto;
+  .detail-media-column {
+    max-height: 48vh;
     width: 100%;
-    max-width: 100%;
   }
+
   .smartphone-mockup {
-    width: 220px;
-    height: 440px;
-    max-height: 55vh;
+    height: 44vh;
+    max-width: 250px;
   }
-  .mobile-showcase-right {
-    flex: auto;
+
+  .browser-mockup {
+    max-height: 36vh;
     width: 100%;
-    max-width: 100%;
+  }
+
+  .detail-info-column {
+    overflow-y: visible;
+    max-height: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .detail-info-inner {
+    padding-right: 0;
+    padding-bottom: 0;
+  }
+
+  .detail-bento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-nav-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .detail-back-btn {
+    padding: 5px 11px;
+    font-size: 11px;
+  }
+
+  .detail-project-nav-bar {
+    padding: 2px 5px;
+  }
+
+  .detail-proj-btn {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  .detail-proj-counter {
+    font-size: 11px;
+    padding: 0 4px;
   }
 }
-
