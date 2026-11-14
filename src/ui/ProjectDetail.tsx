@@ -432,12 +432,42 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
           onMouseLeave={() => setIsPaused(false)}
         >
           {isMobileApp ? (
-            /* Smartphone Mockup Frame */
+            /* Smartphone Mockup Frame (Realistic iPhone Design) */
             <div className="smartphone-mockup" aria-label="Smartphone Device Mockup">
-              {/* Dynamic Island / Camera & Speaker */}
-              <div className="smartphone-island" aria-hidden="true">
+              {/* Outer Hardware Buttons */}
+              <div className="smartphone-button smartphone-button--action" aria-hidden="true" />
+              <div className="smartphone-button smartphone-button--vol-up" aria-hidden="true" />
+              <div className="smartphone-button smartphone-button--vol-down" aria-hidden="true" />
+              <div className="smartphone-button smartphone-button--power" aria-hidden="true" />
+
+              {/* Top Notch with Speaker and Camera */}
+              <div className="smartphone-notch" aria-hidden="true">
                 <div className="smartphone-speaker" />
                 <div className="smartphone-camera-lens" />
+              </div>
+
+              {/* iOS Status Bar (Time on left, Cellular + WiFi + Battery on right) */}
+              <div className="smartphone-statusbar" aria-hidden="true">
+                <span className="smartphone-time">12:41</span>
+                <div className="smartphone-status-icons">
+                  {/* Cellular 4-bar icon */}
+                  <svg className="smartphone-icon-cellular" viewBox="0 0 17 12" fill="currentColor">
+                    <rect x="0" y="9" width="2.5" height="3" rx="0.6" />
+                    <rect x="4.5" y="6" width="2.5" height="6" rx="0.6" />
+                    <rect x="9" y="3" width="2.5" height="9" rx="0.6" />
+                    <rect x="13.5" y="0" width="2.5" height="12" rx="0.6" />
+                  </svg>
+                  {/* Wi-Fi Icon */}
+                  <svg className="smartphone-icon-wifi" viewBox="0 0 16 12" fill="currentColor">
+                    <path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM4.1 6.8a5.5 5.5 0 0 1 7.8 0 .8.8 0 1 1-1.1 1.1 3.9 3.9 0 0 0-5.6 0 .8.8 0 1 1-1.1-1.1zm-3-3a9.7 9.7 0 0 1 13.8 0 .8.8 0 0 1-1.1 1.1 8.1 8.1 0 0 0-11.6 0 .8.8 0 0 1-1.1-1.1z" />
+                  </svg>
+                  {/* Battery Icon */}
+                  <svg className="smartphone-icon-battery" viewBox="0 0 24 12" fill="currentColor">
+                    <rect x="0.5" y="0.5" width="20" height="11" rx="3.5" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                    <rect x="2.5" y="2.5" width="13" height="7" rx="1.8" fill="currentColor" />
+                    <path d="M22 4.5v3a1.5 1.5 0 0 0 1.5-1.5 1.5 1.5 0 0 0-1.5-1.5z" fill="currentColor" />
+                  </svg>
+                </div>
               </div>
 
               {/* Smartphone Viewport with Track */}
