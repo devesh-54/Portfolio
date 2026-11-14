@@ -60,3 +60,4 @@ untracked.slice(0, 30).forEach((f, i) => {
   console.log(`${String(i + 1).padStart(2)}. ${(f.size / 1024).toFixed(1).padStart(7)} KB - ${f.path}`);
 });
 console.log('Total untracked/ignored outside node_modules/dist/.git:', untracked.length);
+
