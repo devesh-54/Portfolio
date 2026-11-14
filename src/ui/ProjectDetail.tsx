@@ -30,10 +30,11 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
   onSelectProject,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const detailsScrollRef = useRef<HTMLDivElement>(null)
   const previewImgRef = useRef<HTMLImageElement>(null)
 
-  // Featured/active projects list for next/prev navigation
-  const activeProjects = projects.filter((p) => p.featured !== false)
+  // Featured/active projects list for next/prev navigation (strictly the 6 featured builds)
+  const activeProjects = projects.filter((p) => p.featured)
 
   // Current project state allowing internal next/previous switching
   const [currentProject, setCurrentProject] = useState<ProjectItem | null>(project)
@@ -97,7 +98,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
           autoAlpha: 0,
           y: -14,
           scale: 0.99,
-          duration: 0.24,
+          duration: 0.22,
           ease: 'power2.in',
         },
         0
@@ -109,10 +110,10 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
         dialog,
         {
           autoAlpha: 0,
-          duration: 0.28,
+          duration: 0.26,
           ease: 'power2.inOut',
         },
-        0.06
+        0.05
       )
     }
 
@@ -165,17 +166,17 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
     tl.fromTo(
       dialog,
       { autoAlpha: 0 },
-      { autoAlpha: 1, duration: 0.28, ease: 'power2.out' },
+      { autoAlpha: 1, duration: 0.26, ease: 'power2.out' },
       0
     )
 
-    // Inner dashboard container smoothly fades & rises into view
+    // Inner container smoothly rises into view
     if (container) {
       tl.fromTo(
         container,
         { autoAlpha: 0, y: 16, scale: 0.99 },
-        { autoAlpha: 1, y: 0, scale: 1, duration: 0.38, ease: 'power3.out' },
-        0.05
+        { autoAlpha: 1, y: 0, scale: 1, duration: 0.34, ease: 'power3.out' },
+        0.04
       )
     }
 
@@ -185,8 +186,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
   const displayProj = currentProject || project || renderedProject
   const isCompleted = displayProj?.status?.toLowerCase().includes('completed')
   const cleanYear = displayProj?.year?.trim() || ''
-  const rawRole = displayProj?.role?.trim() || ''
-  const cleanRole = rawRole && !/\btodo\b/i.test(rawRole) ? rawRole : 'Full-Stack Developer'
+  const cleanRole = displayProj?.role?.trim() || ''
+
   const descriptionParagraphs = displayProj?.description
     ? displayProj.description
         .split(/\n\s*\n/)
@@ -198,11 +199,14 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
   const [activeSlide, setActiveSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
 
-  // Reset to first slide whenever a new project is selected or modal opens
+  // Reset to first slide & top scroll whenever a new project is selected or modal opens
   useEffect(() => {
     if (isOpen) {
       setActiveSlide(0)
       setIsPaused(false)
+      if (detailsScrollRef.current) {
+        detailsScrollRef.current.scrollTop = 0
+      }
     }
   }, [isOpen, displayProj?.id])
 
@@ -219,7 +223,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
 
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % imageList.length)
-    }, 4500) // 4.5s per slide, smooth slow transition
+    }, 4500)
 
     return () => clearInterval(interval)
   }, [isOpen, imageList.length, isPaused])
@@ -240,19 +244,22 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
       if (!targetProj || targetProj.id === displayProj?.id || isNavigatingRef.current) return
       isNavigatingRef.current = true
 
-      const outX = dir === 'next' ? -60 : 60
-      const inX = dir === 'next' ? 60 : -60
+      const outX = dir === 'next' ? -50 : 50
+      const inX = dir === 'next' ? 50 : -50
 
       if (containerRef.current) {
         gsap.to(containerRef.current, {
           x: outX,
           opacity: 0,
-          duration: 0.18,
+          duration: 0.16,
           ease: 'power2.in',
           onComplete: () => {
             setCurrentProject(targetProj)
             setRenderedProject(targetProj)
             setActiveSlide(0)
+            if (detailsScrollRef.current) {
+              detailsScrollRef.current.scrollTop = 0
+            }
             onSelectProject?.(targetProj)
             gsap.fromTo(
               containerRef.current,
@@ -260,7 +267,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
               {
                 x: 0,
                 opacity: 1,
-                duration: 0.26,
+                duration: 0.24,
                 ease: 'power3.out',
                 onComplete: () => {
                   isNavigatingRef.current = false
@@ -367,6 +374,13 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
     challenges: 'High performance real-time interactivity and cross-platform reliability',
   }
 
+  // Derive display domain / URL tag for browser mockup
+  const browserUrl = demoLink?.url
+    ? demoLink.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    : repoLink?.url
+    ? repoLink.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    : `${displayProj?.id || 'project'}.app`
+
   return createPortal(
     <div
       id="project-detail-dialog"
@@ -375,593 +389,338 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
       aria-modal="true"
       aria-label={displayProj?.title || 'Project Details'}
       tabIndex={-1}
-      className={isMobileApp ? 'dialog--mobile-app' : 'dialog--web-app'}
     >
-      {/* Floating Left and Right side navigation buttons */}
-      {prevProject && (
-        <button
-          type="button"
-          className="detail-side-nav detail-side-nav--prev"
-          onClick={() => navigateTo(prevProject, 'prev')}
-          title={`Previous project: ${prevProject.title} (← Left Arrow)`}
-          aria-label={`Previous project: ${prevProject.title}`}
+      {/* Unified 2-Column Dashboard Frame */}
+      <div className="detail-canvas" ref={containerRef}>
+        {/* ========================================================= */}
+        {/* COLUMN 1 (LEFT): Media Showcase (Fixed, capped at 70vh)  */}
+        {/* ========================================================= */}
+        <div
+          className="detail-media-column"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="22"
-            height="22"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          <span className="detail-side-nav-tooltip">‹ {prevProject.title}</span>
-        </button>
-      )}
-
-      {nextProject && (
-        <button
-          type="button"
-          className="detail-side-nav detail-side-nav--next"
-          onClick={() => navigateTo(nextProject, 'next')}
-          title={`Next project: ${nextProject.title} (→ Right Arrow)`}
-          aria-label={`Next project: ${nextProject.title}`}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="22"
-            height="22"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-          <span className="detail-side-nav-tooltip">{nextProject.title} ›</span>
-        </button>
-      )}
-
-      {/* Continuous dark background dashboard canvas */}
-      <div
-        className={`detail-canvas ${
-          isMobileApp ? 'detail-canvas--mobile' : 'detail-canvas--web'
-        }`}
-        ref={containerRef}
-      >
-        {isMobileApp ? (
-          /* ========================================================= */
-          /* MOBILE APPLICATION SHOWCASE (38% Device / 62% Info)       */
-          /* ========================================================= */
-          <div className="mobile-showcase-layout">
-            {/* LEFT COLUMN: Smartphone Mockup (35–38% width) */}
-            <div
-              className="mobile-showcase-left"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-            >
-                <div className="smartphone-mockup" aria-label="Smartphone Device Mockup">
-                  {/* Smartphone Top Notch / Dynamic Island */}
-                  <div className="smartphone-island" aria-hidden="true">
-                    <div className="smartphone-speaker" />
-                    <div className="smartphone-camera-lens" />
-                  </div>
-
-                  {/* Smartphone Screen Viewport with Horizontal Sliding Track */}
-                  <div className="smartphone-screen">
-                    <div
-                      className="smartphone-carousel-track"
-                      style={{ transform: `translateX(-${activeSlide * 100}%)` }}
-                    >
-                      {imageList.map((imgSrc, idx) => (
-                        <div key={imgSrc + idx} className="smartphone-carousel-slide">
-                          <img
-                            ref={idx === 0 ? previewImgRef : undefined}
-                            src={imgSrc}
-                            alt={`${displayProj?.title || 'Mobile project'} screenshot ${idx + 1}`}
-                            className="smartphone-screenshot"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Smartphone Bottom Home Indicator */}
-                  <div className="smartphone-home-indicator" aria-hidden="true" />
-                </div>
-
-                {/* Screenshot navigation controls directly below the phone */}
-                {imageList.length > 1 && (
-                  <div
-                    className="detail-carousel-controls detail-carousel-controls--mobile"
-                    aria-label="Mobile app screenshots"
-                  >
-                    <button
-                      type="button"
-                      className="detail-carousel-btn detail-carousel-btn--prev"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setActiveSlide((prev) => (prev - 1 + imageList.length) % imageList.length)
-                      }}
-                      title="Previous screenshot"
-                      aria-label="Previous screenshot"
-                    >
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-                      </svg>
-                    </button>
-
-                    <div className="detail-carousel-dots">
-                      {imageList.map((_, dotIdx) => (
-                        <button
-                          key={dotIdx}
-                          type="button"
-                          className={`detail-carousel-dot ${dotIdx === activeSlide ? 'is-active' : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setActiveSlide(dotIdx)
-                          }}
-                          title={`View screenshot ${dotIdx + 1}`}
-                          aria-label={`View screenshot ${dotIdx + 1}`}
-                        />
-                      ))}
-                    </div>
-
-                    <button
-                      type="button"
-                      className="detail-carousel-btn detail-carousel-btn--next"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setActiveSlide((prev) => (prev + 1) % imageList.length)
-                      }}
-                      title="Next screenshot"
-                      aria-label="Next screenshot"
-                    >
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-                      </svg>
-                    </button>
-                  </div>
-                )}
+          {isMobileApp ? (
+            /* Smartphone Mockup Frame */
+            <div className="smartphone-mockup" aria-label="Smartphone Device Mockup">
+              {/* Dynamic Island / Camera & Speaker */}
+              <div className="smartphone-island" aria-hidden="true">
+                <div className="smartphone-speaker" />
+                <div className="smartphone-camera-lens" />
               </div>
 
-              {/* RIGHT COLUMN: Project Information + Bottom Info Grid (All in Right Column) */}
-              <div className="mobile-showcase-right">
-                {/* 1. Back navigation */}
-                <div className="mobile-info-nav-row">
-                  <button
-                    type="button"
-                    ref={backBtnRef}
-                    className="detail-back-btn"
-                    onClick={startClose}
-                    aria-label="Close project details"
-                  >
-                    ← back [ESC]
-                  </button>
-
-                  <div className="detail-project-nav-bar">
-                    <button
-                      type="button"
-                      className="detail-proj-btn detail-proj-btn--prev"
-                      onClick={() => navigateTo(prevProject, 'prev')}
-                      title={`Previous Project: ${prevProject.title}`}
-                      aria-label={`Previous Project: ${prevProject.title}`}
-                    >
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-                      </svg>
-                      <span>Prev</span>
-                    </button>
-                    <span className="detail-proj-counter">
-                      {String(currentIndex >= 0 ? currentIndex + 1 : 1).padStart(2, '0')} /{' '}
-                      {String(activeProjects.length).padStart(2, '0')}
-                    </span>
-                    <button
-                      type="button"
-                      className="detail-proj-btn detail-proj-btn--next"
-                      onClick={() => navigateTo(nextProject, 'next')}
-                      title={`Next Project: ${nextProject.title}`}
-                      aria-label={`Next Project: ${nextProject.title}`}
-                    >
-                      <span>Next</span>
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
-                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                {/* 2. Project number and completion status */}
-                <div className="mobile-info-meta-row">
-                  <span className="mobile-proj-tag">
-                    PROJECT {String(currentIndex >= 0 ? currentIndex + 1 : 1).padStart(2, '0')}
-                  </span>
-                  {cleanYear && <span className="detail-year-pill">{cleanYear}</span>}
-                  <span
-                    className={`detail-status-pill ${
-                      isCompleted ? 'detail-status-pill--completed' : 'detail-status-pill--progress'
-                    }`}
-                  >
-                    <span className="detail-status-dot" aria-hidden="true" />
-                    {displayProj?.status || 'In Progress'}
-                  </span>
-                </div>
-
-                {/* 3. Large project title */}
-                <h2 className="mobile-info-title">{displayProj?.title}</h2>
-
-                {/* 4. Application category or developer role */}
-                <div className="mobile-info-category">
-                  <span className="mobile-cat-pill">MOBILE APPLICATION</span>
-                  <span className="mobile-cat-bullet" aria-hidden="true">·</span>
-                  <span className="mobile-role-label">{cleanRole}</span>
-                </div>
-
-                {/* 5. Short project introduction */}
-                <p className="mobile-info-summary">{displayProj?.summary}</p>
-
-                {/* 6. Technology stack badges */}
-                {displayProj?.stack && displayProj.stack.length > 0 && (
-                  <div className="mobile-tech-tags">
-                    {displayProj.stack.map((item) => (
-                      <span key={item} className="detail-tech-pill">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* 7. GitHub and Demo buttons */}
-                <div className="mobile-action-buttons">
-                  {repoLink && (
-                    <a
-                      href={repoLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="detail-btn detail-btn--repo"
-                    >
-                      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                      </svg>
-                      <span>GitHub Repo →</span>
-                    </a>
-                  )}
-                  {demoLink ? (
-                    <a
-                      href={demoLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="detail-btn detail-btn--demo"
-                    >
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                      <span>{demoLink.label} →</span>
-                    </a>
-                  ) : (
-                    <div className="mobile-demo-pill" title="Live APK / Demo in active build pipeline">
-                      <span className="mobile-demo-dot" />
-                      <span>APK / Demo in Build</span>
+              {/* Smartphone Viewport with Track */}
+              <div className="smartphone-screen">
+                <div
+                  className="detail-carousel-track"
+                  style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                >
+                  {imageList.map((imgSrc, idx) => (
+                    <div key={imgSrc + idx} className="detail-carousel-slide">
+                      <img
+                        ref={idx === 0 ? previewImgRef : undefined}
+                        src={imgSrc}
+                        alt={`${displayProj?.title || 'Mobile project'} screenshot ${idx + 1}`}
+                        className="detail-slide-img detail-slide-img--mobile"
+                      />
                     </div>
-                  )}
-                </div>
-
-                {/* Subtle Horizontal Divider */}
-                <div className="mobile-right-divider" />
-
-                {/* 2-Column Spacious Bento Showcase (50% / 50%) */}
-                <div className="mobile-details-bento">
-                  {/* COLUMN 1: Core Capabilities (Features) */}
-                  <div className="mobile-bento-card mobile-bento-card--features">
-                    <div className="mobile-card-header">
-                      <span className="mobile-card-kicker">KEY CAPABILITIES</span>
-                      <span className="mobile-card-headline">Core App Features</span>
-                    </div>
-                    <div className="mobile-features-flow">
-                      {featureColumns.map((col, idx) => (
-                        <div key={idx} className="mobile-feature-row">
-                          <div className="mobile-feature-badge">{col.label}</div>
-                          <p className="mobile-feature-text">{col.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* COLUMN 2: Purpose & Architecture */}
-                  <div className="mobile-bento-card mobile-bento-card--specs">
-                    <div className="mobile-card-header">
-                      <span className="mobile-card-kicker">SYSTEM & IMPACT</span>
-                      <span className="mobile-card-headline">Purpose & Architecture</span>
-                    </div>
-
-                    {/* Problem & Purpose */}
-                    <div className="mobile-spec-section">
-                      <div className="mobile-spec-title">Problem & Impact</div>
-                      <p className="mobile-spec-body">
-                        {displayProj?.aboutDetails?.purpose || displayProj?.description?.split('\n\n')[0]}
-                      </p>
-                      {displayProj?.aboutDetails?.targetUsers && (
-                        <div className="mobile-user-tag-row">
-                          <span className="mobile-user-label">Target Users:</span>
-                          <span className="mobile-user-value">{displayProj.aboutDetails.targetUsers}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Technical Specs */}
-                    <div className="mobile-spec-section mobile-spec-section--arch">
-                      {technicalDetails?.architecture && (
-                        <div className="mobile-spec-item">
-                          <div className="spec-label">System Architecture</div>
-                          <div className="spec-value">{technicalDetails.architecture}</div>
-                        </div>
-                      )}
-                      {technicalDetails?.challenges && (
-                        <div className="mobile-spec-item">
-                          <div className="spec-label">Technical Challenge</div>
-                          <div className="spec-value">{technicalDetails.challenges}</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-          </div>
-        </div>
-      ) : (
-          /* ========================================================= */
-          /* WEBPAGE APPLICATION SHOWCASE (58% Preview / 42% Info)     */
-          /* ========================================================= */
-          <>
-            {/* TOP ROW: Quick Project Info (Left) + Screenshot Preview (Right) */}
-            <div className="detail-top-row">
-              {/* 1. Left — Quick project information (42% width) */}
-              <div className="detail-quick-info">
-                <div className="detail-quick-header">
-                  <button
-                    type="button"
-                    ref={backBtnRef}
-                    className="detail-back-btn"
-                    onClick={startClose}
-                    aria-label="Close project details"
-                  >
-                    ← back [ESC]
-                  </button>
-
-                  {/* Prev / Next project switcher in header */}
-                  <div className="detail-project-nav-bar">
-                    <button
-                      type="button"
-                      className="detail-proj-btn detail-proj-btn--prev"
-                      onClick={() => navigateTo(prevProject, 'prev')}
-                      title={`Previous Project: ${prevProject.title}`}
-                      aria-label={`Previous Project: ${prevProject.title}`}
-                    >
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-                      </svg>
-                      <span>Prev</span>
-                    </button>
-                    <span className="detail-proj-counter">
-                      {String(currentIndex >= 0 ? currentIndex + 1 : 1).padStart(2, '0')} /{' '}
-                      {String(activeProjects.length).padStart(2, '0')}
-                    </span>
-                    <button
-                      type="button"
-                      className="detail-proj-btn detail-proj-btn--next"
-                      onClick={() => navigateTo(nextProject, 'next')}
-                      title={`Next Project: ${nextProject.title}`}
-                      aria-label={`Next Project: ${nextProject.title}`}
-                    >
-                      <span>Next</span>
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
-                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div className="detail-quick-badges">
-                    {cleanYear && <span className="detail-year-pill">{cleanYear}</span>}
-                    <span
-                      className={`detail-status-pill ${
-                        isCompleted ? 'detail-status-pill--completed' : 'detail-status-pill--progress'
-                      }`}
-                    >
-                      <span className="detail-status-dot" aria-hidden="true" />
-                      {displayProj?.status || 'In Progress'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Project name in large typography */}
-                <h2 className="detail-title">{displayProj?.title}</h2>
-
-                {/* Developer role */}
-                <div className="detail-role-label">{cleanRole}</div>
-
-                {/* Short introduction */}
-                <p className="detail-summary-text">{displayProj?.summary}</p>
-
-                {/* Technology tags */}
-                {displayProj?.stack && displayProj.stack.length > 0 && (
-                  <div className="detail-tech-tags">
-                    {displayProj.stack.map((item) => (
-                      <span key={item} className="detail-tech-pill">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* GitHub and Live Demo buttons */}
-                <div className="detail-action-buttons">
-                  {repoLink && (
-                    <a
-                      href={repoLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="detail-btn detail-btn--repo"
-                    >
-                      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                      </svg>
-                      <span>GitHub →</span>
-                    </a>
-                  )}
-                  {demoLink && (
-                    <a
-                      href={demoLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="detail-btn detail-btn--demo"
-                    >
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                      <span>{demoLink.label} →</span>
-                    </a>
-                  )}
+                  ))}
                 </div>
               </div>
 
-              {/* 2. Right — Project preview (58% width) */}
-              <div
-                className="detail-preview-section detail-preview-section--web"
-                onMouseEnter={() => setIsPaused(true)}
-                onMouseLeave={() => setIsPaused(false)}
+              {/* Smartphone Home Indicator Bar */}
+              <div className="smartphone-home-indicator" aria-hidden="true" />
+            </div>
+          ) : (
+            /* Desktop Web Browser Frame */
+            <div className="browser-mockup" aria-label="Web Application Browser Frame">
+              {/* Browser Window Header */}
+              <div className="browser-topbar" aria-hidden="true">
+                <div className="browser-dots">
+                  <span className="browser-dot browser-dot--close" />
+                  <span className="browser-dot browser-dot--min" />
+                  <span className="browser-dot browser-dot--max" />
+                </div>
+                <div className="browser-url-bar">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="12"
+                    height="12"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="browser-lock-icon"
+                  >
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <span className="browser-url-text">{browserUrl}</span>
+                </div>
+              </div>
+
+              {/* Browser Viewport with Track */}
+              <div className="browser-screen">
+                <div
+                  className="detail-carousel-track"
+                  style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                >
+                  {imageList.map((imgSrc, idx) => (
+                    <div key={imgSrc + idx} className="detail-carousel-slide">
+                      <img
+                        ref={idx === 0 ? previewImgRef : undefined}
+                        src={imgSrc}
+                        alt={`${displayProj?.title || 'Project'} screenshot ${idx + 1}`}
+                        className="detail-slide-img detail-slide-img--web"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Carousel Controls Directly Below Device / Browser (only if multiple images) */}
+          {imageList.length > 1 && (
+            <div className="detail-carousel-controls" aria-label="Project screenshot gallery">
+              <button
+                type="button"
+                className="detail-carousel-btn detail-carousel-btn--prev"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setActiveSlide((prev) => (prev - 1 + imageList.length) % imageList.length)
+                }}
+                title="Previous screenshot"
+                aria-label="Previous screenshot"
               >
-                <div className="detail-media-frame detail-media-frame--web">
-                  <div
-                    className="detail-carousel-track"
-                    style={{ transform: `translateX(-${activeSlide * 100}%)` }}
-                  >
-                    {imageList.map((imgSrc, idx) => (
-                      <div key={imgSrc + idx} className="detail-carousel-slide">
-                        <img
-                          ref={idx === 0 ? previewImgRef : undefined}
-                          src={imgSrc}
-                          alt={`${displayProj?.title || 'Project'} screenshot ${idx + 1}`}
-                          className="detail-slide-img"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                  <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                </svg>
+              </button>
 
-                {/* Image navigation dots immediately underneath */}
-                {imageList.length > 1 && (
-                  <div className="detail-carousel-controls" aria-label="Project screenshot gallery">
-                    <button
-                      type="button"
-                      className="detail-carousel-btn detail-carousel-btn--prev"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setActiveSlide((prev) => (prev - 1 + imageList.length) % imageList.length)
-                      }}
-                      title="Previous image"
-                      aria-label="Previous image"
-                    >
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-                      </svg>
-                    </button>
+              <div className="detail-carousel-dots">
+                {imageList.map((_, dotIdx) => (
+                  <button
+                    key={dotIdx}
+                    type="button"
+                    className={`detail-carousel-dot ${dotIdx === activeSlide ? 'is-active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setActiveSlide(dotIdx)
+                    }}
+                    title={`View screenshot ${dotIdx + 1}`}
+                    aria-label={`View screenshot ${dotIdx + 1}`}
+                  />
+                ))}
+              </div>
 
-                    <div className="detail-carousel-dots">
-                      {imageList.map((_, dotIdx) => (
-                        <button
-                          key={dotIdx}
-                          type="button"
-                          className={`detail-carousel-dot ${dotIdx === activeSlide ? 'is-active' : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setActiveSlide(dotIdx)
-                          }}
-                          title={`View image ${dotIdx + 1}`}
-                          aria-label={`View image ${dotIdx + 1}`}
-                        />
-                      ))}
-                    </div>
+              <button
+                type="button"
+                className="detail-carousel-btn detail-carousel-btn--next"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setActiveSlide((prev) => (prev + 1) % imageList.length)
+                }}
+                title="Next screenshot"
+                aria-label="Next screenshot"
+              >
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                  <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
 
-                    <button
-                      type="button"
-                      className="detail-carousel-btn detail-carousel-btn--next"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setActiveSlide((prev) => (prev + 1) % imageList.length)
-                      }}
-                      title="Next image"
-                      aria-label="Next image"
-                    >
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-                      </svg>
-                    </button>
-                  </div>
-                )}
+        {/* ========================================================= */}
+        {/* COLUMN 2 (RIGHT): Project Details (Scrolls internally)   */}
+        {/* ========================================================= */}
+        <div className="detail-info-column" ref={detailsScrollRef}>
+          <div className="detail-info-inner">
+            {/* 1. TOP NAVIGATION ROW: Back Button (Left) & Prev/Next Pill (Right) */}
+            <div className="detail-nav-row">
+              <button
+                type="button"
+                ref={backBtnRef}
+                className="detail-back-btn"
+                onClick={startClose}
+                aria-label="Close project details"
+              >
+                ← BACK [ESC]
+              </button>
+
+              <div className="detail-project-nav-bar" aria-label="Project switcher">
+                <button
+                  type="button"
+                  className="detail-proj-btn detail-proj-btn--prev"
+                  onClick={() => navigateTo(prevProject, 'prev')}
+                  title={`Previous Project: ${prevProject.title}`}
+                  aria-label={`Previous Project: ${prevProject.title}`}
+                >
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                  </svg>
+                  <span>PREV</span>
+                </button>
+                <span className="detail-proj-counter">
+                  {String(currentIndex >= 0 ? currentIndex + 1 : 1).padStart(2, '0')} /{' '}
+                  {String(activeProjects.length).padStart(2, '0')}
+                </span>
+                <button
+                  type="button"
+                  className="detail-proj-btn detail-proj-btn--next"
+                  onClick={() => navigateTo(nextProject, 'next')}
+                  title={`Next Project: ${nextProject.title}`}
+                  aria-label={`Next Project: ${nextProject.title}`}
+                >
+                  <span>NEXT</span>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                  </svg>
+                </button>
               </div>
             </div>
 
-            {/* SUBTLE HORIZONTAL DIVIDER LINE */}
+            {/* 2. META BADGES ROW */}
+            <div className="detail-meta-row">
+              <span className="detail-proj-tag">
+                PROJECT {String(currentIndex >= 0 ? currentIndex + 1 : 1).padStart(2, '0')}
+              </span>
+              {cleanYear && <span className="detail-year-pill">{cleanYear}</span>}
+              <span
+                className={`detail-status-pill ${
+                  isCompleted ? 'detail-status-pill--completed' : 'detail-status-pill--progress'
+                }`}
+              >
+                <span className="detail-status-dot" aria-hidden="true" />
+                {displayProj?.status || 'In Progress'}
+              </span>
+              <span className="detail-category-pill">
+                {isMobileApp ? 'MOBILE APPLICATION' : 'WEB APPLICATION'}
+              </span>
+              {cleanRole && <span className="detail-role-pill">{cleanRole}</span>}
+            </div>
+
+            {/* 3. PROJECT TITLE */}
+            <h2 className="detail-title">{displayProj?.title}</h2>
+
+            {/* 4. SUMMARY */}
+            <p className="detail-summary">{displayProj?.summary}</p>
+
+            {/* 5. TECH STACK BADGES */}
+            {displayProj?.stack && displayProj.stack.length > 0 && (
+              <div className="detail-tech-tags">
+                {displayProj.stack.map((item) => (
+                  <span key={item} className="detail-tech-pill">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* 6. ACTION BUTTONS (GitHub Repo & Live Demo) */}
+            <div className="detail-action-buttons">
+              {repoLink && (
+                <a
+                  href={repoLink.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="detail-btn detail-btn--repo"
+                >
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                  </svg>
+                  <span>GitHub Repo →</span>
+                </a>
+              )}
+              {demoLink ? (
+                <a
+                  href={demoLink.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="detail-btn detail-btn--demo"
+                >
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  <span>{demoLink.label} →</span>
+                </a>
+              ) : (
+                <div className="detail-demo-pill" title="Live APK / Demo in active build pipeline">
+                  <span className="detail-demo-dot" />
+                  <span>APK / Demo in Build</span>
+                </div>
+              )}
+            </div>
+
+            {/* 7. SUBTLE DIVIDER */}
             <div className="detail-divider" />
 
-            {/* 3. BOTTOM — Full-Width Project Details (100% width) */}
-            <div className="detail-bottom-grid">
-              {/* SECTION 1: ABOUT */}
-              <div className="detail-bottom-card detail-card--about">
-                <div className="detail-section-label">ABOUT</div>
-                <h3 className="detail-section-title">Overview & Purpose</h3>
-                <div className="detail-section-content">
-                  {descriptionParagraphs.map((p, idx) => (
-                    <p key={idx}>{p}</p>
-                  ))}
+            {/* 8. 2-COLUMN BENTO SHOWCASE (KEY CAPABILITIES & SYSTEM / IMPACT) */}
+            <div className="detail-bento-grid">
+              {/* BENTO CARD 1: Key Capabilities */}
+              <div className="detail-bento-card detail-bento-card--features">
+                <div className="bento-card-header">
+                  <span className="bento-kicker">KEY CAPABILITIES</span>
+                  <h3 className="bento-headline">Core App Features</h3>
                 </div>
-              </div>
-
-              {/* SECTION 2: HIGHLIGHTS (Important features in two columns) */}
-              <div className="detail-bottom-card detail-card--highlights">
-                <div className="detail-section-label">HIGHLIGHTS</div>
-                <h3 className="detail-section-title">Key Capabilities</h3>
-                <div className="detail-features-two-col">
+                <div className="bento-features-list">
                   {featureColumns.map((col, idx) => (
-                    <div key={idx} className="detail-feature-item">
-                      <div className="detail-feature-num">{col.label}</div>
-                      <div className="detail-feature-desc">{col.description}</div>
+                    <div key={idx} className="bento-feature-item">
+                      <div className="bento-feature-kicker">{col.label}</div>
+                      <p className="bento-feature-desc">{col.description}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* SECTION 3: TECHNICAL DETAILS (Architecture, technologies & challenges) */}
-              <div className="detail-bottom-card detail-card--technical">
-                <div className="detail-section-label">TECHNICAL DETAILS</div>
-                <h3 className="detail-section-title">System & Stack</h3>
-                <div className="detail-tech-specs">
+              {/* BENTO CARD 2: Purpose & Architecture */}
+              <div className="detail-bento-card detail-bento-card--specs">
+                <div className="bento-card-header">
+                  <span className="bento-kicker">SYSTEM & IMPACT</span>
+                  <h3 className="bento-headline">Purpose & Architecture</h3>
+                </div>
+
+                <div className="bento-specs-flow">
+                  {/* Problem & Impact */}
+                  <div className="bento-spec-section">
+                    <div className="bento-spec-kicker">PROBLEM & IMPACT</div>
+                    <p className="bento-spec-body">
+                      {displayProj?.aboutDetails?.purpose || descriptionParagraphs[0]}
+                    </p>
+                  </div>
+
+                  {/* Target Users */}
+                  {displayProj?.aboutDetails?.targetUsers && (
+                    <div className="bento-spec-section">
+                      <div className="bento-spec-kicker">TARGET USERS</div>
+                      <p className="bento-spec-body bento-spec-body--users">
+                        {displayProj.aboutDetails.targetUsers}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* System Architecture */}
                   {technicalDetails?.architecture && (
-                    <div className="detail-tech-spec-row">
-                      <div className="spec-label">Architecture</div>
-                      <div className="spec-value">{technicalDetails.architecture}</div>
+                    <div className="bento-spec-section">
+                      <div className="bento-spec-kicker">SYSTEM ARCHITECTURE</div>
+                      <p className="bento-spec-body">{technicalDetails.architecture}</p>
                     </div>
                   )}
-                  {technicalDetails?.technologies && (
-                    <div className="detail-tech-spec-row">
-                      <div className="spec-label">Technologies</div>
-                      <div className="spec-value">{technicalDetails.technologies}</div>
-                    </div>
-                  )}
+
+                  {/* Technical Challenge */}
                   {technicalDetails?.challenges && (
-                    <div className="detail-tech-spec-row">
-                      <div className="spec-label">Key Challenge</div>
-                      <div className="spec-value">{technicalDetails.challenges}</div>
+                    <div className="bento-spec-section">
+                      <div className="bento-spec-kicker">TECHNICAL CHALLENGE</div>
+                      <p className="bento-spec-body">{technicalDetails.challenges}</p>
                     </div>
                   )}
                 </div>
               </div>
             </div>
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>,
     document.body

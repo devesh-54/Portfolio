@@ -78,9 +78,8 @@ export const projects: ProjectItem[] = [
       purpose:
         'To eliminate life-threatening communication blackouts by turning everyday civilian smartphones into autonomous, multi-hop peer-to-peer relay nodes without internet access.',
       targetUsers:
-        'Disaster survivors in crisis zones, NDRF rescue teams, first responders, medical volunteers, and isolated communities.',
+        'Disaster survivors, community volunteers, and emergency responders in network blackout zones.',
     },
-    role: 'Mobile & Systems Developer',
     year: '2026',
     status: 'In progress',
     stack: ['Flutter', 'Dart', 'Kotlin', 'Wi-Fi Direct', 'BLE', 'Sherpa-ONNX'],
@@ -138,7 +137,6 @@ export const projects: ProjectItem[] = [
       targetUsers:
         'Chit fund members, community savings organizers, self-help groups (SHGs), and micro-investors seeking transparent group finance.',
     },
-    role: 'Mobile & Full-Stack Developer',
     year: '2026',
     status: 'In progress',
     stack: ['Flutter', 'Supabase', 'Node.js', 'Google ML Kit'],
@@ -188,7 +186,14 @@ export const projects: ProjectItem[] = [
       'Inclusive job portal connecting job seekers, including persons with disabilities, with recruiters.',
     description:
       'HireConnect connects educated and vocational job seekers with recruiters, and adds a government exam notification portal. Job seekers get an applications tracker and a support and grievance system.\n\nRecruiters get an analytics dashboard, a multi-step job posting builder with accessibility accommodations (wheelchair access, screen readers, sign language interpreters), applicant management and automated shortlist or reject emails. The interface is bilingual (English and Tamil), screen-reader friendly and uses role-based routes.',
-    role: 'Full-Stack Developer',
+    aboutDetails: {
+      overview:
+        'HireConnect is an inclusive job portal designed for educated and vocational job seekers, including persons with disabilities (PwD).',
+      purpose:
+        'To bridge employment gaps by providing screen-reader accessible job boards, exam alerts, and a recruiter applicant tracking pipeline.',
+      targetUsers:
+        'Job seekers with disabilities, vocational applicants, and inclusive employers.',
+    },
     year: '2026',
     status: 'Completed',
     stack: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Firebase'],
@@ -230,7 +235,14 @@ export const projects: ProjectItem[] = [
       'Diabetic retinopathy grading model with explainable heatmaps and a clinical report.',
     description:
       'RetinAI is an AI-powered medical imaging pipeline that grades diabetic retinopathy from fundus photographs with almost perfect agreement: CLAHE preprocessing, an EfficientNet-B4 model trained in two phases, Grad-CAM heatmaps to show what the model looked at, and an auto-generated clinical report.\n\nEvaluation on the test set achieves 83.88% overall accuracy, 0.8913 quadratic weighted kappa, 0.834 weighted F1 score, and 0.9227 macro ROC-AUC, providing real-time diagnostic grading under 2 seconds.',
-    role: 'Deep Learning & Full-Stack',
+    aboutDetails: {
+      overview:
+        'RetinAI is an explainable deep learning pipeline for automated diabetic retinopathy grading from retinal fundus photographs.',
+      purpose:
+        'To provide fast, clinician-interpretable diagnostic assistance that prevents preventable vision loss in diabetic patients.',
+      targetUsers:
+        'Ophthalmologists, optometrists, diabetic care clinics, and telemedicine providers.',
+    },
     year: '2026',
     status: 'Completed',
     stack: ['Python', 'EfficientNet-B4', 'Grad-CAM', 'Albumentations', 'React'],
@@ -279,7 +291,14 @@ export const projects: ProjectItem[] = [
       'Autonomous working-capital agent that forecasts cash flow and decides how to pay and finance.',
     description:
       'CashPilot AI is an autonomous working-capital management agent for a Tata Motors-style automotive manufacturer, built for the CSI ORIGIN 2026 hackathon. ARIMA forecasts daily net cash flow, and a decision engine weighs payment and financing strategy against supplier obligations, discounts, penalties and financing costs.\n\nThe language model never calculates anything: it only narrates a pre-computed decision. A FastAPI backend streams live data to a React dashboard.',
-    role: 'AI & Full-Stack Developer',
+    aboutDetails: {
+      overview:
+        'CashPilot AI is an autonomous working-capital management agent simulating corporate treasury operations for automotive supply chains.',
+      purpose:
+        'To optimize corporate liquidity by balancing supplier discount capture against debt financing penalties via real-time optimization.',
+      targetUsers:
+        'Corporate treasurers, supply chain finance teams, and automotive manufacturers.',
+    },
     year: '2026',
     status: 'In progress',
     stack: ['Python', 'ARIMA', 'FastAPI', 'React', 'TypeScript'],
@@ -313,13 +332,21 @@ export const projects: ProjectItem[] = [
   },
   {
     id: 'campus-ims',
-    featured: false,
+    kind: 'web',
+    featured: true,
     title: 'Campus-IMS',
     summary:
       '3D interactive campus information system with an administrative suite for students, faculty and staff.',
     description:
       'Campus-IMS lets users explore a 3D campus (3 buildings, 16 floors, 108+ rooms) and find staff, with auto-focus on the room. Access is isolated by role using PostgreSQL row-level security.\n\nIt includes a smart classroom resource manager, an LMS suite (attendance, marks, gradebook, leave and OD workflow) and a cloud print hub with a first-come queue, teacher priority and automatic file purge after 24 hours.',
-    role: 'AI & Full-Stack Developer',
+    aboutDetails: {
+      overview:
+        'Campus-IMS is an interactive 3D spatial twin and comprehensive administrative suite for modern academic institutions.',
+      purpose:
+        'To simplify campus navigation across 108+ rooms while automating smart classroom management, attendance, and secure print queues.',
+      targetUsers:
+        'Students, faculty members, lab instructors, and administrative staff.',
+    },
     year: '2026',
     status: 'Completed',
     stack: ['Three.js', 'React', 'TypeScript', 'Supabase', 'Tailwind CSS'],
@@ -327,7 +354,33 @@ export const projects: ProjectItem[] = [
       'Interactive 3D campus navigator across 3 buildings, 16 floors and 108+ rooms',
       'Smart classroom LMS suite & cloud print hub with PostgreSQL row-level security',
     ],
+    featureColumns: [
+      {
+        label: '01 — 3D CAMPUS NAVIGATOR',
+        description:
+          'Three.js spatial digital twin mapping 3 buildings, 16 floors, and 108+ rooms with automated camera wayfinding.',
+      },
+      {
+        label: '02 — LMS & RESOURCE SUITE',
+        description:
+          'Smart classroom booking, attendance records, gradebook workflows, and leave management.',
+      },
+      {
+        label: '03 — SECURE CLOUD PRINT HUB',
+        description:
+          'Automated first-come print queue with teacher priority overrides and 24-hour file purge.',
+      },
+    ],
+    technicalDetails: {
+      architecture:
+        'Three.js 3D viewport embedded in React with Supabase PostgreSQL Row-Level Security.',
+      technologies:
+        'Three.js, React, TypeScript, Supabase PostgreSQL RLS, Tailwind CSS.',
+      challenges:
+        'Optimizing 3D mesh rendering and camera focus across complex multi-floor building plans.',
+    },
     image: campusImsImg,
+    images: [campusImsImg],
     focus: '50% 50%',
     links: [
       { label: 'Repo', url: 'https://github.com/devesh-54/Campus-IMS' },
@@ -341,7 +394,6 @@ export const projects: ProjectItem[] = [
       'Medicine management app with risk-graded drug and food interaction checks.',
     description:
       'A patient and caretaker app that checks drug and food interactions, advises on missed doses and sets offline medicine alarms, with a caretaker portal showing adherence. Evidence comes from sources like RxNav and USDA FoodData Central, and the language model is used only to put results in plain English. Presented at Nanohack 2026 and built for the AI HealthTech & Groq LPU Hackathon.',
-    role: 'AI & Full-Stack Developer',
     year: '2026',
     status: 'In progress',
     stack: ['Flutter', 'TypeScript', 'Express', 'Supabase'],
@@ -357,7 +409,6 @@ export const projects: ProjectItem[] = [
       'AI career intelligence: ATS resume scoring, skill-gap radar and a learning roadmap.',
     description:
       'Connects a degree to live job and salary data. It scores resumes (PDF or DOCX) against ATS rules, shows a skill-gap radar and builds a phased learning roadmap. Built for the Global AI Hackathon 2026 (AI & Future of Work track).',
-    role: 'AI & Full-Stack Developer',
     year: '2026',
     status: 'In progress',
     stack: ['React', 'TypeScript', 'FastAPI', 'Supabase', 'Gemini'],
