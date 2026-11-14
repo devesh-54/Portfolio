@@ -341,7 +341,6 @@ export function Home() {
         { name: 'p_0.64_cashpilot', p: 0.64, title: 'p = 0.64 (CashPilot Focus - Right Side)' },
         { name: 'p_0.72_mediguard_ai', p: 0.72, title: 'p = 0.72 (MediGuard AI Focus - Left Side)' },
         { name: 'p_0.80_hireconnect', p: 0.80, title: 'p = 0.80 (HireConnect Focus - Right Side)' },
-        { name: 'p_0.88_campus_ims', p: 0.88, title: 'p = 0.88 (Campus IMS Focus - Left Side)' },
         { name: 'p_1.00_pure_black_end', p: 1.00, title: 'p = 1.00 (Pure Black Blank End)' },
       ]
       console.log('[autocapture] Detected autocapture=1, scheduling capture in 2s...')

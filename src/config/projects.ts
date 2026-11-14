@@ -8,7 +8,6 @@ import mediguardAiImg from '../assets/projects/mediguard-ai.webp'
 import hireconnect1Img from '../assets/projects/hireconnect-1.png'
 import hireconnect2Img from '../assets/projects/hireconnect-2.png'
 import hireconnect3Img from '../assets/projects/hireconnect-3.png'
-import campusImsImg from '../assets/projects/campus-ims.webp'
 import careerCompassImg from '../assets/projects/career-compass.svg'
 import retinaiLandingImg from '../assets/projects/retinai-landing.jpg'
 import retinaiTryImg from '../assets/projects/retinai-try.png'
@@ -328,62 +327,6 @@ export const projects: ProjectItem[] = [
     focus: '50% 50%',
     links: [
       { label: 'Repo', url: 'https://github.com/devesh-54/CaptialMind' },
-    ],
-  },
-  {
-    id: 'campus-ims',
-    kind: 'web',
-    featured: true,
-    title: 'Campus-IMS',
-    summary:
-      '3D interactive campus information system with an administrative suite for students, faculty and staff.',
-    description:
-      'Campus-IMS lets users explore a 3D campus (3 buildings, 16 floors, 108+ rooms) and find staff, with auto-focus on the room. Access is isolated by role using PostgreSQL row-level security.\n\nIt includes a smart classroom resource manager, an LMS suite (attendance, marks, gradebook, leave and OD workflow) and a cloud print hub with a first-come queue, teacher priority and automatic file purge after 24 hours.',
-    aboutDetails: {
-      overview:
-        'Campus-IMS is an interactive 3D spatial twin and comprehensive administrative suite for modern academic institutions.',
-      purpose:
-        'To simplify campus navigation across 108+ rooms while automating smart classroom management, attendance, and secure print queues.',
-      targetUsers:
-        'Students, faculty members, lab instructors, and administrative staff.',
-    },
-    year: '2026',
-    status: 'Completed',
-    stack: ['Three.js', 'React', 'TypeScript', 'Supabase', 'Tailwind CSS'],
-    highlights: [
-      'Interactive 3D campus navigator across 3 buildings, 16 floors and 108+ rooms',
-      'Smart classroom LMS suite & cloud print hub with PostgreSQL row-level security',
-    ],
-    featureColumns: [
-      {
-        label: '01 — 3D CAMPUS NAVIGATOR',
-        description:
-          'Three.js spatial digital twin mapping 3 buildings, 16 floors, and 108+ rooms with automated camera wayfinding.',
-      },
-      {
-        label: '02 — LMS & RESOURCE SUITE',
-        description:
-          'Smart classroom booking, attendance records, gradebook workflows, and leave management.',
-      },
-      {
-        label: '03 — SECURE CLOUD PRINT HUB',
-        description:
-          'Automated first-come print queue with teacher priority overrides and 24-hour file purge.',
-      },
-    ],
-    technicalDetails: {
-      architecture:
-        'Three.js 3D viewport embedded in React with Supabase PostgreSQL Row-Level Security.',
-      technologies:
-        'Three.js, React, TypeScript, Supabase PostgreSQL RLS, Tailwind CSS.',
-      challenges:
-        'Optimizing 3D mesh rendering and camera focus across complex multi-floor building plans.',
-    },
-    image: campusImsImg,
-    images: [campusImsImg],
-    focus: '50% 50%',
-    links: [
-      { label: 'Repo', url: 'https://github.com/devesh-54/Campus-IMS' },
     ],
   },
   {
