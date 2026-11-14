@@ -287,6 +287,32 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
     [displayProj?.id, onSelectProject]
   )
 
+  // Native wheel scroll support: stop bubbling to window (preventing Lenis cancellation)
+  // and route wheel scrolls anywhere on the dialog into the details column
+  useEffect(() => {
+    if (!isOpen) return
+    const dialog = dialogRef.current
+    if (!dialog) return
+
+    const handleWheel = (e: WheelEvent) => {
+      // Stop bubbling so Lenis or window scroll listeners never intercept or preventDefault
+      e.stopPropagation()
+
+      const scrollEl = detailsScrollRef.current
+      if (!scrollEl) return
+
+      // If cursor is over media column or dialog margins, scroll the details column directly
+      if (!scrollEl.contains(e.target as Node)) {
+        scrollEl.scrollTop += e.deltaY
+      }
+    }
+
+    dialog.addEventListener('wheel', handleWheel, { passive: true })
+    return () => {
+      dialog.removeEventListener('wheel', handleWheel)
+    }
+  }, [isOpen, dialogRef])
+
   // ESC key, Left/Right arrows, and focus trap
   useEffect(() => {
     if (!isOpen) return
@@ -393,9 +419,10 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
       aria-modal="true"
       aria-label={displayProj?.title || 'Project Details'}
       tabIndex={-1}
+      data-lenis-prevent="true"
     >
       {/* Unified 2-Column Dashboard Frame */}
-      <div className="detail-canvas" ref={containerRef}>
+      <div className="detail-canvas" ref={containerRef} data-lenis-prevent="true">
         {/* ========================================================= */}
         {/* COLUMN 1 (LEFT): Media Showcase (Fixed, capped at 70vh)  */}
         {/* ========================================================= */}
@@ -540,7 +567,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
         {/* ========================================================= */}
         {/* COLUMN 2 (RIGHT): Project Details (Scrolls internally)   */}
         {/* ========================================================= */}
-        <div className="detail-info-column" ref={detailsScrollRef}>
+        <div className="detail-info-column" ref={detailsScrollRef} data-lenis-prevent="true">
           <div className="detail-info-inner">
             {/* 1. TOP NAVIGATION ROW: Back Button (Left) & Prev/Next Pill (Right) */}
             <div className="detail-nav-row">

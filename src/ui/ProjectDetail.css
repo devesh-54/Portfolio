@@ -21,6 +21,7 @@
   height: 100svh;
   max-height: 100svh;
   overflow: hidden; /* Desktop/laptop viewport never overflows */
+  overscroll-behavior: contain;
   box-sizing: border-box;
 }
 
@@ -326,6 +327,7 @@
   max-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
   box-sizing: border-box;
   /* Soft fade gradient at the bottom */
   -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 42px), transparent 100%);
@@ -355,11 +357,19 @@
 
 /* 2A. Navigation Row: Back Button (Left) & Prev/Next Pill (Right) */
 .detail-nav-row {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  background: #070d18;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+  padding: 10px 0;
+  margin-top: -10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: clamp(14px, 2vh, 18px);
+  margin-bottom: clamp(12px, 2vh, 18px);
 }
 
 .detail-back-btn {
