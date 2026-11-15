@@ -368,9 +368,14 @@ export function Home() {
 
   // Initialize Lenis and ScrollTriggers
   useEffect(() => {
+    const isTouchDevice =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+
     const lenis = new Lenis({
       lerp: FLIGHT_CONFIG.LENIS_LERP,
       touchMultiplier: 2,
+      syncTouch: true,
     })
     lenisRef.current = lenis
     if (typeof window !== 'undefined') {
@@ -388,8 +393,8 @@ export function Home() {
     gsap.ticker.add(tickerCb)
     gsap.ticker.lagSmoothing(0)
 
-    // Scroll lock until intro completes
-    if (!introEnded) {
+    // Scroll lock until intro completes (desktop only; mobile allows immediate swipe)
+    if (!introEnded && !isTouchDevice) {
       lenis.stop()
     } else {
       lenis.start()
@@ -622,7 +627,10 @@ export function Home() {
   // Sync scroll lock with introEnded
   useEffect(() => {
     if (!lenisRef.current) return
-    if (introEnded) {
+    const isTouch =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+    if (isTouch || introEnded) {
       lenisRef.current.start()
     } else {
       lenisRef.current.stop()

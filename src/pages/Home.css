@@ -216,6 +216,7 @@
   height: 100svh;
   overflow: hidden;
   pointer-events: none;
+  touch-action: pan-y;
   z-index: 3;
 }
 
@@ -226,6 +227,7 @@
   height: 100svh;
   z-index: 2;
   pointer-events: auto;
+  touch-action: pan-y;
 }
 
 /* Projects Section */
