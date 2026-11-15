@@ -20,7 +20,7 @@ export const site: SiteConfig = {
   email: "deveshdhanush73@gmail.com",
   github: "https://github.com/devesh-54",
   linkedin: "https://www.linkedin.com/in/devesh-s-6097a6370",
-  resumeUrl: "/Resume___.pdf",
+  resumeUrl: "/resume.pdf",
   languages: ["English", "Tamil", "Telugu"],
   focus: ["AI & Deep Learning", "Full-Stack Web", "Mobile Apps"],
   bio: [
