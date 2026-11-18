@@ -71,8 +71,8 @@ interface PlaybackState {
   lastTime: number
 }
 
-const MOSAIC_COLS = 24
-const MOSAIC_ROWS = 30
+const MOSAIC_COLS = 30
+const MOSAIC_ROWS = 36
 const FORMATION_DURATION_MS = 3200
 const REVERSE_DURATION_MS = 2400
 const mosaicCache = new WeakMap<HTMLElement, CachedMosaic>()
@@ -174,33 +174,38 @@ function buildMosaicCache(stageEl: HTMLElement, imgEl: HTMLImageElement): Cached
       }
       if (!hasVisible) continue
 
-      // Reverse of video disappearance: Particles stream in from the right across the ENTIRE HEIGHT of the subject
+      // Organic 360-degree radial constellation cloud (matches the realistic multi-directional physics of the text shards)
       const normR = r / Math.max(1, MOSAIC_ROWS - 1)
       const normC = c / Math.max(1, MOSAIC_COLS - 1)
+      const dxCenter = normC - 0.5
+      const dyCenter = normR - 0.5
+      const baseAngle = Math.atan2(dyCenter, dxCenter)
+      const radialDist = clamp01(Math.hypot(dxCenter, dyCenter) * 1.45)
 
       const hA = hash2(c * 17 + 5, r * 13 + 11)
       const hB = hash2(r * 23 + 7, c * 19 + 3)
       const hC = hash2(c * 29 + 31, r * 37 + 17)
       const hD = hash2(r * 41 + 19, c * 43 + 23)
 
-      // Particles arrive from the right (+X), with varied flight distance
-      const entryDx = 220 + hA * 420
-      // Conical plume vertical spread based on distance, centered around each tile's OWN height level
-      const entryPlume = (normR - 0.5) * 85 * (entryDx / 350)
-      const entryDy = entryPlume + (hB - 0.5) * 44 + Math.sin(c * 0.45 + r * 0.65) * 18
-      const entryRot = (hC - 0.5) * 2.6
-      const entryScale = 0.22 + hD * 0.24
-      const entryLift = (hA - 0.5) * 20
+      // Entry gathering: tight, refined 360° cloud closely hugging the card footprint
+      const entryAngle = baseAngle + (hA - 0.5) * Math.PI * 1.25
+      const entryDist = 42 + hB * 92 + radialDist * 26
+      const entryDx = Math.cos(entryAngle) * entryDist
+      const entryDy = Math.sin(entryAngle) * entryDist + (hC - 0.5) * 18
+      const entryRot = (hC - 0.5) * 1.8
+      const entryScale = 0.42 + hD * 0.28
+      const entryLift = (hA - 0.5) * 14
 
-      // Wavefront progression: core/left forms first, right side arrives last
-      const order = clamp01(normC * 0.62 + (hB - 0.5) * 0.18 + Math.abs(normR - 0.5) * 0.16)
+      // Organic stochastic + center-outward arrival order (no rigid vertical curtain wall)
+      const order = clamp01(radialDist * 0.34 + hB * 0.54 + hD * 0.12)
 
-      // Exit pattern: Forward of video (particles disintegrate & blow OUT to the right across full height)
-      const exitDx = 260 + hA * 460
-      const exitPlume = (normR - 0.5) * 115 * (exitDx / 350)
-      const exitDy = exitPlume + (hC - 0.5) * 50 + Math.sin(c * 0.5 + r * 0.5) * 20
-      const exitRot = (hD - 0.5) * 3.2
-      const scatterOrder = clamp01((1 - normC) * 0.62 + (hB - 0.5) * 0.18 + Math.abs(normR - 0.5) * 0.16)
+      // Exit scatter: tight, controlled 360° outward dispersion + subtle tumble rotation
+      const exitAngle = baseAngle + (hC - 0.5) * Math.PI * 1.25
+      const exitDist = 52 + hA * 108 + radialDist * 30
+      const exitDx = Math.cos(exitAngle) * exitDist
+      const exitDy = Math.sin(exitAngle) * exitDist - 10 + (hB - 0.5) * 18
+      const exitRot = (hD - 0.5) * 2.1
+      const scatterOrder = clamp01((1 - radialDist) * 0.34 + hD * 0.54 + hA * 0.12)
 
       tiles.push({
         sx,
@@ -210,8 +215,8 @@ function buildMosaicCache(stageEl: HTMLElement, imgEl: HTMLImageElement): Cached
         col: c,
         row: r,
         order,
-        jitterX: (hA - 0.5) * 28,
-        jitterY: (hB - 0.5) * 30,
+        jitterX: (hA - 0.5) * 12,
+        jitterY: (hB - 0.5) * 14,
         entryDx,
         entryDy,
         entryRot,
@@ -566,28 +571,28 @@ export function applyAboutStageVars(
     const { destLeft, destTop, cellW, cellH } = cache
 
     if (effD > 0.001) {
-      // Exit scatter pattern: radial vortex burst + tumble rotation outward across the viewport
+      // Exit scatter pattern: organic 360° outward burst + tumble rotation (mirrors text shards)
       for (let i = 0; i < cached.tiles.length; i++) {
         const tile = cached.tiles[i]
-        const tStart = tile.scatterOrder * 0.44
-        const rawT = clamp01((effD - tStart) / 0.52)
+        const tStart = tile.scatterOrder * 0.46
+        const rawT = clamp01((effD - tStart) / 0.48)
         if (rawT >= 0.995) continue
 
-        // Smooth acceleration curve outward
-        const t = rawT * rawT
+        // Smooth organic outward acceleration matching text shards
+        const t = rawT * rawT * (2.15 - 1.15 * rawT)
         const targetX = destLeft + tile.col * cellW
         const targetY = destTop + tile.row * cellH
 
         const curX = targetX + tile.scatterDx * t
         const curY = targetY + tile.scatterDy * t
-        const curScale = lerp(1.0, 0.24, t)
+        const curScale = lerp(1.0, 0.28, t)
         const curRot = tile.scatterRot * t
         const halfW = (cellW * curScale + 0.65) * 0.5
         const halfH = (cellH * curScale + 0.65) * 0.5
         const cx = curX + cellW * 0.5
         const cy = curY + cellH * 0.5
 
-        ctx.globalAlpha = 1 - smoothstep(0.42, 1.0, rawT)
+        ctx.globalAlpha = 1 - smoothstep(0.36, 1.0, rawT)
         if (Math.abs(curRot) > 0.01) {
           ctx.save()
           ctx.translate(cx, cy)
@@ -619,26 +624,24 @@ export function applyAboutStageVars(
         }
       }
     } else {
-      // Entry pattern: Reverse of video disintegration.
-      // Particles sweep in horizontally from the right across the ENTIRE VERTICAL SPAN of the portrait.
+      // Entry gathering pattern: organic 360° constellation cloud converging smoothly into the card
       for (let i = 0; i < cached.tiles.length; i++) {
         const tile = cached.tiles[i]
-        const tStart = 0.02 + tile.order * 0.54
-        const rawT = clamp01((effA - tStart) / 0.38)
+        const tStart = 0.02 + tile.order * 0.52
+        const rawT = clamp01((effA - tStart) / 0.42)
         if (rawT <= 0.005) continue
 
-        // Ease-out cubic deceleration curve (rushing in from the right, settling gently into place)
+        // Smooth ease-out cubic deceleration (floating in from every direction, snapping cleanly home)
         const inv = 1 - rawT
         const t = 1 - inv * inv * inv
 
         const targetX = destLeft + tile.col * cellW
         const targetY = destTop + tile.row * cellH
 
-        // Start position is to the right (+X) at the tile's own vertical level with conical plume spread
         const startX = targetX + tile.entryDx
         const startY = targetY + tile.entryDy
 
-        const curX = lerp(startX, targetX, t)
+        const curX = lerp(startX, targetX, t) + Math.sin(rawT * Math.PI) * tile.jitterX
         const curY = lerp(startY, targetY, t) + Math.sin(rawT * Math.PI) * tile.entryLift
         const curScale = lerp(tile.entryScale, 1.0, t)
         const curRot = lerp(tile.entryRot, 0, t)
@@ -648,7 +651,7 @@ export function applyAboutStageVars(
         const cx = curX + cellW * 0.5
         const cy = curY + cellH * 0.5
 
-        ctx.globalAlpha = smoothstep(0.0, 0.20, rawT)
+        ctx.globalAlpha = smoothstep(0.0, 0.34, rawT)
         if (Math.abs(curRot) > 0.01) {
           ctx.save()
           ctx.translate(cx, cy)

@@ -249,7 +249,7 @@ export function PixelStage({
     const voidEl = voidScreenRef.current
     if (voidEl) {
       if (s < SKILLS_SPLIT_WIPE_END) {
-        voidEl.style.background = '#03050a'
+        voidEl.style.background = '#000000'
       } else if (E > 0.05) {
         voidEl.style.background = '#000000'
       } else {
@@ -847,7 +847,7 @@ export function PixelStage({
       }
     >
       {/* 1. Seamless Backdrop at z: 1 (starts dark for Monitor/About -> stays solid dark void for kinetic split) */}
-      <div ref={voidScreenRef} className="ps-screen ps-screen--void" style={{ background: '#03050a' }} />
+      <div ref={voidScreenRef} className="ps-screen ps-screen--void" style={{ background: '#000000' }} />
 
       {/* 2. Screen Skills at z: 2 */}
       <div

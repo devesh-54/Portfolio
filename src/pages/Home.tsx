@@ -726,7 +726,7 @@ export function Home() {
         ) : (
           <>
             {/* About Section */}
-            <section id="about" data-theme="dark" className="page-section" style={{ padding: 0, background: '#03050a' }}>
+            <section id="about" data-theme="dark" className="page-section" style={{ padding: 0, background: '#000000' }}>
               <About embedded />
             </section>
 

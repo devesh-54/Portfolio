@@ -84,6 +84,14 @@ export default function App({
     return visited || reducedMotion || hasP
   })
 
+  const handleSceneReady = useCallback(() => {
+    setSceneReady(true)
+  }, [])
+
+  const handleLoaderHidden = useCallback(() => {
+    setLoaderHidden(true)
+  }, [])
+
   const handleIntroEnd = useCallback(() => {
     setIntroEnded(true)
     sessionStorage.setItem('welcomeIntroPlayed', 'true')
@@ -393,7 +401,7 @@ function BackgroundController() {
 
           {/* Camera Rig (Inside Suspense so it waits for models to load) */}
           <CameraRig
-            onReady={() => setSceneReady(true)}
+            onReady={handleSceneReady}
             start={loaderHidden}
             onIntroEnd={handleIntroEnd}
             skipIntro={introEnded}
@@ -423,8 +431,8 @@ function BackgroundController() {
 
       <Loader
         ready={sceneReady}
-        onHidden={() => setLoaderHidden(true)}
-        onTransitionEnd={() => setLoaderHidden(true)}
+        onHidden={handleLoaderHidden}
+        onTransitionEnd={handleLoaderHidden}
       />
 
       {showChrome && <Credits />}
