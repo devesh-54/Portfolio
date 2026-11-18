@@ -150,10 +150,8 @@ function buildMosaicCache(stageEl: HTMLElement, imgEl: HTMLImageElement): Cached
   sourceCanvas.height = natH
   const pCtx = sourceCanvas.getContext('2d', { willReadFrequently: true })
   if (!pCtx) return null
-  // Bake contrast & brightness filter ONCE on load so per-frame animation matches settled <img> with zero tonal jump
-  pCtx.filter = 'contrast(1.06) brightness(0.95)'
+  // Draw clean source so per-frame mosaic animation matches settled <img> with zero tonal jump
   pCtx.drawImage(cleanSource, 0, 0)
-  pCtx.filter = 'none'
 
   const sw = natW / MOSAIC_COLS
   const sh = natH / MOSAIC_ROWS
@@ -302,7 +300,7 @@ function measureStageCache(stageEl: HTMLElement, forceRecompute = false): StageD
       cache.stageW = stageR.width
       cache.stageH = stageR.height
       cache.destLeft = imgR.left - stageR.left + (imgR.width - drawW) * 0.5
-      cache.destTop = imgR.top - stageR.top + (imgR.height - drawH)
+      cache.destTop = imgR.top - stageR.top + (imgR.height - drawH) * 0.5
       cache.cellW = drawW / MOSAIC_COLS
       cache.cellH = drawH / MOSAIC_ROWS
       cache.dpr = Math.min(2, window.devicePixelRatio || 1)
@@ -842,12 +840,13 @@ export function About({ embedded = false, stageMode = false }: AboutProps) {
           </div>
         </div>
 
-        {/* Right bottom-anchored portrait matching exact reference image position */}
+        {/* Right vertically centered portrait / placeholder visual (with 24x30 mosaic tile scatter & join) */}
         <div className="about-visual">
           <img
             src={portraitImg}
-            alt={`${site.name} studio portrait`}
+            alt={`${site.name} portrait`}
             className="about-portrait-img"
+            data-defringed="1"
             loading="eager"
             decoding="async"
           />

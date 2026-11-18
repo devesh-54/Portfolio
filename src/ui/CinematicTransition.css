@@ -1,0 +1,165 @@
+/* ==========================================================================
+   Cinematic Monitor Dive & Shatter Transition Styles
+   ========================================================================== */
+
+/* State class added to document.body during transition */
+body.is-transitioning,
+.is-transitioning {
+  overflow: hidden !important;
+  user-select: none !important;
+}
+
+body.is-transitioning a,
+body.is-transitioning button {
+  pointer-events: none !important;
+}
+
+/* ==========================================================================
+   Glass Shatter Overlay (.glass-crack-overlay)
+   ========================================================================== */
+.glass-crack-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;
+  transform-origin: 40% 48%;
+  transition: opacity 0.12s ease-out;
+  background: radial-gradient(
+    circle at 40% 48%,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(47, 208, 255, 0.08) 30%,
+    transparent 70%
+  );
+}
+
+/* Active shattering state with violent physical jitter */
+.glass-crack-overlay--active {
+  opacity: 1;
+  animation: shatter-jitter 0.08s infinite alternate ease-in-out;
+}
+
+/* SVG Fracture Pattern Scaling */
+.glass-crack-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 0 16px rgba(47, 208, 255, 0.85))
+    drop-shadow(0 0 35px rgba(255, 255, 255, 0.6));
+}
+
+/* Primary thick fracture veins */
+.crack-vein-primary {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: bevel;
+}
+
+/* Secondary cyan glowing fracture branches */
+.crack-vein-secondary {
+  fill: none;
+  stroke: #8fc4ff;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: bevel;
+  opacity: 0.92;
+}
+
+/* Tertiary hairline micro-fractures */
+.crack-vein-tertiary {
+  fill: none;
+  stroke: #cfe3ff;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+  stroke-linejoin: bevel;
+  opacity: 0.75;
+}
+
+/* Spiderweb concentric fracture rings */
+.crack-ring {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.8;
+  stroke-linejoin: miter;
+}
+
+/* Broken glass crystalline polygon shards */
+.crack-shard {
+  fill: rgba(255, 255, 255, 0.12);
+  stroke: #ffffff;
+  stroke-width: 1.2;
+}
+
+.crack-shard-cyan {
+  fill: rgba(47, 208, 255, 0.18);
+  stroke: #8fc4ff;
+  stroke-width: 1;
+}
+
+/* Central impact crater explosion */
+.crack-impact-core {
+  fill: rgba(255, 255, 255, 0.65);
+  stroke: #ffffff;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 12px #ffffff);
+}
+
+/* Subtle, violent jitter animation simulating glass snapping under extreme pressure */
+@keyframes shatter-jitter {
+  0% {
+    transform: scale(1) translate(0px, 0px) rotate(0deg);
+  }
+  20% {
+    transform: scale(1.025) translate(-3px, 2px) rotate(-0.4deg);
+  }
+  40% {
+    transform: scale(1.045) translate(4px, -3px) rotate(0.5deg);
+  }
+  60% {
+    transform: scale(1.07) translate(-4px, -2px) rotate(-0.3deg);
+  }
+  80% {
+    transform: scale(1.095) translate(3px, 3px) rotate(0.4deg);
+  }
+  100% {
+    transform: scale(1.12) translate(-2px, 1px) rotate(-0.2deg);
+  }
+}
+
+/* ==========================================================================
+   Blinding White Flash (.blinding-flash)
+   ========================================================================== */
+.blinding-flash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  /* Maximum bloom box-shadow flaring the edges */
+  box-shadow: inset 0 0 150px 75px rgba(255, 255, 255, 1),
+    0 0 250px 120px rgba(255, 255, 255, 1);
+  transition: opacity 0.35s cubic-bezier(0.12, 0, 0.39, 0);
+}
+
+/* Flash active: full solid pure whiteout */
+.blinding-flash--active {
+  opacity: 1;
+}
+
+/* Flash fading on arrival at the new page */
+.blinding-flash--fading {
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

@@ -135,10 +135,10 @@
 }
 
 .about-stage--embedded .about-portrait-img {
-  height: 100%;
-  max-height: min(720px, calc(100vh - 140px));
+  height: clamp(270px, 50vh, 450px);
+  max-height: min(450px, calc(100vh - 180px));
   object-fit: contain;
-  object-position: bottom center;
+  object-position: center;
 }
 
 /* Faint studio glow + diagonal streaks behind the right-side portrait */
@@ -379,13 +379,13 @@
   outline-offset: 4px;
 }
 
-/* Right bottom-anchored portrait visual */
+/* Right vertically centered portrait / placeholder visual */
 .about-visual {
   position: relative;
   align-self: stretch;
   height: 100%;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   pointer-events: none;
 }
@@ -394,11 +394,10 @@
   display: block;
   width: auto;
   max-width: 100%;
-  height: clamp(350px, 72vh, 720px);
-  max-height: calc(100svh - 40px);
+  height: clamp(270px, 50vh, 450px);
+  max-height: calc(100svh - 140px);
   object-fit: contain;
-  object-position: bottom center;
-  filter: contrast(1.06) brightness(0.95);
+  object-position: center;
   opacity: var(--about-img-op, 1);
   will-change: opacity;
 }
@@ -445,8 +444,8 @@
   }
 
   .about-portrait-img {
-    height: clamp(260px, 44vh, 380px);
-    max-height: 48svh;
+    height: clamp(220px, 36vh, 320px);
+    max-height: 40svh;
   }
 
   .about-streak--1 {
